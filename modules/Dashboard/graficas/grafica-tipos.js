@@ -233,9 +233,23 @@ function initTypesChart() {
 
 // Auto-inicializar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
-    if (document.getElementById('type-chart')) {
-        window.typesChartInstance = initTypesChart();
+  const chartDom = document.getElementById('type-chart');
+  if (!chartDom) return;
+  const chart = echarts.init(chartDom);
+
+  window.typesChartInstance = {
+    updateData: function({ categories, values, colors }) {
+      chart.setOption({
+        xAxis: { type: 'category', data: categories },
+        yAxis: { type: 'value' },
+        series: [{
+          data: values,
+          type: 'bar',
+          itemStyle: { color: function(params) { return colors[params.dataIndex] || '#0284c7'; } }
+        }]
+      });
     }
+  };
 });
 
 // Exportar para uso global1 initTypesChart;
