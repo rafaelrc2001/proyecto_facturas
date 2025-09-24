@@ -17,7 +17,6 @@ async function cargarDatosDashboard() {
 
 // Procesa y actualiza la gráfica de tipos
 function actualizarGraficaTipos(registros) {
-  // Suponiendo que columna 0 es Fecha, columna 1 es Tipo
   const facturasPorDia = {};
   registros.forEach((fila) => {
     const fecha = (fila[0] || "").trim();
@@ -27,18 +26,29 @@ function actualizarGraficaTipos(registros) {
     }
   });
 
-  // Ordenar fechas de menor a mayor
   const fechas = Object.keys(facturasPorDia).sort();
   const valores = fechas.map((f) => facturasPorDia[f]);
-  const colors = fechas.map(() => "#1D3E53"); // Un solo color o puedes alternar
 
-  if (window.typesChartInstance) {
-    window.typesChartInstance.updateData({
-      categories: fechas,
-      values: valores,
-      colors: colors,
-    });
+  // Inicializar o actualizar la gráfica
+  if (!window.facturasDiaChartInstance) {
+    const chartDom = document.getElementById("type-chart");
+    if (!chartDom) return;
+    const chart = echarts.init(chartDom);
+    window.facturasDiaChartInstance = chart;
   }
+  window.facturasDiaChartInstance.setOption({
+    title: { text: "" },
+    tooltip: {},
+    xAxis: { type: "category", data: fechas },
+    yAxis: { type: "value" },
+    series: [
+      {
+        data: valores,
+        type: "bar",
+        itemStyle: { color: "#1D3E53" },
+      },
+    ],
+  });
 }
 
 // Procesa y actualiza la gráfica de estatus
