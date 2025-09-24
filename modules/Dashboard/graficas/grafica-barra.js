@@ -1,4 +1,3 @@
-
 // Configuración de la gráfica de tipos
 function initTypesChart() {
     const typesData = {
@@ -21,9 +20,19 @@ function initTypesChart() {
             borderWidth: 1,
             textStyle: {
                 color: '#111827', // --color-text
-                fontSize: 11
+                fontSize: 12
             },
-            padding: [5, 8]
+            padding: [6, 10],
+            formatter: function(params) {
+              const data = params[0];
+              return `
+                <div style="font-weight: 600; margin-bottom: 3px; font-size: 12px;">${data.name}</div>
+                <div style="display: flex; align-items: center; gap: 5px; font-size: 12px;">
+                  <span style="display: inline-block; width: 8px; height: 8px; background: ${data.color}; border-radius: 50%;"></span>
+                  Facturas: <strong>${data.value}</strong>
+                </div>
+              `;
+            }
         },
         grid: {
             left: '30%',
@@ -192,7 +201,7 @@ function initTypesChart() {
     };
 }
 
-// Auto-inicializar cuando el DOM esté listo
+ //Auto-inicializar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
   const chartDom = document.getElementById('type-chart');
   if (!chartDom) return;
@@ -213,4 +222,144 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 });
 
-// Exportar para uso global1 initTypesChart;
+function initBarChart({ elementId, label, color }) {
+    const chartDom = document.getElementById(elementId);
+    if (!chartDom) return null;
+    const chart = echarts.init(chartDom);
+
+    // Configuración base
+    const baseOption = {
+        backgroundColor: "transparent", // Fondo transparente
+        title: { show: false },
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: { type: 'shadow' },
+            backgroundColor: 'rgba(255,255,255,0.95)',
+            borderColor: '#254B62',
+            borderWidth: 1,
+            textStyle: {
+                color: '#111827',
+                fontSize: 12
+            },
+            padding: [6, 10],
+            formatter: function(params) {
+                const data = params[0];
+                return `
+                  <div style="font-weight: 600; margin-bottom: 3px; font-size: 12px;">${data.name}</div>
+                  <div style="display: flex; align-items: center; gap: 5px; font-size: 12px;">
+                    <span style="display: inline-block; width: 8px; height: 8px; background: ${data.color}; border-radius: 50%;"></span>
+                    ${label}: <strong>${data.value}</strong>
+                  </div>
+                `;
+            }
+        },
+        grid: {
+            left: '30%',
+            right: '3%',
+            bottom: '3%',
+            top: '5%',
+            containLabel: false
+        },
+        xAxis: {
+            type: 'value',
+            name: 'Cantidad',
+            nameTextStyle: {
+                color: '#476D7C',
+                fontSize: 10,
+                fontWeight: 500,
+                padding: [0, 0, 0, 20]
+            },
+            axisLabel: {
+                show: false // Oculta los números del eje X
+            },
+            axisLine: { show: false },
+            axisTick: { show: false },
+            splitLine: {
+                lineStyle: {
+                    color: '#f3f4f6',
+                    width: 1,
+                    type: 'solid'
+                }
+            },
+            splitNumber: 4
+        },
+        yAxis: {
+            type: 'category',
+            data: [],
+            axisLabel: {
+                color: '#476D7C',
+                fontSize: 10,
+                fontWeight: 500,
+                interval: 0,
+                margin: 8
+            },
+            axisLine: {
+                lineStyle: {
+                    color: '#254B62',
+                    width: 1
+                }
+            },
+            axisTick: { show: false }
+        },
+        series: [{
+            name: label,
+            type: 'bar',
+            data: [],
+            itemStyle: {
+                color: color
+            },
+            barWidth: '55%',
+            label: {
+                show: false // Oculta los números en las barras
+            }
+        }],
+        animationEasing: 'elasticOut',
+        animationDelay: function (idx) {
+            return idx * 80;
+        },
+        animationDelayUpdate: function (idx) {
+            return idx * 40;
+        }
+    };
+
+    chart.setOption(baseOption);
+
+    window.addEventListener('resize', function() {
+        chart.resize();
+    });
+
+    // Función para actualizar datos
+    function updateData({ categories, values }) {
+        chart.setOption({
+            yAxis: { data: categories },
+            series: [{
+                data: values.map((value) => ({
+                    value: value,
+                    itemStyle: {
+                        color: color
+                    }
+                })),
+                label: { show: false } // Oculta los números en las barras al actualizar
+            }]
+        });
+    }
+
+    return {
+        chart,
+        updateData,
+        resize: () => chart.resize()
+    };
+}
+
+// Inicialización global para ambas gráficas
+window.facturasChartInstance = initBarChart({
+    elementId: 'type-chart',
+    label: 'Facturas',
+    color: '#77ABB7' // --color-accent
+});
+
+window.ticketsChartInstance = initBarChart({
+    elementId: 'tickets-dia-chart',
+    label: 'Tickets',
+    color: '#1D3E53' // --color-sidebar
+});
