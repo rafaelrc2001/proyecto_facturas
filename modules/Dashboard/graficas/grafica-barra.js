@@ -1,5 +1,3 @@
-// Gráfica de Permisos por Tipo - Barras Horizontales
-// grafica-tipos.js
 
 // Configuración de la gráfica de tipos
 function initTypesChart() {
