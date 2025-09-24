@@ -30,7 +30,7 @@ function actualizarGraficaTipos(registros) {
   // Ordenar fechas de menor a mayor
   const fechas = Object.keys(facturasPorDia).sort();
   const valores = fechas.map((f) => facturasPorDia[f]);
-  const colors = fechas.map(() => "#0284c7"); // Un solo color o puedes alternar
+  const colors = fechas.map(() => "#1D3E53"); // Un solo color o puedes alternar
 
   if (window.typesChartInstance) {
     window.typesChartInstance.updateData({
@@ -55,7 +55,7 @@ function actualizarGraficaEstatus(registros) {
 
   const categories = ["Facturas", "Tickets"];
   const values = [totalFacturas, totalTickets];
-  const colors = ["#0ea5e9", "#22c55e"];
+  const colors = ["#1D3E53","#77ABB7"];
 
   if (window.statusChartInstance) {
     window.statusChartInstance.updateData({
@@ -101,7 +101,7 @@ function actualizarGraficaTicketsPorDia(registros) {
 
   const fechas = Object.keys(ticketsPorDia).sort();
   const valores = fechas.map((f) => ticketsPorDia[f]);
-  const colors = fechas.map(() => "#22c55e");
+  const colors = fechas.map(() => "#1D3E53");
 
   // Inicializar o actualizar la gráfica
   if (!window.ticketsDiaChartInstance) {
@@ -119,7 +119,7 @@ function actualizarGraficaTicketsPorDia(registros) {
       {
         data: valores,
         type: "bar",
-        itemStyle: { color: "#22c55e" },
+        itemStyle: { color: "#77ABB7" },
       },
     ],
   });
