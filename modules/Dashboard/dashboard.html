@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard - Scanalyze</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link rel="stylesheet" href="/CSS/general.css" />
+    <link rel="stylesheet" href="/CSS/menu.css" />
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div>
+          <div class="sidebar-header">
+            <div class="logo-container">
+              <span class="logo-text">Scanalyze</span>
+              <button
+                class="sidebar-toggle-btn"
+                id="sidebarToggle"
+                aria-label="Ocultar menú"
+              >
+                <i class="fas fa-bars"></i>
+              </button>
+            </div>
+          </div>
+          <nav
+            class="sidebar-nav"
+            role="navigation"
+            aria-label="Menú principal"
+          >
+            <ul>
+              
+                        <li class="active">
+                            <a href="#" class="nav-item">
+                                <i class="fas fa-home" aria-hidden="true"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/modules/registros/registros.html" class="nav-item">
+                                <i class="fas fa-database" aria-hidden="true"></i>
+                                <span>Tickets y Facturas</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="avatar">AC</div>
+                    <div class="user-info">
+                        <h4 id="user-name">Ana Cortez</h4>
+                       
+                    </div>
+                </div>
+                <button class="logout-btn">
+                    <i class="fas fa-door-open" style="font-size:1.25em;"></i>
+                    <span style="font-size:1.25em;">Cerrar sesión</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="main-header">
+                <h1>
+                    <i class="fas fa-chart-pie"></i>
+                    Dashboard de Facturas y Tickets
+                </h1>
+            </header>
+
+            <!-- Cards Section -->
+            <section class="cards-section">
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-server"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Total de facturas y tickets</h3>
+                        <div class="count">-</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Tickets</h3>
+                        <div class="count">-</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <div class="card-content">
+                        <h3>Facturas</h3>
+                        <div class="count">-</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Gráficas -->
+            <div class="charts-container" style="display: flex; gap: 24px; flex-wrap: wrap; margin-top: 32px;">
+              
+                <!-- Gráfica de Tipos -->
+                <div class="chart-card" style="flex:1; min-width:320px;">
+                    <div class="chart-title">
+                        <i class="fas fa-list-alt" style="color:#0284c7"></i>
+                        Facturas y Tickets por Tipo
+                    </div>
+                    <div id="type-chart" class="chart-container" style="height:320px;"></div>
+                </div>
+                <!-- Gráfica de Estatus -->
+                <div class="chart-card" style="flex:1; min-width:320px;">
+                    <div class="chart-title">
+                        <i class="fas fa-tasks" style="color:#0ea5e9"></i>
+                        Facturas y Tickets por Estatus
+                    </div>
+                    <div id="status-chart" class="chart-container" style="height:320px;"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/modules/Dashboard/graficas/grafica-tipos.js"></script>
+    <script src="/modules/Dashboard/graficas/grafica-estatus.js"></script>
+    <script src="/JS/menu.js"></script>
+</body>
+</html>
+

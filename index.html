@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Sistema de Facturas</title>
+  <link rel="stylesheet" href="/CSS/general.css">
+  <link rel="stylesheet" href="/CSS/index.css">
+
+</head>
+  <body>
+    <div class="login-bg"></div>
+    <main class="login-container" role="main">
+      <div class="login-logo">
+        <img src="/img/inxite.png" alt="Logo FactuTech">
+      </div>
+      <header class="login-header">
+        <h1>Scanalyze</h1>
+        <p></p>
+      </header>
+
+    <form class="login-form" novalidate aria-label="Formulario de inicio de sesión">
+      <div class="form-group">
+        <label for="email">Correo electrónico</label>
+        <input type="email" id="email" name="email" 
+               placeholder="usuario@empresa.com" 
+               required aria-required="true">
+        <small class="error-message" id="email-error"></small>
+      </div>
+      <div class="form-group password-group">
+        <label for="password">Contraseña</label>
+        <div class="input-wrapper">
+          <input type="password" id="password" name="password"
+                 placeholder="••••••••" 
+                 required aria-required="true">
+          <button type="button" class="toggle-password" aria-label="Mostrar u ocultar contraseña">
+            
+          </button>
+        </div>
+            </div>
+   
+      <button type="submit" class="login-btn" id="login-btn">
+        Iniciar sesión
+      </button>
+      <div class="loading-spinner" id="loading-spinner" aria-hidden="true"></div>
+    </form>
+    
+  </main>
+
+  <script src="/index.js"></script>
+</body>
+</html>

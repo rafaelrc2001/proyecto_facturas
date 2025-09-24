@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sistema de Gestión - Diseño Moderno</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Montserrat:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/CSS/general.css" />
+    <link rel="stylesheet" href="/CSS/menu.css" />
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div>
+          <div class="sidebar-header">
+            <div class="logo-container">
+              <span class="logo-text">Scanalyze</span>
+              <button
+                class="sidebar-toggle-btn"
+                id="sidebarToggle"
+                aria-label="Ocultar menú"
+              >
+                <i class="fas fa-bars"></i>
+              </button>
+            </div>
+          </div>
+          <nav
+            class="sidebar-nav"
+            role="navigation"
+            aria-label="Menú principal"
+          >
+            <ul>
+              <li>
+                <a href="/modules/Dashboard/dashboard.html" class="nav-item">
+                  <i class="fas fa-home" aria-hidden="true"></i>
+                  <span>Dashboard</span>
+                </a>
+              </li>
+              <li class="active">
+                <a href="/modules/registros/registros.html" class="nav-item">
+                  <i class="fas fa-database" aria-hidden="true"></i>
+                  <span>Tickets y Facturas</span>
+                </a>
+              </li>
+            </ul>
+          </nav>
+        </div>
+        <div class="sidebar-footer">
+          <div class="user-profile">
+            <div class="avatar">AC</div>
+            <div class="user-info">
+              <h4 id="user-name">Ana Cortez</h4>
+            </div>
+          </div>
+          <!-- ...existing code... -->
+          <!-- ...existing code... -->
+          <button class="logout-btn" style="font-size: 1rem">
+            <i class="fas fa-sign-out-alt" style="font-size: 1em"></i>
+            <span style="font-size: 1em">Cerrar sesión</span>
+          </button>
+          <!-- ...existing code... -->
+          <!-- ...existing code... -->
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <header class="main-header">
+          <!-- ...existing code... -->
+          <h1>
+            <span class="header-icon">
+              <i class="fas fa-file-invoice-dollar"></i>
+            </span>
+            Registros de facturas y Tickets
+          </h1>
+          <!-- ...existing code... -->
+        </header>
+
+        <section class="cards-section">
+          <div class="card">
+            <div class="card-icon">
+              <i class="fas fa-server"></i>
+            </div>
+            <div class="card-content">
+              <h3>Total de facturas y tickets</h3>
+              <div class="count" id="total-count">-</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">
+              <i class="fas fa-database"></i>
+            </div>
+            <div class="card-content">
+              <h3>Tickets</h3>
+              <div class="count" id="tickets-count">-</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-icon">
+              <i class="fas fa-network-wired"></i>
+            </div>
+            <div class="card-content">
+              <h3>Facturas</h3>
+              <div class="count" id="facturas-count">-</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="table-section">
+          <div class="section-header">
+            <div class="header-actions">
+              <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Buscar en el sistema..." />
+              </div>
+            </div>
+
+            <button class="btn primary">
+              <i class="fas fa-download"></i>
+              Descargar CSV
+            </button>
+          </div>
+
+          <div class="table-container">
+            <table id="facturasTable">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Tipo</th>
+                  <th>Factura</th>
+                  <th>Subtotal</th>
+                  <th>IVA</th>
+                  <th>Total</th>
+
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Aquí se llenarán los datos con JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="pagination">
+            <button class="pagination-btn active">1</button>
+            <button class="pagination-btn">2</button>
+            <button class="pagination-btn">3</button>
+            <button class="pagination-btn">></button>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="/modules/registros/registros.js"></script>
+    <script src="/Js/menu.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+
+    <!-- <script src="/Js/registros.js"></script> -->
+
+    <div id="modal-ver" class="modal" style="display: none">
+      <div class="modal-content">
+        <span class="modal-close">&times;</span>
+        <h2>Detalle del registro</h2>
+        <div id="modal-detalle"></div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,356 @@
+/* ===============================
+   VARIABLES DE COLOR (THEME)
+   =============================== */
+:root {
+  --color-bg: #d3dce4; /* fondo general */
+  --color-sidebar: #1D3E53; /* azul oscuro sidebar */
+  --color-sidebar-text: #ffffff; /* texto en sidebar */
+  --color-primary: #254B62; /* botones, títulos */
+  --color-secondary: #476D7C; /* detalles secundarios */
+  --color-accent: #77ABB7; /* acento (badges, hover) */
+  --color-text: #111827; /* texto principal */
+  --color-card-bg: #ffffff; /* fondo tarjetas */
+  --color-table-header: #f3f4f6; /* encabezado tabla */
+}
+
+/* ===============================
+   RESET Y BASE
+   =============================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ===============================
+   APP LAYOUT
+   =============================== */
+.app-container {
+  display: flex;
+  width: 100%;
+}
+
+/* ===============================
+   MAIN CONTENT
+   =============================== */
+.main-content {
+  flex: 1;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.main-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 24px 0 12px 0;
+}
+
+.main-header h1 {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  margin: 0;
+  text-align: center;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.search-bar {
+  background: var(--color-card-bg);
+  border-radius: 8px;
+  padding: 0.5rem 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.search-bar input {
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--color-text);
+  font-size: 0.9rem;
+}
+
+.notification-btn {
+  position: relative;
+  background: var(--color-card-bg);
+  border: none;
+  padding: 0.6rem;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--color-text);
+}
+
+.notification-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 50%;
+}
+
+/* ===============================
+   CARDS
+   =============================== */
+.cards-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.card {
+  background: var(--color-card-bg);
+  padding: 1rem;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: transform 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}
+
+.card-icon {
+  font-size: 1.8rem;
+  color: var(--color-primary);
+}
+
+.card-content h3 {
+  font-size: 1rem;
+  margin-bottom: 0.4rem;
+  color: var(--color-secondary);
+}
+
+.count {
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+.card-trend {
+  font-size: 0.85rem;
+  color: var(--color-accent);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* ===============================
+   TABLE
+   =============================== */
+.table-section .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.table-section h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-primary);
+}
+
+.btn.primary {
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.btn.primary:hover {
+  background: var(--color-secondary);
+}
+
+.table-container {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  border-radius: 18px;
+  background: var(--color-card-bg);
+  box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+  overflow-x: auto;
+}
+
+.table-container table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-card-bg);
+  border-radius: 16px;
+}
+
+.table-container th, .table-container td {
+  padding: 14px 10px;
+  text-align: left;
+  font-size: 1rem;
+  color: var(--color-text);
+}
+
+.table-container th {
+  background: var(--color-table-header);
+  font-weight: 600;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.table-container tr {
+  transition: background 0.2s;
+}
+
+.table-container tbody tr:hover {
+  background: #e3f2fd;
+}
+
+.table-container td {
+  border-bottom: 1px solid #f3f4f6;
+}
+
+/* Botones de acciones */
+.action-btn {
+  background: #fff;
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
+  border-radius: 8px;
+  padding: 6px 10px;
+  margin: 0 2px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 4px rgba(37,75,98,0.07);
+  display: inline-flex;
+  align-items: center;
+}
+
+.action-btn:hover {
+  background: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(37,75,98,0.12);
+}
+
+/* Botones de acciones modernos y acordes a la paleta */
+.icon-btn {
+  background: #fff;
+  border: 1.5px solid var(--color-primary);
+  color: var(--color-primary);
+  border-radius: 8px;
+  padding: 6px 10px;
+  margin: 0 2px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 1px 4px rgba(37,75,98,0.07);
+  display: inline-flex;
+  align-items: center;
+}
+
+.icon-btn:hover {
+  background: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(37,75,98,0.12);
+}
+
+.icon-btn:active {
+  background: var(--color-secondary);
+  color: #fff;
+}
+
+/* Íconos dentro de los botones */
+.action-btn i {
+  pointer-events: none;
+}
+
+.icon-btn i {
+  pointer-events: none;
+}
+
+/* Opcional: espacio entre botones */
+.table-container td:last-child {
+  min-width: 120px;
+}
+
+/* ===============================
+   PAGINATION
+   =============================== */
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+  gap: 0.5rem;
+}
+
+.pagination-btn {
+  background: var(--color-card-bg);
+  border: none;
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.pagination-btn.active,
+.pagination-btn:hover {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+/* Puedes poner esto en general.css */
+.modal {
+  position: fixed;
+  z-index: 9999;
+  left: 0; top: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-content {
+  background: #fff;
+  border-radius: 14px;
+  padding: 2rem 1.5rem;
+  min-width: 320px;
+  max-width: 90vw;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  position: relative;
+}
+.modal-content img {
+  display: block;
+  margin: 0 auto;
+  max-width: 320px;
+  max-height: 220px;
+  border-radius: 10px;
+  margin-top: 8px;
+}
+.modal-close {
+  position: absolute;
+  top: 14px; right: 18px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #888;
+}
