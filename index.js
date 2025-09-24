@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					if (emailError) emailError.textContent = '';
 					if (passwordError) passwordError.textContent = '';
 					if (email === 'admin' && password === 'admin123') {
-						window.location.href = '/modules/Dashboard/dashboard.html';
+						window.location.href = 'modules/Dashboard/dashboard.html';
 					} else {
 						if (email !== 'admin' && emailError) {
 							emailError.textContent = 'Usuario incorrecto';
