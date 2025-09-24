@@ -234,10 +234,39 @@ function initStatusChart() {
 
 // Auto-inicializar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
-    if (document.getElementById('status-chart')) {
-        window.statusChartInstance = initStatusChart();
-    }
-});
+  const chartDom = document.getElementById('status-chart');
+  if (!chartDom) return;
+  const chart = echarts.init(chartDom);
 
-// Exportar para uso global
-window.initStatusChart = initStatusChart;
+  window.statusChartInstance = {
+    updateData: function({ categories, values, colors }) {
+      const data = [
+        { value: values[0], name: categories[0], itemStyle: { color: colors[0] } },
+        { value: values[1], name: categories[1], itemStyle: { color: colors[1] } }
+      ];
+      chart.setOption({
+        tooltip: {
+          trigger: 'item',
+          formatter: '{b}: {c} ({d}%)'
+        },
+        legend: {
+          orient: 'horizontal',
+          bottom: '0%',
+          data: categories,
+          textStyle: {
+            color: '#254B62',
+            fontSize: 12
+          }
+        },
+        series: [{
+          type: "pie",
+          radius: "60%",
+          data: data,
+          label: {
+            formatter: '{b}: {d}%'
+          }
+        }]
+      });
+    }
+  };
+});

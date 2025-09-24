@@ -53,9 +53,19 @@ function actualizarGraficaEstatus(registros) {
     else if (tipo === "ticket") totalTickets++;
   });
 
+  // Asegura que sean números válidos
+  totalFacturas = Number.isFinite(totalFacturas) ? totalFacturas : 0;
+  totalTickets = Number.isFinite(totalTickets) ? totalTickets : 0;
+
+  // Si ambos son cero, pon 1 y 1 para evitar división por cero
+  if (totalFacturas === 0 && totalTickets === 0) {
+    totalFacturas = 1;
+    totalTickets = 1;
+  }
+
   const categories = ["Facturas", "Tickets"];
   const values = [totalFacturas, totalTickets];
-  const colors = ["#1D3E53","#77ABB7"];
+  const colors = ["#1D3E53", "#77ABB7"];
 
   if (window.statusChartInstance) {
     window.statusChartInstance.updateData({
