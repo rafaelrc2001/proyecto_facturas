@@ -5,131 +5,124 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Scanalyze</title>
     <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Orbitron:wght@500;700&family=Roboto:wght@400;500&display=swap"
       rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Montserrat:wght@400;500;600;700&display=swap"
+      href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="../../CSS/general.css" />
     <link rel="stylesheet" href="../../CSS/menu.css" />
-    <link rel="icon" href="../../img/inxiteblanco.png" type="image/png">
+    <link rel="icon" href="../../img/inxiteblanco.png" type="image/png" />
   </head>
   <body>
     <div class="app-container">
       <!-- Sidebar -->
       <aside class="sidebar" id="sidebar">
-        <div>
-          <div class="sidebar-header">
-            <div class="logo-container">
-              <span class="logo-text">Scanalyze</span>
-              <button
-                class="sidebar-toggle-btn"
-                id="sidebarToggle"
-                aria-label="Ocultar menú"
-              >
-                <i class="fas fa-bars"></i>
-              </button>
-            </div>
-          </div>
-          <nav
-            class="sidebar-nav"
-            role="navigation"
-            aria-label="Menú principal"
-          >
-            <ul>
-              <li>
-                <a href="../Dashboard/dashboard.html" class="nav-item">
-                  <i class="fas fa-home" aria-hidden="true"></i>
-                  <span>Dashboard</span>
-                </a>
-              </li>
-              <li class="active">
-                <a href="registros.html" class="nav-item">
-                  <i class="fas fa-database" aria-hidden="true"></i>
-                  <span>Tickets y Facturas</span>
-                </a>
-              </li>
-            </ul>
-          </nav>
+        <div class="sidebar-header">
+          <h2 class="logo-container">
+            <i class="ri-database-2-line logo-icon"></i>
+            <span class="logo-text">Scanalyze</span>
+          </h2>
+          <button class="collapse-btn" id="sidebarToggle">
+            <i class="ri-menu-line menu-icon"></i>
+            <i class="ri-arrow-right-s-line collapse-icon"></i>
+          </button>
         </div>
+        <nav class="sidebar-nav">
+          <ul>
+            <li>
+              <a href="../Dashboard/dashboard.html">
+                <i class="ri-pie-chart-2-line"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li class="active">
+              <a href="registros.html">
+                <i class="ri-file-list-2-line"></i>
+                <span>Tickets y Facturas</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
         <div class="sidebar-footer">
           <div class="user-profile">
-            <div class="avatar">AC</div>
+            <div class="avatar">Ad</div>
             <div class="user-info">
-              <h4 id="user-name">Ana Cortez</h4>
+              <span class="name">Admin</span>
+              <span class="role">Administrador</span>
             </div>
           </div>
-          <!-- ...existing code... -->
-          <!-- ...existing code... -->
-          <button class="logout-btn" style="font-size: 1rem">
-            <i class="fas fa-sign-out-alt" style="font-size: 1em"></i>
-            <span style="font-size: 1em">Cerrar sesión</span>
+          <button class="logout-btn">
+            <i class="ri-logout-box-r-line"></i>
           </button>
-          <!-- ...existing code... -->
-          <!-- ...existing code... -->
         </div>
       </aside>
 
       <!-- Main Content -->
       <main class="main-content">
         <header class="main-header">
-          <!-- ...existing code... -->
           <h1>
-            <span class="header-icon">
-              <i class="fas fa-file-invoice-dollar"></i>
-            </span>
-            Registros de facturas y Tickets
+            <span style="font-size: 1.5rem">📊</span> Registros de Facturas y
+            Tickets
           </h1>
-          <!-- ...existing code... -->
+          <div class="header-actions">
+            <div class="search-bar">
+              <input type="text" placeholder="Buscar en el sistema..." />
+              <i class="ri-search-line"></i>
+            </div>
+          </div>
         </header>
 
+        <!-- Cards Section -->
         <section class="cards-section">
           <div class="card">
-            <div class="card-icon">
-              <i class="fas fa-server"></i>
+            <div class="card-icon" style="background-color: #eceff1">
+              <i class="ri-file-list-2-line" style="color: #455a64"></i>
             </div>
             <div class="card-content">
-              <h3>Total de facturas y tickets</h3>
-              <div class="count" id="total-count">-</div>
+              <h3>Total de Registros</h3>
+              <p class="count" id="total-count">-</p>
             </div>
           </div>
 
           <div class="card">
-            <div class="card-icon">
-              <i class="fas fa-database"></i>
+            <div class="card-icon" style="background-color: #fff8e1">
+              <i class="ri-ticket-line" style="color: #ff8f00"></i>
             </div>
             <div class="card-content">
               <h3>Tickets</h3>
-              <div class="count" id="tickets-count">-</div>
+              <p class="count" id="tickets-count">-</p>
             </div>
           </div>
 
           <div class="card">
-            <div class="card-icon">
-              <i class="fas fa-network-wired"></i>
+            <div class="card-icon" style="background-color: #e8f5e9">
+              <i class="ri-file-text-line" style="color: #2e7d32"></i>
             </div>
             <div class="card-content">
               <h3>Facturas</h3>
-              <div class="count" id="facturas-count">-</div>
+              <p class="count" id="facturas-count">-</p>
             </div>
           </div>
+
+         
         </section>
 
-        <section class="table-section">
-          <div class="section-header">
-            <div class="header-actions">
-              <div class="search-bar">
-                <i class="fas fa-search"></i>
-                <input type="text" placeholder="Buscar en el sistema..." />
-              </div>
-            </div>
+        <!-- Actions Section -->
+        <section class="actions-section">
+          <button class="btn primary">
+            <i class="ri-download-line"></i> Descargar CSV
+          </button>
 
-            <button class="btn primary">
-              <i class="fas fa-download"></i>
-              Descargar CSV
-            </button>
+   
+        </section>
+
+        <!-- Registros Table -->
+        <section class="permits-table">
+          <div class="table-header">
+            <h3>Listado de Facturas y Tickets</h3>
           </div>
 
           <div class="table-container">
@@ -142,38 +135,109 @@
                   <th>Subtotal</th>
                   <th>IVA</th>
                   <th>Total</th>
-
                   <th>Acciones</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody id="table-body">
                 <!-- Aquí se llenarán los datos con JS -->
               </tbody>
             </table>
           </div>
-
-          <div class="pagination">
-            <button class="pagination-btn active">1</button>
-            <button class="pagination-btn">2</button>
-            <button class="pagination-btn">3</button>
-            <button class="pagination-btn">></button>
+          <div class="table-footer">
+            <div class="pagination">
+              <button class="pagination-btn">
+                <i class="ri-arrow-left-s-line"></i>
+              </button>
+              <button class="pagination-btn active">1</button>
+              <button class="pagination-btn">2</button>
+              <button class="pagination-btn">3</button>
+              <button class="pagination-btn">
+                <i class="ri-arrow-right-s-line"></i>
+              </button>
+            </div>
+            <div class="records-counter">
+              <span id="records-count">0</span> registros
+            </div>
           </div>
         </section>
       </main>
+    </div>
+
+    <!-- Modal de detalle -->
+    <div id="modal-ver" class="modal" style="display: none">
+      <div class="modal-content executive-view">
+        <!-- Header del Modal -->
+        <div class="modal-header">
+          <div class="permit-title">
+            <h2 id="modal-tipo-documento">DETALLE DEL DOCUMENTO</h2>
+            <div class="permit-number" id="modal-numero">No. Documento</div>
+          </div>
+          <span class="close-modal">&times;</span>
+        </div>
+
+        <!-- Cuerpo del Modal -->
+        <div class="modal-body">
+          <!-- Sección 1: Información General -->
+          <div class="executive-section">
+            <div class="section-header">
+              <i class="ri-information-line"></i>
+              <h3>Información General</h3>
+            </div>
+            <div class="executive-grid">
+              <div class="executive-item">
+                <label>Fecha:</label>
+                <p class="highlight" id="modal-fecha"></p>
+              </div>
+              <div class="executive-item">
+                <label>Tipo:</label>
+                <p id="modal-tipo"></p>
+              </div>
+              <div class="executive-item">
+                <label>Número:</label>
+                <p id="modal-numero-doc"></p>
+              </div>
+              <div class="executive-item">
+                <label>Estado:</label>
+                <p class="highlight" id="modal-estado"></p>
+              </div>
+              <div class="executive-item full-width">
+                <label>Descripción:</label>
+                <p class="description-box" id="modal-descripcion"></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sección 2: Detalles Financieros -->
+          <div class="executive-section">
+            <div class="section-header">
+              <i class="ri-money-dollar-circle-line"></i>
+              <h3>Detalles Financieros</h3>
+            </div>
+            <div class="executive-grid">
+              <div class="executive-item">
+                <label>Subtotal:</label>
+                <p id="modal-subtotal"></p>
+              </div>
+              <div class="executive-item">
+                <label>IVA:</label>
+                <p id="modal-iva"></p>
+              </div>
+              <div class="executive-item">
+                <label>Total:</label>
+                <p class="highlight" id="modal-total"></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Agrega este div para el detalle dinámico -->
+          <div id="modal-detalle"></div>
+        </div>
+      </div>
     </div>
 
     <script src="registros.js"></script>
     <script src="../../Js/menu.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
 
-    <!-- <script src="/Js/registros.js"></script> -->
-
-    <div id="modal-ver" class="modal" style="display: none">
-      <div class="modal-content">
-        <span class="modal-close">&times;</span>
-        <h2>Detalle del registro</h2>
-        <div id="modal-detalle"></div>
-      </div>
-    </div>
   </body>
 </html>

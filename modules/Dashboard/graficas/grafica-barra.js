@@ -42,28 +42,14 @@ function initTypesChart() {
             containLabel: false
         },
         xAxis: {
-            type: 'value',
-            name: 'Cantidad',
-            nameTextStyle: {
-                color: '#476D7C', // --color-secondary
-                fontSize: 10,
-                fontWeight: 500,
-                padding: [0, 0, 0, 20]
-            },
+            type: 'category',
+            data: fechas,
             axisLabel: {
-                color: '#476D7C', // --color-secondary
-                fontSize: 10
-            },
-            axisLine: { show: false },
-            axisTick: { show: false },
-            splitLine: {
-                lineStyle: {
-                    color: '#f3f4f6', // --color-table-header
-                    width: 1,
-                    type: 'solid'
-                }
-            },
-            splitNumber: 4
+                rotate: 30, // Inclina las etiquetas
+                fontSize: 12,
+                interval: 0, // Muestra todas las etiquetas
+                color: '#455a64'
+            }
         },
         yAxis: {
             type: 'category',

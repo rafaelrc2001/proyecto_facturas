@@ -20,7 +20,7 @@ async function cargarDatosCSV() {
   registrosFiltrados = registrosGlobal; // Inicializar registros filtrados
   paginaActual = 1;
   renderTabla(registrosFiltrados);
-  actualizarContadores(); // Actualizar las tarjetas de conteo
+  actualizarTarjetasDashboard(registrosGlobal); // <-- aquí
 }
 
 // ------------------- CARGA DE DATOS DESDE APPS SCRIPT -------------------
@@ -38,7 +38,7 @@ async function cargarDatosDesdeAppsScript() {
       paginaActual = 1;
 
       renderTabla(registrosFiltrados);
-      actualizarContadores();
+      actualizarTarjetasDashboard(registrosGlobal); // <-- aquí
 
       console.log("✅ Datos cargados:", registrosGlobal.length, "registros");
     } else {
@@ -609,3 +609,47 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   };
 });
+
+function actualizarTarjetasDashboard(registros) {
+  let conteoTickets = 0;
+  let conteoFacturas = 0;
+
+  registros.forEach((fila) => {
+    if (fila.length > 1) {
+      const tipo = fila[1].toLowerCase().trim();
+      if (tipo === "ticket" || tipo === "tickets") {
+        conteoTickets++;
+      } else if (tipo === "factura" || tipo === "facturas") {
+        conteoFacturas++;
+      }
+    }
+  });
+
+  const totalGeneral = conteoTickets + conteoFacturas;
+
+  document.getElementById("total-count").textContent = totalGeneral;
+  document.getElementById("tickets-count").textContent = conteoTickets;
+  document.getElementById("facturas-count").textContent = conteoFacturas;
+
+
+
+
+}
+
+
+  // Función para mostrar la fecha actual
+  function mostrarFecha() {
+    const fecha = new Date();
+    const opciones = {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    };
+    const fechaFormateada = fecha.toLocaleDateString("es-ES", opciones);
+    document.getElementById("current-date").textContent = fechaFormateada;
+  }
+
+  // Ejecutar al cargar la página
+  document.addEventListener("DOMContentLoaded", mostrarFecha);
+

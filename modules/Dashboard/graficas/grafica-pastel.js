@@ -234,39 +234,46 @@ function initStatusChart() {
 
 // Auto-inicializar cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
-  const chartDom = document.getElementById('status-chart');
+  const chartDom = document.getElementById('distribution-chart');
   if (!chartDom) return;
   const chart = echarts.init(chartDom);
 
-  window.statusChartInstance = {
-    updateData: function({ categories, values, colors }) {
-      const data = [
-        { value: values[0], name: categories[0], itemStyle: { color: colors[0] } },
-        { value: values[1], name: categories[1], itemStyle: { color: colors[1] } }
-      ];
-      chart.setOption({
-        tooltip: {
-          trigger: 'item',
-          formatter: '{b}: {c} ({d}%)'
-        },
-        legend: {
-          orient: 'horizontal',
-          bottom: '0%',
-          data: categories,
-          textStyle: {
-            color: '#254B62',
-            fontSize: 12
-          }
-        },
-        series: [{
-          type: "pie",
-          radius: "60%",
-          data: data,
-          label: {
-            formatter: '{b}: {d}%'
-          }
-        }]
-      });
-    }
-  };
+  // Datos de ejemplo, reemplaza por tus datos reales
+  const data = [
+    { value: 42, name: 'Tickets' },
+    { value: 45, name: 'Facturas' }
+  ];
+
+  chart.setOption({
+    backgroundColor: "#fff",
+    tooltip: {
+      trigger: 'item',
+      formatter: '{b}: {c} ({d}%)'
+    },
+    legend: {
+      orient: 'vertical',
+      left: 'left',
+      data: data.map(d => d.name),
+      textStyle: { color: '#476D7C', fontSize: 12 }
+    },
+    series: [{
+      name: 'Distribución',
+      type: 'pie',
+      radius: '60%',
+      center: ['55%', '55%'],
+      data: data,
+      label: {
+        color: '#111827',
+        fontSize: 12,
+        formatter: '{b}: {c}'
+      },
+      itemStyle: {
+        borderRadius: 6,
+        borderColor: '#fff',
+        borderWidth: 2
+      }
+    }]
+  });
+
+  window.distributionChartInstance = chart;
 });

@@ -1,150 +1,191 @@
 <!DOCTYPE html>
 <html lang="es">
-<head>
+  <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Scanalyze</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <title>Scanalyze - Dashboard</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Orbitron:wght@500;700&family=Roboto:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <link rel="stylesheet" href="../../CSS/general.css" />
     <link rel="stylesheet" href="../../CSS/menu.css" />
-<link rel="icon" href="../../img/inxiteblanco.png" type="image/png">
+    <link rel="icon" href="../../img/inxiteblanco.png" type="image/png" />
   </head>
   <body>
     <div class="app-container">
       <!-- Sidebar -->
       <aside class="sidebar" id="sidebar">
-        <div>
-          <div class="sidebar-header">
-            <div class="logo-container">
-              <span class="logo-text">Scanalyze</span>
-              <button
-                class="sidebar-toggle-btn"
-                id="sidebarToggle"
-                aria-label="Ocultar menú"
-              >
-                <i class="fas fa-bars"></i>
-              </button>
+  <div class="sidebar-header">
+    <h2 class="logo-container">
+      <i class="ri-database-2-line logo-icon"></i>
+      <span class="logo-text">Scanalyze</span>
+    </h2>
+    <button class="collapse-btn" id="sidebarToggle">
+      <i class="ri-menu-line menu-icon"></i>
+      <i class="ri-arrow-right-s-line collapse-icon"></i>
+    </button>
+  </div>
+        <nav class="sidebar-nav">
+          <ul>
+            <li class="active">
+              <a href="#">
+                <i class="ri-pie-chart-2-line"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="../registros/registros.html">
+                <i class="ri-file-list-2-line"></i>
+                <span>Tickets y Facturas</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <div class="sidebar-footer">
+          <div class="user-profile">
+            <div class="avatar">Ad</div>
+            <div class="user-info">
+              <span class="name">Admin</span>
+              <span class="role">Administrador</span>
             </div>
           </div>
-          <nav
-            class="sidebar-nav"
-            role="navigation"
-            aria-label="Menú principal"
-          >
-            <ul>
-              
-                        <li class="active">
-                            <a href="#" class="nav-item">
-                                <i class="fas fa-home" aria-hidden="true"></i>
-                                <span>Dashboard</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="../registros/registros.html" class="nav-item">
-                                <i class="fas fa-database" aria-hidden="true"></i>
-                                <span>Tickets y Facturas</span>
-                            </a>
-                        </li>
-                    </ul>
-                </nav>
-            </div>
-            <div class="sidebar-footer">
-                <div class="user-profile">
-                    <div class="avatar">AC</div>
-                    <div class="user-info">
-                        <h4 id="user-name">Ana Cortez</h4>
-                       
-                    </div>
-                </div>
-               <button class="logout-btn" style="font-size: 1rem">
-            <i class="fas fa-sign-out-alt" style="font-size: 1em"></i>
-            <span style="font-size: 1em">Cerrar sesión</span>
+          <button class="logout-btn">
+            <i class="ri-logout-box-r-line"></i>
           </button>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <header class="main-header">
+          <div class="header-content">
+          
+            <div class="header-center">
+              <h1>Sistema de Control de Facturas y Tickets</h1>
+              <div class="header-date" id="current-date"></div>
             </div>
-        </aside>
+            
+          </div>
+        </header>
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <header class="main-header">
-                <h1>
-                    <i class="fas fa-chart-pie"></i>
-                    Dashboard de Facturas y Tickets
-                </h1>
-            </header>
-
-            <!-- Cards Section -->
-            <section class="cards-section">
-                <div class="card">
-                    <div class="card-icon">
-                        <i class="fas fa-server"></i>
-                    </div>
-                    <div class="card-content">
-                        <h3>Total de facturas y tickets</h3>
-                        <div class="count" id="total-count">-</div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-icon">
-                        <i class="fas fa-database"></i>
-                    </div>
-                    <div class="card-content">
-                        <h3>Tickets</h3>
-                        <div class="count" id="tickets-count">-</div>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-icon">
-                        <i class="fas fa-network-wired"></i>
-                    </div>
-                    <div class="card-content">
-                        <h3>Facturas</h3>
-                        <div class="count" id="facturas-count">-</div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Gráficas -->
-            <div class="charts-flex-container" style="display: flex; gap: 32px; margin-top: 32px; align-items: center;">
-              <!-- Columna izquierda: Barras -->
-              <div style="flex: 1; display: flex; flex-direction: column; gap: 32px; min-width: 340px;">
-                <!-- Gráfica de Facturas por Día -->
-                <div class="chart-card">
-                  <div class="chart-title">
-                    <i class="fas fa-list-alt" style="color:#1D3E53"></i>
-                    Facturas por Día
-                  </div>
-                  <div id="type-chart" style="width:100%;height:200px;"></div>
-                </div>
-                <!-- Gráfica de Tickets por Día -->
-                <div class="chart-card">
-                  <div class="chart-title">
-                    <i class="fas fa-ticket-alt" style="color:#77ABB7"></i>
-                    Tickets por Día
-                  </div>
-                  <div id="tickets-dia-chart" style="width:100%;height:200px;"></div>
-                </div>
-              </div>
-              <!-- Columna derecha: Pastel -->
-              <div style="flex: 1; display: flex; justify-content: center; align-items: center; min-width: 340px;">
-                <div class="chart-card" style="width: 100%; max-width: 420px;">
-                  <div class="chart-title">
-                    <i class="fas fa-tasks" style="color:#0ea5e9"></i>
-                    Facturas y Tickets por Estatus
-                  </div>
-                  <div id="status-chart" class="chart-container" style="height:380px;"></div>
-                </div>
-              </div>
+        <!-- Cards Section -->
+        <section class="cards-section">
+          <div class="card">
+            <div class="card-icon" style="background-color: #eceff1">
+              <i class="ri-file-list-2-line" style="color: #455a64"></i>
             </div>
-        </main>
+            <div class="card-content">
+              <h3>Total de Registros</h3>
+              <p class="count" id="total-count">-</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-icon" style="background-color: #fff8e1">
+              <i class="ri-ticket-line" style="color: #ff8f00"></i>
+            </div>
+            <div class="card-content">
+              <h3>Tickets</h3>
+              <p class="count" id="tickets-count">-</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-icon" style="background-color: #e8f5e9">
+              <i class="ri-file-text-line" style="color: #2e7d32"></i>
+            </div>
+            <div class="card-content">
+              <h3>Facturas</h3>
+              <p class="count" id="facturas-count">-</p>
+            </div>
+          </div>
+
+ 
+
+
+
+          <!-- Search Bar moved here -->
+          
+        </section>
+
+
+        <!-- Gráficas Inferiores: Tendencias y Montos -->
+        <div class="charts-container">
+          <!-- Gráfica de Facturas por Día -->
+          <div class="chart-card">
+            <div class="chart-title">
+              <i
+                class="ri-line-chart-line"
+                style="color: var(--naranja-seguridad)"
+              ></i>
+              Facturas por Día
+            </div>
+            <div id="type-chart" class="chart-container"></div> <!-- <--- CORREGIDO -->
+          </div>
+
+          <!-- Gráfica de Tickets por Día -->
+          <div class="chart-card">
+            <div class="chart-title">
+              <i
+                class="ri-bar-chart-line"
+                style="color: var(--verde-tecnico)"
+              ></i>
+              Tickets por Día
+            </div>
+            <div id="tickets-dia-chart" class="chart-container"></div> <!-- <--- CORREGIDO -->
+          </div>
+
+          
+        </div>
+      
+        
+        <!-- Dashboard Grid: Tabla + Gráfica de Resumen -->
+        <div class="dashboard-grid">
+          <!-- Tabla de Registros -->
+          
+          
+
+          <!-- Gráfica de Resumen -->
+          <div class="chart-card">
+            <div class="chart-title">
+              <i
+                class="ri-pie-chart-2-line"
+                style="color: var(--azul-petroleo)"
+              ></i>
+              Distribución por Tipo
+            </div>
+            <div id="distribution-chart" class="chart-container"></div>
+          </div>
+        </div>
+      </main>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
-    <script src="graficas/grafica-barras.js"></script>
+    <script src="graficas/grafica-barra.js"></script>
     <script src="graficas/grafica-pastel.js"></script>
-  
     <script src="dashboard.js"></script>
     <script src="../../Js/menu.js"></script>
-</body>
-</html>
+    <script>
+      // Función para mostrar la fecha actual
+      function mostrarFecha() {
+        const fecha = new Date();
+        const opciones = {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        };
+        const fechaFormateada = fecha.toLocaleDateString("es-ES", opciones);
+        document.getElementById("current-date").textContent = fechaFormateada;
+      }
 
+      // Ejecutar al cargar la página
+      document.addEventListener("DOMContentLoaded", mostrarFecha);
+    </script>
+  </body>
+</html>
