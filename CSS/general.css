@@ -290,12 +290,19 @@ th, td {
   border-bottom: 1px solid var(--blanco-neutro);
 }
 
+thead tr {
+  background: linear-gradient(90deg, #0d1f2d 0%, #003B5C 100%);
+}
+
 th {
-  background-color: var(--azul-petroleo);
+  background: none; /* Quita el fondo individual */
   color: var(--blanco-neutro);
   font-weight: 500;
   font-size: 0.9rem;
   text-transform: uppercase;
+  border-bottom: 2px solid var(--plata-industrial);
+  letter-spacing: 1px;
+  text-shadow: 0 1px 2px #000, 0 0 4px #b0bec5;
 }
 
 td {
