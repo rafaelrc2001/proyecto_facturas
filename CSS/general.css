@@ -386,26 +386,31 @@ td {
 }
 
 .icon-btn {
-  background: #fff;
+  background: var(--azul-petroleo);
   border: 1.5px solid var(--azul-petroleo);
-  color: var(--azul-petroleo);
+  color: #fff;
   border-radius: 4px;
-  padding: 6px 10px;
+  padding: 4px 7px;         /* Menos padding */
   margin: 0 2px;
-  font-size: 1.1rem;
+  font-size: 0.93rem;       /* 15% menos que 1.1rem */
   cursor: pointer;
   transition: all 0.3s ease;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
+}
+
+.icon-btn i {
+  font-size: 1.1rem;        /* 15% menos que 1.3rem */
+  color: #fff; /* Iconos blancos para mejor contraste */
 }
 
 .icon-btn:hover {
-  background: var(--azul-petroleo);
-  color: #fff;
+  background: var(--naranja-seguridad);
+  border-color: var(--naranja-seguridad);
 }
 
-.icon-btn:active {
-  background: var(--gris-acero);
+.icon-btn:hover i {
   color: #fff;
 }
 
@@ -768,60 +773,59 @@ td {
 
 .tabla-container {
   margin: 32px auto;
-  max-width: 900px;
+  max-width: 1200px;      /* Más ancho */
   background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  padding: 32px 32px 24px 32px; /* Más padding */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.tabla-container .table-container {
+  width: 100%;
+  overflow-x: auto;
 }
 
 #facturasTable {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
+  min-width: 900px; /* O el ancho que necesites */
 }
 
-#facturasTable th, #facturasTable td {
-  border-bottom: 1px solid #e0e0e0;
-  padding: 8px 12px;
-  text-align: left;
-}
 
-#facturasTable th {
-  background: #f3f4f6;
-  color: #254B62;
-  font-weight: 600;
-}
-
-#facturasTable tr:hover {
-  background: #f6f8fa;
-}
-
-.pagination {
-  margin-top: 16px;
-  text-align: center;
-}
-
-.pagination-btn {
-  margin: 0 2px;
-  padding: 4px 10px;
-  border: none;
-  background: #77ABB7;
+.icon-btn {
+  background: var(--azul-petroleo);
+  border: 1.5px solid var(--azul-petroleo);
   color: #fff;
   border-radius: 4px;
+  padding: 4px 7px;         /* Menos padding */
+  margin: 0 2px;
+  font-size: 0.93rem;       /* 15% menos que 1.1rem */
   cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.pagination-btn.active {
-  background: #254B62;
+.icon-btn i {
+  font-size: 1.1rem;        /* 15% menos que 1.3rem */
+  color: #fff; /* Iconos blancos para mejor contraste */
 }
 
+.icon-btn:hover {
+  background: var(--naranja-seguridad);
+  border-color: var(--naranja-seguridad);
+}
 
+.icon-btn:hover i {
+  color: #fff;
+}
 
-.chart-container {
-  min-width: 350px;
-  min-height: 260px;
-  width: 100%;
-  height: 260px;
-  padding: 8px 0;
+.table-header-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Separación proporcional */
+  margin-bottom: 16px;
+  padding: 0 10px;               /* Opcional: agrega padding lateral */
 }

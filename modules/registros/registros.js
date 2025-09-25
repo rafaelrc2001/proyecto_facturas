@@ -461,39 +461,14 @@ function getDriveImageLink(link) {
 
 // Nueva función para agregar eventos de acciones
 function agregarEventosAcciones(filaElement, filaIndex) {
-  // Evento Ver
+  // Evento Ver: abrir URL en nueva pestaña
   filaElement
     .querySelector('.icon-btn[title="Ver"]')
     .addEventListener("click", function () {
-      const datos = Array.from(filaElement.querySelectorAll("td"))
-        .slice(0, 6)
-        .map((td) => td.textContent);
-
-      const link = registrosFiltrados[filaIndex]
-        ? registrosFiltrados[filaIndex][6]
-        : null;
-
-      const imgSrc = getDriveImageLink(link);
-      console.log("URL de imagen Drive generada:", imgSrc);
-
-      let linkHtml = "";
-      if (imgSrc) {
-        linkHtml = `<br><strong>Enlace:</strong> <a href="${imgSrc}" target="_blank" style="color:#1565c0;text-decoration:underline;">Ver imagen en Drive</a>`;
-      } else if (link) {
-        linkHtml = `<br><strong>Enlace:</strong> <span style="color:#ef4444;">No se pudo generar el enlace</span>`;
+      const link = registrosFiltrados[filaIndex] ? registrosFiltrados[filaIndex][6] : null;
+      if (link) {
+        window.open(link, '_blank');
       }
-
-      const detalle = `
-      <strong>Fecha:</strong> ${datos[0]}<br>
-      <strong>Tipo:</strong> ${datos[1]}<br>
-      <strong>Factura:</strong> ${datos[2]}<br>
-      <strong>Subtotal:</strong> ${datos[3]}<br>
-      <strong>IVA:</strong> ${datos[4]}<br>
-      <strong>Total:</strong> ${datos[5]}
-      ${linkHtml}
-    `;
-      document.getElementById("modal-detalle").innerHTML = detalle;
-      document.getElementById("modal-ver").style.display = "block";
     });
 
   // Evento Editar
@@ -652,4 +627,13 @@ function actualizarTarjetasDashboard(registros) {
 
   // Ejecutar al cargar la página
   document.addEventListener("DOMContentLoaded", mostrarFecha);
+
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('btn-ver')) {
+      const url = e.target.getAttribute('data-url');
+      if (url) {
+        window.open(url, '_blank'); // Abre la URL en otra ventana/pestaña
+      }
+    }
+  });
 

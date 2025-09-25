@@ -14,6 +14,7 @@
     />
     <link rel="stylesheet" href="../../CSS/general.css" />
     <link rel="stylesheet" href="../../CSS/menu.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="icon" href="../../img/inxiteblanco.png" type="image/png" />
   </head>
   <body>
@@ -110,55 +111,55 @@
          
         </section>
 
-        <!-- Actions Section -->
-        <section class="actions-section">
-          <button class="btn primary">
-            <i class="ri-download-line"></i> Descargar CSV
-          </button>
+  
 
    
         </section>
 
         <!-- Registros Table -->
         <section class="permits-table">
-          <div class="table-header">
+          <div class="table-header-flex">
             <h3>Listado de Facturas y Tickets</h3>
+
+            <button class="btn primary">
+              <i class="ri-download-line"></i> Descargar CSV
+            </button>
+           
           </div>
 
-          <div class="table-container">
-            <table id="facturasTable">
-              <thead>
-                <tr>
-                  <th>Fecha</th>
-                  <th>Tipo</th>
-                  <th>Factura</th>
-                  <th>Subtotal</th>
-                  <th>IVA</th>
-                  <th>Total</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
-              <tbody id="table-body">
-                <!-- Aquí se llenarán los datos con JS -->
-              </tbody>
-            </table>
-          </div>
-          <div class="table-footer">
-            <div class="pagination">
-              <button class="pagination-btn">
-                <i class="ri-arrow-left-s-line"></i>
-              </button>
-              <button class="pagination-btn active">1</button>
-              <button class="pagination-btn">2</button>
-              <button class="pagination-btn">3</button>
-              <button class="pagination-btn">
-                <i class="ri-arrow-right-s-line"></i>
-              </button>
-            </div>
-            <div class="records-counter">
-              <span id="records-count">0</span> registros
-            </div>
-          </div>
+          <div class="tabla-container">
+    <div class="table-container">
+      <table id="facturasTable">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Factura</th>
+            <th>Subtotal</th>
+            <th>IVA</th>
+            <th>Total</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="table-body">
+          <!-- Aquí se llenarán los datos con JS -->
+        </tbody>
+      </table>
+    </div>
+    <div class="table-footer">
+      <div class="pagination">
+        <button class="pagination-btn">
+          <i class="ri-arrow-left-s-line"></i>
+        </button>
+        <button class="pagination-btn active">1</button>
+        <button class="pagination-btn">2</button>
+        <button class="pagination-btn">3</button>
+        <button class="pagination-btn">
+          <i class="ri-arrow-right-s-line"></i>
+        </button>
+      </div>
+    </div>
+  </div>
         </section>
       </main>
     </div>
