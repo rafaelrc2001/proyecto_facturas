@@ -101,16 +101,13 @@
 }
 
 .logo-text {
-  font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+  font-family: 'Montserrat', 'Roboto', Arial, sans-serif;
   font-size: 1.6rem;
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 2px;
   color: #fff;
   background: none;
-  -webkit-background-clip: unset;
-  background-clip: unset;
-  -webkit-text-fill-color: unset;
   text-shadow: 0 2px 8px rgba(0,0,0,0.18);
   transition: all 0.3s ease;
   position: relative;
@@ -302,6 +299,17 @@
   justify-content: center;
   font-weight: 500;
   font-size: 0.9rem;
+  background: var(--blanco-neutro);
+  color: var(--gris-acero); /* <-- aquí el cambio */
+  font-weight: bold;
+  font-size: 1rem;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
 }
 
 .user-info {
@@ -500,16 +508,13 @@
 
 /* ...existing code... */
 .logo-text {
-  font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+  font-family: 'Montserrat', 'Roboto', Arial, sans-serif;
   font-size: 1.6rem;
   font-weight: bold;
   text-transform: uppercase;
   letter-spacing: 2px;
   color: #fff;
   background: none;
-  -webkit-background-clip: unset;
-  background-clip: unset;
-  -webkit-text-fill-color: unset;
   text-shadow: 0 2px 8px rgba(0,0,0,0.18);
   transition: all 0.3s ease;
   position: relative;

@@ -10,8 +10,7 @@ const SHEET_URL =
 
 // ------------------- CONFIGURACIÓN APPS SCRIPT -------------------
 const APPS_SCRIPT_URL =
-  "https://script.google.com/macros/s/AKfycbxAVXxdploOS5EV9bE-7nDoxQG240bnUyq7fYA5NidHHuiidrNFBWllV_BvNUhPbSar0Q/exec";
-// ------------------- CARGA DE DATOS -------------------
+ "https://script.google.com/macros/s/AKfycbw3hK_J9OmYxfqNvfMlu0vq-eeColgYqbXxIgzHVTm0q6lVHaTw8n6G15ydiKIoPfkAbQ/exec";  // ------------------- CARGA DE DATOS -------------------
 async function cargarDatosCSV() {
   const response = await fetch(SHEET_URL);
   const data = await response.text();
@@ -159,28 +158,32 @@ async function guardarEdicion(filaElement, filaIndex) {
       body: formData
     });
 
-    const result = await response.json();
-
-    if (result.status === "error") {
-      throw new Error(result.message);
+    if (!response.ok) {
+      throw new Error("No se pudo conectar con el servidor (status " + response.status + ")");
     }
+
+    const result = await response.json();
+    console.log("Respuesta Apps Script:", result);
 
     if (result.success) {
       actualizarFilaUI(filaElement, nuevosDatos);
-      mostrarNotificacion(
-        "✅ Registro actualizado en Google Sheets",
-        "success"
-      );
+      mostrarNotificacion("✅ Registro actualizado en Google Sheets", "success");
       actualizarContadores();
     } else {
-      throw new Error(result.error || "Error desconocido");
+      throw new Error(result.error || result.message || "Error desconocido");
     }
   } catch (error) {
-    console.error("❌ Error guardando en Apps Script:", error);
-    mostrarNotificacion(
-      "❌ Error al actualizar el registro: " + error.message,
-      "error"
-    );
+    if (error.message === "Failed to fetch") {
+      mostrarNotificacion(
+        "❌ Error de conexión con Apps Script. Revisa CORS y publicación.",
+        "error"
+      );
+    } else {
+      mostrarNotificacion(
+        "❌ Error al actualizar el registro: " + error.message,
+        "error"
+      );
+    }
     actualizarFilaUI(filaElement, registrosGlobal[filaIndex]);
     actualizarContadores();
   }
@@ -238,11 +241,9 @@ async function eliminarRegistro(filaIndex) {
     });
 
     const result = await response.json();
+    console.log("Respuesta Apps Script:", result); // <-- Depuración
 
-    if (result.status === "error") {
-      throw new Error(result.message);
-    }
-
+    // Elimina la validación por status, solo usa success
     if (result.success) {
       mostrarNotificacion(
         "✅ Registro eliminado de Google Sheets",
@@ -251,7 +252,7 @@ async function eliminarRegistro(filaIndex) {
       renderTabla(registrosFiltrados);
       actualizarContadores();
     } else {
-      throw new Error(result.error || "Error desconocido");
+      throw new Error(result.error || result.message || "Error desconocido");
     }
   } catch (error) {
     console.error("Error al eliminar en Google Sheets:", error);

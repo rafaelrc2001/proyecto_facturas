@@ -52,21 +52,75 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .main-header {
-  padding: 20px 30px;
-  background-color: white;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  background: var(--azul-petroleo);
+  padding: 32px 0 24px 0;
+  border-radius: 0;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+  width: 100%;
+}
+
+.header-content {
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
 }
 
-.main-header h1 {
-  font-size: 1.5rem;
+.header-left-image,
+.header-right-image {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
 }
 
+.header-logo {
+  height: 60px;
+  width: auto;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
+}
+
+.header-logo:hover {
+  opacity: 1;
+}
+
+.header-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  gap: 8px;
+}
+
+.header-center h1 {
+  color: #fff;
+  font-size: 2rem;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  margin: 0;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.header-date {
+  font-size: 1rem;
+  color: #fff;
+  margin-top: 8px;
+  text-align: center;
+  font-weight: 400;
+  opacity: 0.95;
+}
+
+/* ===============================
+   SEARCH BAR
+   =============================== */
 .search-bar {
   position: relative;
 }
@@ -93,6 +147,9 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--plata-industrial);
 }
 
+/* ===============================
+   NOTIFICATIONS
+   =============================== */
 .notification-btn {
   position: relative;
   background: white;
@@ -630,8 +687,35 @@ td {
 }
 
 .header-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 40px;
+}
+
+.header-text {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* <-- Esto centra verticalmente los textos */
+  justify-content: center;
+  min-width: 0;
+}
+
+.header-text h1,
+.header-text .header-date {
   text-align: center;
+  width: 100%;
+}
+
+.banner-img {
+  width: 110px;
+  height: 80px;
+  object-fit: contain;
+  background: #b0bec5;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
 }
 
 .header-center h1 {
@@ -641,9 +725,9 @@ td {
 }
 
 .header-date {
-  font-size: 0.9rem;
+  font-size: 1rem;
+  margin-top: 8px;
   color: var(--gris-acero);
-  margin-top: 5px;
 }
 
 .search-card {
@@ -835,4 +919,99 @@ td {
   justify-content: space-between; /* Separación proporcional */
   margin-bottom: 16px;
   padding: 0 10px;               /* Opcional: agrega padding lateral */
+}
+
+/* Banner principal */
+.main-header {
+  background: var(--azul-petroleo);
+  padding: 32px 0 24px 0;
+  border-radius: 0;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+
+.main-header .header-center h1,
+.main-header .header-date {
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.10);
+}
+
+.header-date {
+  font-size: 1rem;
+  margin-top: 8px;
+}
+
+/* ===============================
+   NUEVAS CLASES Y AJUSTES
+   =============================== */
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+.header-left-image,
+.header-right-image {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-logo {
+  height: 60px;
+  width: auto;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
+}
+
+.header-center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  gap: 8px;
+}
+
+.header-center h1 {
+  color: #fff;
+  font-size: 2rem;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  margin: 0;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.header-date {
+  font-size: 1rem;
+  color: #fff;
+  margin-top: 8px;
+  text-align: center;
+  font-weight: 400;
+  opacity: 0.95;
+}
+
+/* Responsive para banner */
+@media (max-width: 900px) {
+  .header-content {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .header-left-image,
+  .header-right-image {
+    margin-bottom: 8px;
+  }
+  .header-center h1 {
+    font-size: 1.2rem;
+  }
+  .header-logo {
+    height: 40px;
+  }
 }
