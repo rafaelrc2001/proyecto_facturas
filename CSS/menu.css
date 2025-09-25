@@ -94,38 +94,38 @@
 
 .logo-icon {
   font-size: 1.5rem;
-  color: var(--verde-tecnico);
+  color: var(--blanco-neutro); /* Ahora es blanco */
   transition: transform 0.3s ease, color 0.3s ease;
   display: flex;
   align-items: center;
 }
 
 .logo-text {
-  font-family: 'Orbitron', sans-serif;
-  font-size: 1.4rem;
-  font-weight: 700;
+  font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+  font-size: 1.6rem;
+  font-weight: bold;
   text-transform: uppercase;
-  letter-spacing: 1.5px;
-  background: linear-gradient(90deg, #ffffff, #e0e0e0);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 8px rgba(0, 191, 165, 0.3);
+  letter-spacing: 2px;
+  color: #fff;
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
+  -webkit-text-fill-color: unset;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.18);
   transition: all 0.3s ease;
   position: relative;
   padding-left: 5px;
 }
 
 .logo-text::after {
-  content: '';
-  position: absolute;
-  bottom: -3px;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, var(--verde-tecnico), transparent);
-  opacity: 0.7;
-  transition: all 0.3s ease;
+  content: "";
+  display: block;
+  width: 80%;
+  height: 4px;
+  margin-top: 4px;
+  background: var(--naranja-seguridad, #FF6F00); /* Cambia aquí el color */
+  border-radius: 2px;
+  transition: background 0.3s;
 }
 
 /* Hover effect */
@@ -488,3 +488,47 @@
 }
 
 
+
+.sidebar {
+  width: 280px;
+  background: linear-gradient(135deg, #1C2833 0%, #003B5C 80%);
+  color: #e0e0e0;
+  box-shadow: 4px 0 16px rgba(0,0,0,0.18), inset 0 0 24px #222;
+  border-right: 1px solid #2c3e50;
+}
+
+
+/* ...existing code... */
+.logo-text {
+  font-family: 'Comic Sans MS', 'Comic Sans', cursive;
+  font-size: 1.6rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #fff;
+  background: none;
+  -webkit-background-clip: unset;
+  background-clip: unset;
+  -webkit-text-fill-color: unset;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  transition: all 0.3s ease;
+  position: relative;
+  padding-left: 5px;
+}
+/* ...existing code... */
+
+
+
+.avatar {
+  background: var(--blanco-neutro);
+  color: var(--gris-acero); /* <-- aquí el cambio */
+  font-weight: bold;
+  font-size: 1rem;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+}
