@@ -13,14 +13,15 @@ async function cargarDatosDashboard() {
   actualizarGraficaTipos(registros);
   actualizarGraficaEstatus(registros);
   actualizarGraficaTicketsPorDia(registros);
+  actualizarGraficaPastel(registros);
 }
 
 // Procesa y actualiza la gráfica de tipos
 function actualizarGraficaTipos(registros) {
   const facturasPorDia = {};
   registros.forEach((fila) => {
-    const fecha = (fila[0] || "").trim();
-    const tipo = (fila[1] || "").trim().toLowerCase();
+    const fecha = (fila[1] || "").trim(); // <-- Fecha en columna 1
+    const tipo = (fila[2] || "").trim().toLowerCase(); // <-- Tipo en columna 2
     if (tipo === "factura" && fecha) {
       facturasPorDia[fecha] = (facturasPorDia[fecha] || 0) + 1;
     }
@@ -91,8 +92,8 @@ function actualizarTarjetasDashboard(registros) {
   let conteoFacturas = 0;
 
   registros.forEach((fila) => {
-    if (fila.length > 1) {
-      const tipo = fila[1].toLowerCase().trim();
+    if (fila.length > 2) {
+      const tipo = fila[2].toLowerCase().trim(); // Usa índice 2 como en registros.js
       if (tipo === "ticket" || tipo === "tickets") {
         conteoTickets++;
       } else if (tipo === "factura" || tipo === "facturas") {
@@ -109,11 +110,10 @@ function actualizarTarjetasDashboard(registros) {
 }
 
 function actualizarGraficaTicketsPorDia(registros) {
-  // Suponiendo que columna 0 es Fecha, columna 1 es Tipo
   const ticketsPorDia = {};
   registros.forEach((fila) => {
-    const fecha = (fila[0] || "").trim();
-    const tipo = (fila[1] || "").trim().toLowerCase();
+    const fecha = (fila[1] || "").trim(); // <-- Fecha en columna 1
+    const tipo = (fila[2] || "").trim().toLowerCase(); // <-- Tipo en columna 2
     if (tipo === "ticket" && fecha) {
       ticketsPorDia[fecha] = (ticketsPorDia[fecha] || 0) + 1;
     }
@@ -123,7 +123,6 @@ function actualizarGraficaTicketsPorDia(registros) {
   const valores = fechas.map((f) => ticketsPorDia[f]);
   const colors = fechas.map(() => "#1D3E53");
 
-  // Inicializar o actualizar la gráfica
   if (!window.ticketsDiaChartInstance) {
     const chartDom = document.getElementById("tickets-dia-chart");
     if (!chartDom) return;

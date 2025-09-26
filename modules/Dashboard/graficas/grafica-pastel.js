@@ -277,3 +277,56 @@ document.addEventListener('DOMContentLoaded', function() {
 
   window.distributionChartInstance = chart;
 });
+
+function actualizarGraficaPastel(registros) {
+  let totalFacturas = 0;
+  let totalTickets = 0;
+
+  registros.forEach((fila) => {
+    const tipo = (fila[2] || "").trim().toLowerCase(); // Tipo en columna 2
+    if (tipo === "factura") totalFacturas++;
+    else if (tipo === "ticket") totalTickets++;
+  });
+
+  const data = [
+    { value: totalTickets, name: 'Tickets' },
+    { value: totalFacturas, name: 'Facturas' }
+  ];
+
+  const chartDom = document.getElementById('distribution-chart');
+  if (!chartDom) return;
+  const chart = echarts.init(chartDom);
+
+  chart.setOption({
+    backgroundColor: "#fff",
+    tooltip: {
+      trigger: 'item',
+      formatter: '{b}: {c} ({d}%)'
+    },
+    legend: {
+      orient: 'vertical',
+      left: 'left',
+      data: data.map(d => d.name),
+      textStyle: { color: '#476D7C', fontSize: 12 }
+    },
+    series: [{
+      name: 'Distribución',
+      type: 'pie',
+      radius: '60%',
+      center: ['55%', '55%'],
+      data: data,
+      label: {
+        color: '#111827',
+        fontSize: 12,
+        formatter: '{b}: {c}'
+      },
+      itemStyle: {
+        borderRadius: 6,
+        borderColor: '#fff',
+        borderWidth: 2
+      }
+    }]
+  });
+
+  window.distributionChartInstance = chart;
+}
