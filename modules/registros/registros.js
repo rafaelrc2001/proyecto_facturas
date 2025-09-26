@@ -10,7 +10,8 @@ const SHEET_URL =
 
 // ------------------- CONFIGURACIÓN APPS SCRIPT -------------------
 const APPS_SCRIPT_URL =
- "https://script.google.com/macros/s/AKfycbw3hK_J9OmYxfqNvfMlu0vq-eeColgYqbXxIgzHVTm0q6lVHaTw8n6G15ydiKIoPfkAbQ/exec";  // ------------------- CARGA DE DATOS -------------------
+"https://script.google.com/macros/s/AKfycbyoOenzUbbKx0Zn6xasjGHgAdNdcxxwkvIlBrTlMv4-LQEgBetAT_U94Wy-d6eKnbbo6g/exec";
+
 async function cargarDatosCSV() {
   const response = await fetch(SHEET_URL);
   const data = await response.text();
@@ -26,18 +27,20 @@ async function cargarDatosCSV() {
 async function cargarDatosDesdeAppsScript() {
   try {
     console.log("Cargando datos desde Apps Script...");
-
-    // ✅ Simple GET con action=get
     const response = await fetch(APPS_SCRIPT_URL + "?action=get");
     const data = await response.json();
 
-    if (Array.isArray(data)) {
-      registrosGlobal = ordenarPorFechaDesc(data.slice(1)); // omitir encabezados y ordena
+    console.log("Respuesta Apps Script:", data);
+
+    // Aquí debes aceptar array de arrays, no de objetos
+    if (Array.isArray(data) && data.length > 1 && Array.isArray(data[0])) {
+      // data[0] es el encabezado, data[1...] son los registros
+      registrosGlobal = ordenarPorFechaDesc(data.slice(1)); // omite encabezado y ordena
       registrosFiltrados = registrosGlobal;
       paginaActual = 1;
 
       renderTabla(registrosFiltrados);
-      actualizarTarjetasDashboard(registrosGlobal); // <-- aquí
+      actualizarTarjetasDashboard(registrosGlobal);
 
       console.log("✅ Datos cargados:", registrosGlobal.length, "registros");
     } else {
@@ -45,7 +48,6 @@ async function cargarDatosDesdeAppsScript() {
     }
   } catch (error) {
     console.error("❌ Error cargando desde Apps Script:", error);
-    // fallback CSV
     cargarDatosCSV();
   }
 }
@@ -582,16 +584,19 @@ function mostrarNotificacion(mensaje, tipo = "info") {
 
 // ------------------- INICIALIZAR -------------------
 document.addEventListener("DOMContentLoaded", () => {
-  // Intentar cargar desde Apps Script primero
   cargarDatosDesdeAppsScript();
 
-  // Cerrar modal
-  document.querySelector(".modal-close").onclick = () => {
-    document.getElementById("modal-ver").style.display = "none";
-  };
-  window.onclick = (event) => {
-    if (event.target === document.getElementById("modal-ver")) {
+  // Cerrar modal solo si existe el elemento
+  const modalCloseBtn = document.querySelector(".modal-close");
+  if (modalCloseBtn) {
+    modalCloseBtn.onclick = () => {
       document.getElementById("modal-ver").style.display = "none";
+    };
+  }
+  window.onclick = (event) => {
+    const modalVer = document.getElementById("modal-ver");
+    if (modalVer && event.target === modalVer) {
+      modalVer.style.display = "none";
     }
   };
 });
@@ -633,7 +638,10 @@ function actualizarTarjetasDashboard(registros) {
       day: "numeric",
     };
     const fechaFormateada = fecha.toLocaleDateString("es-ES", opciones);
-    document.getElementById("current-date").textContent = fechaFormateada;
+    const fechaElem = document.getElementById("current-date");
+    if (fechaElem) {
+      fechaElem.textContent = fechaFormateada;
+    }
   }
 
   // Ejecutar al cargar la página
@@ -655,5 +663,12 @@ function ordenarPorFechaDesc(registros) {
     const fechaB = new Date(b[0]);
     return fechaB - fechaA; // Más reciente primero
   });
+}
+
+function doGet(e) {
+  var doc = SpreadsheetApp.openById(SHEET_ID);
+  var sheet = doc.getSheetByName(SHEET_NAME);
+  var values = sheet.getDataRange().getValues();
+  return ContentService.createTextOutput(JSON.stringify(values)).setMimeType(ContentService.MimeType.JSON);
 }
 
