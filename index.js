@@ -23,3 +23,19 @@ document.addEventListener('DOMContentLoaded', function() {
 		});
 	}
 });
+
+// Mostrar/ocultar contraseña
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleBtn = document.querySelector('.toggle-password');
+    const passwordInput = document.getElementById('password');
+    if (toggleBtn && passwordInput) {
+        toggleBtn.innerHTML = '<i class="ri-eye-off-line"></i>';
+        toggleBtn.addEventListener('click', function() {
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+            toggleBtn.innerHTML = isPassword
+                ? '<i class="ri-eye-line"></i>'
+                : '<i class="ri-eye-off-line"></i>';
+        });
+    }
+});

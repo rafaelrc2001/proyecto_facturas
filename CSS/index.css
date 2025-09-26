@@ -182,17 +182,26 @@ body {
   right: 15px;
   top: 50%;
   transform: translateY(-50%);
-  background: none;
+  background: rgba(0, 191, 165, 0.08);
   border: none;
   cursor: pointer;
   color: var(--plata-industrial);
-  transition: all 0.3s;
+  transition: background 0.3s, color 0.3s, box-shadow 0.3s;
   z-index: 3;
-  font-size: 1.1rem;
+  font-size: 1.25rem;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,191,165,0.08);
 }
 
 .input-group .toggle-password:hover {
-  color: var(--verde-tecnico);
+  background: var(--verde-tecnico);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0,191,165,0.18);
 }
 
 .input-group input:focus + label,
@@ -553,4 +562,33 @@ body {
   .particles {
     display: none; /* Ocultar partículas en móviles para mejor rendimiento */
   }
+}
+
+.logo-text {
+  font-family: 'Orbitron', 'Montserrat', Arial, sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  background: linear-gradient(90deg, #ffffff, #e0e0e0);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 8px rgba(0, 191, 165, 0.3);
+  position: relative;
+  padding-left: 5px;
+  margin-bottom: 8px;
+  display: inline-block;
+}
+
+.logo-text::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--naranja-seguridad, #FF6F00);
+  opacity: 0.8;
+  border-radius: 2px;
 }

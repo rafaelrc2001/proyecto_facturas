@@ -15,8 +15,8 @@ async function cargarDatosCSV() {
   const response = await fetch(SHEET_URL);
   const data = await response.text();
   const filas = data.split("\n").map((row) => row.split(","));
-  registrosGlobal = filas.slice(1); // omite encabezado
-  registrosFiltrados = registrosGlobal; // Inicializar registros filtrados
+  registrosGlobal = ordenarPorFechaDesc(filas.slice(1)); // omite encabezado y ordena
+  registrosFiltrados = registrosGlobal;
   paginaActual = 1;
   renderTabla(registrosFiltrados);
   actualizarTarjetasDashboard(registrosGlobal); // <-- aquí
@@ -32,7 +32,7 @@ async function cargarDatosDesdeAppsScript() {
     const data = await response.json();
 
     if (Array.isArray(data)) {
-      registrosGlobal = data.slice(1); // omitir encabezados
+      registrosGlobal = ordenarPorFechaDesc(data.slice(1)); // omitir encabezados y ordena
       registrosFiltrados = registrosGlobal;
       paginaActual = 1;
 
@@ -96,7 +96,7 @@ function actualizarContadores() {
 let registrosGlobal = [];
 let registrosFiltrados = []; // Nueva variable para registros filtrados
 let paginaActual = 1;
-const registrosPorPagina = 7;
+const registrosPorPagina = 15; // Cambiado de 7 a 15
 
 // ------------------- FUNCIONES DE EDICIÓN Y ELIMINACIÓN -------------------
 
@@ -314,8 +314,28 @@ function renderPaginacion(totalRegistros) {
   paginacion.innerHTML = "";
 
   const totalPaginas = Math.ceil(totalRegistros / registrosPorPagina);
+  let start = Math.max(1, paginaActual - 2);
+  let end = Math.min(totalPaginas, start + 4);
 
-  for (let i = 1; i <= totalPaginas; i++) {
+  // Ajustar el rango si estamos cerca del final
+  if (end - start < 4) {
+    start = Math.max(1, end - 4);
+  }
+
+  // Botón anterior
+  if (paginaActual > 1) {
+    const prevBtn = document.createElement("button");
+    prevBtn.className = "pagination-btn";
+    prevBtn.textContent = "<";
+    prevBtn.addEventListener("click", () => {
+      paginaActual--;
+      renderTabla(registrosFiltrados);
+    });
+    paginacion.appendChild(prevBtn);
+  }
+
+  // Botones de página
+  for (let i = start; i <= end; i++) {
     const btn = document.createElement("button");
     btn.className = "pagination-btn" + (i === paginaActual ? " active" : "");
     btn.textContent = i;
@@ -326,6 +346,7 @@ function renderPaginacion(totalRegistros) {
     paginacion.appendChild(btn);
   }
 
+  // Botón siguiente
   if (paginaActual < totalPaginas) {
     const nextBtn = document.createElement("button");
     nextBtn.className = "pagination-btn";
@@ -335,17 +356,6 @@ function renderPaginacion(totalRegistros) {
       renderTabla(registrosFiltrados);
     });
     paginacion.appendChild(nextBtn);
-  }
-
-  if (paginaActual > 1) {
-    const prevBtn = document.createElement("button");
-    prevBtn.className = "pagination-btn";
-    prevBtn.textContent = "<";
-    prevBtn.addEventListener("click", () => {
-      paginaActual--;
-      renderTabla(registrosFiltrados);
-    });
-    paginacion.insertBefore(prevBtn, paginacion.firstChild);
   }
 }
 
@@ -637,4 +647,13 @@ function actualizarTarjetasDashboard(registros) {
       }
     }
   });
+
+function ordenarPorFechaDesc(registros) {
+  return registros.slice().sort((a, b) => {
+    // Intenta convertir ambas fechas a objetos Date
+    const fechaA = new Date(a[0]);
+    const fechaB = new Date(b[0]);
+    return fechaB - fechaA; // Más reciente primero
+  });
+}
 
