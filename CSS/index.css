@@ -592,3 +592,33 @@ body {
   opacity: 0.8;
   border-radius: 2px;
 }
+
+.input-error {
+  color: #e74c3c;
+  font-size: 0.9em;
+  margin-top: 4px;
+}
+
+.input-group {
+  position: relative;
+}
+
+.input-group .toggle-password {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--plata-industrial, #476D7C);
+  font-size: 1.25rem;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+  transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+}
