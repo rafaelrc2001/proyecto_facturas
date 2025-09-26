@@ -10,8 +10,7 @@ const SHEET_URL =
 
 // ------------------- CONFIGURACIÓN APPS SCRIPT -------------------
 const APPS_SCRIPT_URL =
-"https://script.google.com/macros/s/AKfycbzm2z10tHekmyE339mhDcNFArJsfXo8SbRJ2PzrYNKQQb9aGT0WIIpnv5STEhKFmN3zEA/exec";
-
+"https://script.google.com/macros/s/AKfycbzecB_A8rkCc17qTBgcgxoGZFdjZnP_U_cik1gAslEuqA93Hbo4HqNJGzeDgzLQzoVi7g/exec";
 
 async function cargarDatosCSV() {
   const response = await fetch(SHEET_URL);
@@ -269,42 +268,53 @@ function renderTabla(registros) {
   const paginaRegistros = registros.slice(inicio, fin);
 
   paginaRegistros.forEach((fila, indexLocal) => {
-    if (fila.length >= 6) {
-      const tr = document.createElement("tr");
+    // fila es un array que ahora debe tener al final sheetRowNumber (porque doGet lo añade)
+    if (!fila) return;
 
-      // Formatear la fecha
-      let fechaFormateada = fila[1]; // Ahora la fecha está en la columna 1
-      if (fechaFormateada && fechaFormateada.includes("T")) {
-        const fechaObj = new Date(fechaFormateada);
-        fechaFormateada = fechaObj.toLocaleDateString("es-ES");
-      }
+    // Extraer sheetRowNumber (último elemento)
+    const sheetRowNumber = fila[fila.length - 1];
 
-      // Mostrar columnas: Fecha, Tipo, Factura, Subtotal, IVA, Total
-      const columnas = [fechaFormateada, fila[2], fila[3], fila[4], fila[5], fila[6]];
-      columnas.forEach((valor) => {
-        const td = document.createElement("td");
-        td.textContent = valor || "";
-        tr.appendChild(td);
-      });
+    // Buscar el índice real en registrosGlobal por coincidencia del rowNumber
+    const filaGlobalIndex = registrosGlobal.findIndex(r => {
+      // algunos rows podrían no tener rowNumber si aún no hubo doGet actualizado; tolerancia:
+      return r && r[r.length - 1] && String(r[r.length - 1]) === String(sheetRowNumber);
+    });
 
-      // Botones de acciones
-      const tdAcciones = document.createElement("td");
-      tdAcciones.innerHTML = `
-        <button class="icon-btn" title="Ver"><i class="fas fa-eye"></i></button>
-        <button class="icon-btn" title="Editar"><i class="fas fa-edit"></i></button>
-        <button class="icon-btn" title="Eliminar"><i class="fas fa-trash-alt"></i></button>
-      `;
-      tr.appendChild(tdAcciones);
-      tbody.appendChild(tr);
+    // Fallback si no lo encuentra: usar la posición relativa (menos ideal)
+    const indexParaEventos = filaGlobalIndex !== -1 ? filaGlobalIndex : (inicio + indexLocal);
 
-      // Agregar eventos a esta fila específica
-      const filaGlobalIndex = inicio + indexLocal;
-      agregarEventosAcciones(tr, filaGlobalIndex);
+    // Crear TR y celdas con los datos visibles (Fecha, Tipo, Factura, Subtotal, IVA, Total)
+    const tr = document.createElement("tr");
+
+    let fechaFormateada = fila[1];
+    if (fechaFormateada && fechaFormateada.includes("T")) {
+      const fechaObj = new Date(fechaFormateada);
+      fechaFormateada = fechaObj.toLocaleDateString("es-ES");
     }
+
+    const columnas = [fechaFormateada, fila[2], fila[3], fila[4], fila[5], fila[6]];
+    columnas.forEach((valor) => {
+      const td = document.createElement("td");
+      td.textContent = valor || "";
+      tr.appendChild(td);
+    });
+
+    const tdAcciones = document.createElement("td");
+    tdAcciones.innerHTML = `
+      <button class="icon-btn" title="Ver"><i class="fas fa-eye"></i></button>
+      <button class="icon-btn" title="Editar"><i class="fas fa-edit"></i></button>
+      <button class="icon-btn" title="Eliminar"><i class="fas fa-trash-alt"></i></button>
+    `;
+    tr.appendChild(tdAcciones);
+    tbody.appendChild(tr);
+
+    // Agregar eventos usando el índice global correcto
+    agregarEventosAcciones(tr, indexParaEventos);
   });
 
   renderPaginacion(registros.length);
 }
+
 
 // ------------------- PAGINACIÓN -------------------
 function renderPaginacion(totalRegistros) {
@@ -468,31 +478,39 @@ function getDriveImageLink(link) {
 }
 
 // Nueva función para agregar eventos de acciones
-function agregarEventosAcciones(filaElement, filaIndex) {
-  // Evento Ver: abrir URL en nueva pestaña
-  filaElement
-    .querySelector('.icon-btn[title="Ver"]')
-    .addEventListener("click", function () {
-      const link = registrosFiltrados[filaIndex] ? registrosFiltrados[filaIndex][6] : null;
-      if (link) {
-        window.open(link, '_blank');
-      }
-    });
+function agregarEventosAcciones(filaElement, filaGlobalIndex) {
+  const registro = registrosGlobal[filaGlobalIndex] || [];
 
-  // Evento Editar
-  filaElement
-    .querySelector('.icon-btn[title="Editar"]')
-    .addEventListener("click", function () {
-      habilitarEdicion(filaElement, filaIndex);
+  // BOTÓN VER
+  const verBtn = filaElement.querySelector('.icon-btn[title="Ver"]');
+  if (verBtn) {
+    verBtn.addEventListener("click", function () {
+      // Link normalmente está en la columna 8 (índice 7) si doGet NO añadió rowNumber,
+      // o en índice 7 también si doGet añadió rowNumber en posición 8 (fila[7] = Link).
+      // Como fallback intento usar registro[7] o el penúltimo.
+      const link = registro[7] || registro[registro.length - 2] || null;
+      if (link) window.open(link, '_blank');
+      else mostrarNotificacion("No hay enlace disponible", "info");
     });
+  }
 
-  // Evento Eliminar
-  filaElement
-    .querySelector('.icon-btn[title="Eliminar"]')
-    .addEventListener("click", function () {
-      eliminarRegistro(filaIndex);
+  // BOTÓN EDITAR
+  const editarBtn = filaElement.querySelector('.icon-btn[title="Editar"]');
+  if (editarBtn) {
+    editarBtn.addEventListener("click", function () {
+      habilitarEdicion(filaElement, filaGlobalIndex);
     });
+  }
+
+  // BOTÓN ELIMINAR
+  const eliminarBtn = filaElement.querySelector('.icon-btn[title="Eliminar"]');
+  if (eliminarBtn) {
+    eliminarBtn.addEventListener("click", function () {
+      eliminarRegistro(filaGlobalIndex);
+    });
+  }
 }
+
 
 function agregarEventosVer() {
   document.querySelectorAll(".icon-btn[title='Ver']").forEach((btn) => {
