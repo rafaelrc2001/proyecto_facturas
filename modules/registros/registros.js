@@ -10,7 +10,8 @@ const SHEET_URL =
 
 // ------------------- CONFIGURACIÓN APPS SCRIPT -------------------
 const APPS_SCRIPT_URL =
-"https://script.google.com/macros/s/AKfycbyoOenzUbbKx0Zn6xasjGHgAdNdcxxwkvIlBrTlMv4-LQEgBetAT_U94Wy-d6eKnbbo6g/exec";
+"https://script.google.com/macros/s/AKfycbzm2z10tHekmyE339mhDcNFArJsfXo8SbRJ2PzrYNKQQb9aGT0WIIpnv5STEhKFmN3zEA/exec";
+
 
 async function cargarDatosCSV() {
   const response = await fetch(SHEET_URL);
@@ -59,9 +60,8 @@ function actualizarContadores() {
 
   // Contar tickets y facturas basándose en la columna "Tipo" (índice 1)
   registrosGlobal.forEach((fila) => {
-    if (fila.length > 1) {
-      const tipo = fila[1].toLowerCase().trim(); // Columna tipo (índice 1)
-
+    if (fila.length > 2) {
+      const tipo = fila[2].toLowerCase().trim(); // Cambia a índice 2
       if (tipo === "ticket" || tipo === "tickets") {
         conteoTickets++;
       } else if (tipo === "factura" || tipo === "facturas") {
@@ -131,65 +131,78 @@ function habilitarEdicion(filaElement, filaIndex) {
 
 // Función para guardar los cambios en Apps Script
 async function guardarEdicion(filaElement, filaIndex) {
-  try {
-    const inputs = filaElement.querySelectorAll(".edit-input");
-    const nuevosDatos = Array.from(inputs).map((input) => input.value);
+  // Selecciona sólo los inputs creados para edición
+  const inputs = filaElement.querySelectorAll(".edit-input");
+  const valores = Array.from(inputs).map(i => i.value);
 
-    // Mostrar loading
-    const guardarBtn = filaElement.querySelector(".guardar-btn");
-    guardarBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+  // seguridad: debe haber 6 inputs (Fecha..Total)
+  if (valores.length < 6) {
+    console.warn("Esperaba 6 inputs (Fecha..Total). Encontrados:", valores.length);
+  }
+
+  const filaActual = registrosGlobal[filaIndex] || [];
+  const sheetRowNumber = filaActual[filaActual.length - 1]; // último elemento = número de fila
+  const linkValue = filaActual.length >= 2 ? filaActual[filaActual.length - 2] : ""; // penúltimo = Link (si existe)
+
+  // Reconstruir la fila preservando Id y Link y añadiendo rowNumber al final
+  const nuevaFila = [
+    filaActual[0] || "",    // Id (no tocar)
+    valores[0] || "",      // Fecha
+    valores[1] || "",      // Tipo
+    valores[2] || "",      // Factura
+    valores[3] || "",      // Subtotal
+    valores[4] || "",      // IVA
+    valores[5] || "",      // Total
+    linkValue || "",       // Link (no tocar)
+    sheetRowNumber         // número de fila (último)
+  ];
+
+  // Actualizar localmente (para que renderTabla muestre los cambios)
+  registrosGlobal[filaIndex] = nuevaFila;
+  registrosFiltrados = registrosGlobal;
+
+  // Preparar datos a enviar: SOLO Fecha..Total + row
+  const formData = new FormData();
+  formData.append("action", "update");
+  formData.append("row", sheetRowNumber);
+  formData.append("Fecha", valores[0] || "");
+  formData.append("Tipo", valores[1] || "");
+  formData.append("Factura", valores[2] || "");
+  formData.append("Subtotal", valores[3] || "");
+  formData.append("IVA", valores[4] || "");
+  formData.append("Total", valores[5] || "");
+
+  // Opcional: feedback visual en el botón Guardar
+  const guardarBtn = filaElement.querySelector(".guardar-btn");
+  if (guardarBtn) {
     guardarBtn.disabled = true;
+    guardarBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+  }
 
-    // actualizar local
-    registrosGlobal[filaIndex] = nuevosDatos;
-    registrosFiltrados = registrosGlobal;
-
-    // ✅ Usar FormData en lugar de parámetros URL
-    const formData = new FormData();
-    formData.append('action', 'update');
-    formData.append('rowIndex', (filaIndex + 2).toString());
-    formData.append('Fecha', nuevosDatos[0]);
-    formData.append('Tipo', nuevosDatos[1]);
-    formData.append('Factura', nuevosDatos[2]);
-    formData.append('Subtotal', nuevosDatos[3]);
-    formData.append('IVA', nuevosDatos[4]);
-    formData.append('Total', nuevosDatos[5]);
-
-    const response = await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      body: formData
-    });
-
-    if (!response.ok) {
-      throw new Error("No se pudo conectar con el servidor (status " + response.status + ")");
-    }
-
+  try {
+    const response = await fetch(APPS_SCRIPT_URL, { method: "POST", body: formData });
     const result = await response.json();
-    console.log("Respuesta Apps Script:", result);
 
     if (result.success) {
-      actualizarFilaUI(filaElement, nuevosDatos);
-      mostrarNotificacion("✅ Registro actualizado en Google Sheets", "success");
-      actualizarContadores();
+      renderTabla(registrosFiltrados);
+      mostrarNotificacion("✅ Registro actualizado", "success");
     } else {
-      throw new Error(result.error || result.message || "Error desconocido");
+      throw new Error(result.error || result.message || "Respuesta no exitosa");
     }
-  } catch (error) {
-    if (error.message === "Failed to fetch") {
-      mostrarNotificacion(
-        "❌ Error de conexión con Apps Script. Revisa CORS y publicación.",
-        "error"
-      );
-    } else {
-      mostrarNotificacion(
-        "❌ Error al actualizar el registro: " + error.message,
-        "error"
-      );
+  } catch (err) {
+    console.error("Error al actualizar:", err);
+    mostrarNotificacion("❌ Error al actualizar: " + err.message, "error");
+    // Restaurar datos desde servidor por seguridad
+    await cargarDatosDesdeAppsScript();
+  } finally {
+    if (guardarBtn) {
+      guardarBtn.disabled = false;
+      guardarBtn.innerHTML = '<i class="fas fa-save"></i>';
     }
-    actualizarFilaUI(filaElement, registrosGlobal[filaIndex]);
-    actualizarContadores();
   }
 }
+
+
 
 // Función para cancelar edición
 function cancelarEdicion(filaElement) {
@@ -222,54 +235,29 @@ function actualizarFilaUI(filaElement, nuevosDatos) {
 
 // Función para eliminar registro
 async function eliminarRegistro(filaIndex) {
-  if (!confirm("¿Estás seguro de que quieres eliminar este registro?")) {
-    return;
-  }
+  if (!confirm("¿Eliminar este registro?")) return;
 
-  try {
-    // Primero eliminar del array local
-    const filaEliminada = registrosGlobal[filaIndex];
+  const filaEliminada = registrosGlobal[filaIndex];
+  const sheetRowNumber = filaEliminada[filaEliminada.length - 1]; // último valor
+
+  const formData = new FormData();
+  formData.append('action', 'delete');
+  formData.append('row', sheetRowNumber);
+
+  const response = await fetch(APPS_SCRIPT_URL, { method: 'POST', body: formData });
+  const result = await response.json();
+
+  if (result.success) {
     registrosGlobal.splice(filaIndex, 1);
-    registrosFiltrados = registrosGlobal;
-
-    // ✅ Usar FormData
-    const formData = new FormData();
-    formData.append('action', 'delete');
-    formData.append('rowIndex', (filaIndex + 2).toString());
-
-    const response = await fetch(APPS_SCRIPT_URL, {
-      method: 'POST',
-      body: formData
-    });
-
-    const result = await response.json();
-    console.log("Respuesta Apps Script:", result); // <-- Depuración
-
-    // Elimina la validación por status, solo usa success
-    if (result.success) {
-      mostrarNotificacion(
-        "✅ Registro eliminado de Google Sheets",
-        "success"
-      );
-      renderTabla(registrosFiltrados);
-      actualizarContadores();
-    } else {
-      throw new Error(result.error || result.message || "Error desconocido");
-    }
-  } catch (error) {
-    console.error("Error al eliminar en Google Sheets:", error);
-    mostrarNotificacion(
-      "❌ Error al eliminar el registro: " + error.message,
-      "error"
-    );
-
-    // Restaurar el registro si falló la eliminación en Sheets
-    registrosGlobal.splice(filaIndex, 0, filaEliminada);
     registrosFiltrados = registrosGlobal;
     renderTabla(registrosFiltrados);
     actualizarContadores();
+    mostrarNotificacion("✅ Registro eliminado", "success");
+  } else {
+    mostrarNotificacion("❌ Error: " + result.error, "error");
   }
 }
+
 
 // ------------------- RENDER TABLA -------------------
 function renderTabla(registros) {
@@ -284,12 +272,20 @@ function renderTabla(registros) {
     if (fila.length >= 6) {
       const tr = document.createElement("tr");
 
-      // Datos normales
-      for (let i = 0; i < 6; i++) {
-        const td = document.createElement("td");
-        td.textContent = fila[i] || "";
-        tr.appendChild(td);
+      // Formatear la fecha
+      let fechaFormateada = fila[1]; // Ahora la fecha está en la columna 1
+      if (fechaFormateada && fechaFormateada.includes("T")) {
+        const fechaObj = new Date(fechaFormateada);
+        fechaFormateada = fechaObj.toLocaleDateString("es-ES");
       }
+
+      // Mostrar columnas: Fecha, Tipo, Factura, Subtotal, IVA, Total
+      const columnas = [fechaFormateada, fila[2], fila[3], fila[4], fila[5], fila[6]];
+      columnas.forEach((valor) => {
+        const td = document.createElement("td");
+        td.textContent = valor || "";
+        tr.appendChild(td);
+      });
 
       // Botones de acciones
       const tdAcciones = document.createElement("td");
@@ -373,7 +369,7 @@ document
     } else {
       // Filtrar registros
       registrosFiltrados = registrosGlobal.filter((fila) => {
-        return fila.some((celda) => celda.toLowerCase().includes(filtro));
+        return fila.some((celda) => String(celda).toLowerCase().includes(filtro));
       });
     }
 
@@ -389,9 +385,8 @@ function actualizarContadoresFiltrados(registrosFiltrados) {
 
   // Contar tickets y facturas en los registros filtrados
   registrosFiltrados.forEach((fila) => {
-    if (fila.length > 1) {
-      const tipo = fila[1].toLowerCase().trim();
-
+    if (fila.length > 2) {
+      const tipo = fila[2].toLowerCase().trim(); // Cambia a índice 2
       if (tipo === "ticket" || tipo === "tickets") {
         conteoTickets++;
       } else if (tipo === "factura" || tipo === "facturas") {
@@ -606,8 +601,8 @@ function actualizarTarjetasDashboard(registros) {
   let conteoFacturas = 0;
 
   registros.forEach((fila) => {
-    if (fila.length > 1) {
-      const tipo = fila[1].toLowerCase().trim();
+    if (fila.length > 2) {
+      const tipo = fila[2].toLowerCase().trim(); // Cambia a índice 2
       if (tipo === "ticket" || tipo === "tickets") {
         conteoTickets++;
       } else if (tipo === "factura" || tipo === "facturas") {
@@ -658,10 +653,9 @@ function actualizarTarjetasDashboard(registros) {
 
 function ordenarPorFechaDesc(registros) {
   return registros.slice().sort((a, b) => {
-    // Intenta convertir ambas fechas a objetos Date
-    const fechaA = new Date(a[0]);
-    const fechaB = new Date(b[0]);
-    return fechaB - fechaA; // Más reciente primero
+    const fechaA = new Date(a[1]);
+    const fechaB = new Date(b[1]);
+    return fechaB - fechaA;
   });
 }
 
