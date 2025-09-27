@@ -16,11 +16,17 @@
    SIDEBAR BASE
    =============================== */
 .sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;         /* Ocupa toda la altura de la ventana */
   width: 280px;
-  background-color: var(--azul-petroleo);
-  color: white;
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
+  z-index: 1000;
+  background-color: var(--azul-petroleo);
+  color: white;
   transition: all 0.3s ease;
 }
 
@@ -114,6 +120,7 @@
   padding-left: 5px;
 }
 
+/* Cambios en el color del texto y el fondo del logo */
 .logo-text::after {
   content: "";
   display: block;
@@ -275,6 +282,10 @@
    PERFIL USUARIO
    =============================== */
 .sidebar-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
   padding: 20px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   display: flex;
@@ -495,7 +506,30 @@
   }
 }
 
+/* Sidebar responsive */
+@media (max-width: 900px) {
+  .sidebar {
+    width: 80px;
+    min-width: 80px;
+  }
+}
 
+/* Responsive: sidebar ocupa toda la pantalla en móviles */
+@media (max-width: 576px) {
+  .sidebar {
+    width: 100vw;
+    min-width: 100vw;
+    height: 70px; /* Puedes ajustar la altura si quieres un menú horizontal */
+    flex-direction: row;
+    bottom: 0;
+    top: auto;
+  }
+  .sidebar-footer {
+    position: static;
+    margin-top: 0;
+    width: auto;
+  }
+}
 
 .sidebar {
   width: 280px;
@@ -505,37 +539,60 @@
   border-right: 1px solid #2c3e50;
 }
 
-
-/* ...existing code... */
-.logo-text {
-  font-family: 'Montserrat', 'Roboto', Arial, sans-serif;
-  font-size: 1.6rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  color: #fff;
-  background: none;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.18);
-  transition: all 0.3s ease;
-  position: relative;
-  padding-left: 5px;
-}
-/* ...existing code... */
-
-
-
-.avatar {
-  background: var(--blanco-neutro);
-  color: var(--gris-acero); /* <-- aquí el cambio */
-  font-weight: bold;
-  font-size: 1rem;
-  border-radius: 50%;
-  width: 36px;
-  height: 36px;
+/* Ajusta el contenido principal para no quedar debajo del sidebar */
+.app-container {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  min-height: 100vh;
 }
 
+.main-content {
+  margin-left: 280px; /* Igual al ancho del sidebar */
+  width: calc(100vw - 280px);
+  /* ...otros estilos... */
+}
 
+/* Responsive: cuando el sidebar es más pequeño */
+@media (max-width: 900px) {
+  .main-content {
+    margin-left: 80px;
+    width: calc(100vw - 80px);
+  }
+}
+
+/* Responsive: sidebar horizontal en móviles */
+@media (max-width: 576px) {
+  .main-content {
+    margin-left: 0;
+    margin-top: 70px; /* Si el sidebar está arriba */
+    width: 100vw;
+  }
+}
+
+/* Cuando el sidebar está colapsado */
+.sidebar.collapsed ~ .main-content {
+  margin-left: 80px;
+  width: calc(100vw - 80px);
+}
+
+/* Cuando el sidebar está colapsado/compacto */
+.sidebar.compact ~ .main-content {
+  margin-left: 60px;
+  width: calc(100vw - 60px);
+}
+
+/* Responsive: si el sidebar compacto es 80px en pantallas medianas */
+@media (max-width: 900px) {
+  .sidebar.compact ~ .main-content {
+    margin-left: 80px;
+    width: calc(100vw - 80px);
+  }
+}
+
+/* Responsive: sidebar horizontal en móviles */
+@media (max-width: 576px) {
+  .sidebar.compact ~ .main-content {
+    margin-left: 0;
+    margin-top: 70px;
+    width: 100vw;
+  }
+}
