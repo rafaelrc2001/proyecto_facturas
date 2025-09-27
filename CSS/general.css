@@ -52,11 +52,71 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .main-header {
-  background: var(--azul-petroleo);
-  padding: 32px 0 24px 0;
-  border-radius: 0;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-  width: 100%;
+  position: relative;
+  padding-top: 32px;
+  padding-bottom: 24px;
+  background: linear-gradient(90deg, #fff 0%, #f7fafc 100%);
+  box-shadow: 0 2px 12px rgba(0,59,92,0.07);
+  border-bottom: 3px solid var(--naranja-seguridad);
+  padding: 32px 32px 0 32px;
+  border-radius: 0 0 16px 16px;
+  margin-bottom: 0;
+}
+
+.main-header h1 {
+  font-size: 2.1rem !important;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  color: var(--azul-petroleo) !important;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-shadow: 0 2px 8px rgba(0,59,92,0.08);
+  margin-bottom: 32px !important; /* Más espacio debajo del título */
+  padding-left: 32px; /* Ajusta el valor según lo que necesites */
+}
+
+.main-header img {
+  height: 60px !important;
+  width: 72px !important;
+  margin-right: 16px;
+  vertical-align: middle;
+  /* Quita el filtro si tu logo ya es blanco */
+  filter: none;
+}
+
+.main-header .search-bar {
+  min-width: 260px;
+  margin-left: auto;
+}
+
+.main-header .search-bar input {
+  border-radius: 8px;
+  border: 1.5px solid var(--plata-industrial);
+  background: #fff;
+  font-size: 1rem;
+  color: var(--azul-petroleo);
+  box-shadow: 0 1px 6px rgba(0,59,92,0.04);
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+.main-header .search-bar input:focus {
+  border-color: var(--naranja-seguridad);
+  box-shadow: 0 0 0 2px rgba(255,111,0,0.10);
+}
+
+.main-header::after {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 4px;
+  background: var(--naranja-seguridad, #ff6f00);
+  border-radius: 0 0 8px 8px;
+  z-index: 1;
 }
 
 .header-content {
@@ -1084,6 +1144,44 @@ td {
   .header-logo {
     height: 40px;
   }
+}
+
+
+.header-center h1 {
+  color: #fff !important;
+}
+
+.main-header > div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  padding-left: 24px; /* Opcional: para separar del borde */
+}
+
+.main-header h1 {
+  margin-bottom: 4px !important;
+}
+
+.header-subtitle {
+  margin-top: 0;
+  margin-left: 0;
+  font-size: 1.08rem;
+  color: #6c8ca1;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-align: left;
+}
+
+.header-subtitle {
+  margin-top: 0;
+  margin-left: 0;
+  margin-bottom: 24px; /* <-- Esto baja la línea naranja */
+  font-size: 1.08rem;
+  color: #6c8ca1;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  text-align: left;
 }
 
 

@@ -1,7 +1,6 @@
 const SHEET_URL =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vSBnwkeQram0eM9JdLWPkbjG9SPrc1ZjsSwFQ_N8gj3l6f3YSB7RBA-j_ddbZXplTjJcPDgiVbLrr3L/pub?output=csv";
-
-async function cargarDatosDashboard() {
+"https://docs.google.com/spreadsheets/d/e/2PACX-1vQFNxPS_lZrhCuH7xrQfeMJgZIb3vaHirtKySurmZCvrQmKV45caRB-eJAqJ6sju3Mxdwy6ituHWBEA/pub?gid=0&single=true&output=csv";
+  async function cargarDatosDashboard() {
   const response = await fetch(SHEET_URL);
   const data = await response.text();
   const filas = data.split("\n").map((row) => row.split(","));

@@ -1,17 +1,16 @@
 // ------------------- CONFIGURACIÓN DE HOJA -------------------
-const SHEET_ID = "1vwurBvgGx2jl1lhMxWZc4QiZFVXJIgwILZdYIUz6Xks"; // Tu Sheet ID
+const SHEET_ID = "1De-GU-LmGrZ3D74NW6rfqPZ310eRf5eE3dTvm4zwuiM"; // Tu Sheet ID
 const API_KEY = "TU_API_KEY_AQUI"; // La sacas de Google Cloud
-const RANGE = "facturas"; // Cambia si tu hoja se llama distinto
+const RANGE = "Hoja 1"; // Ajusta según el nombre de tu pestaña
 const URL = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`;
 
 // CSV público como alternativa
 const SHEET_URL =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vSBnwkeQram0eM9JdLWPkbjG9SPrc1ZjsSwFQ_N8gj3l6f3YSB7RBA-j_ddbZXplTjJcPDgiVbLrr3L/pub?output=csv";
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vSfS8EokIwk13JmEuvtulVtWBmxrbhhS58K-ySn2kU8snRLxko_GytDpExoAW7FX0DA1VLO9mt6QeoH/pub?output=csv";
 
 // ------------------- CONFIGURACIÓN APPS SCRIPT -------------------
 const APPS_SCRIPT_URL =
-"https://script.google.com/macros/s/AKfycbzecB_A8rkCc17qTBgcgxoGZFdjZnP_U_cik1gAslEuqA93Hbo4HqNJGzeDgzLQzoVi7g/exec";
-
+"https://script.google.com/macros/s/AKfycbzNSOIMO4vyf1D8hYpLU2br6LPaMVI-cbLFnJyHh49JiprSYkdbNXxsbPByCXogl_GMlA/exec";
 async function cargarDatosCSV() {
   const response = await fetch(SHEET_URL);
   const data = await response.text();
