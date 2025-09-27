@@ -375,6 +375,34 @@ td {
   background: var(--blanco-neutro);
 }
 
+/* Estilo para inputs en modo edición de tabla */
+.table-container input[type="text"],
+.table-container input[type="number"] {
+  padding: 8px 12px;
+  border: 1px solid var(--plata-industrial);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  color: var(--negro-carbon);
+  background: #f7fafc;
+  transition: border 0.2s, box-shadow 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.table-container input[type="text"]:focus,
+.table-container input[type="number"]:focus {
+  border-color: var(--azul-petroleo);
+  box-shadow: 0 0 0 2px rgba(0,59,92,0.12);
+  outline: none;
+  background: #fff;
+}
+
+/* Opcional: reduce el padding de la celda cuando está en edición */
+.table-container td.editing {
+  padding: 8px 8px;
+  background: #eef6fa;
+}
+
 /* ===============================
    STATUS BADGES
    =============================== */
@@ -453,11 +481,10 @@ td {
   background: none;
   border: none;
   padding: 0;
-  margin: 0 2px; /* antes 4px */
+  margin: 0 2px;
   cursor: pointer;
-  color: #222;
-  font-size: 1.1rem; /* antes 1.3rem */
-  transition: color 0.2s;
+  font-size: 1.1rem;
+  transition: color 0.2s, background 0.2s;
   box-shadow: none;
   outline: none;
   display: inline-flex;
@@ -465,16 +492,40 @@ td {
   justify-content: center;
 }
 
-.icon-btn:hover,
-.icon-btn:focus {
-  color: var(--azul-petroleo, #003B5C); /* Azul al pasar el mouse */
-  background: none;
-  outline: none;
+/* SOLO aplica color si NO tiene variante */
+.icon-btn:not(.ver):not(.editar):not(.eliminar) {
+  color: var(--azul-petroleo);
 }
 
-.icon-btn:active {
-  color: #1565c0; /* Un azul más fuerte al hacer clic */
+/* Variantes de color */
+.icon-btn.ver,
+.icon-btn.editar,
+.icon-btn.eliminar,
+.icon-btn.guardar,
+.icon-btn.cancelar {
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 1.2rem;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0 2px;
 }
+
+.icon-btn.ver    { background-color: #00bcd4; color: #fff; }
+.icon-btn.editar { background-color: #ffca28; color: #222; }
+.icon-btn.eliminar { background-color: #ef5350; color: #fff; }
+.icon-btn.guardar  { background-color: #4CAF50; color: #fff; }
+.icon-btn.cancelar { background-color: #f44336; color: #fff; }
+
+.icon-btn.ver:hover      { filter: brightness(0.95); }
+.icon-btn.editar:hover   { filter: brightness(0.95); }
+.icon-btn.eliminar:hover { filter: brightness(0.95); }
+.icon-btn.guardar:hover  { filter: brightness(0.95); }
+.icon-btn.cancelar:hover { filter: brightness(0.95); }
 
 /* ===============================
    TABLE FOOTER & PAGINATION
@@ -886,11 +937,10 @@ td {
   background: none;
   border: none;
   padding: 0;
-  margin: 0 2px; /* antes 4px */
+  margin: 0 2px;
   cursor: pointer;
-  color: var(--azul-petroleo);
-  font-size: 1.1rem; /* antes 1.3rem */
-  transition: color 0.2s;
+  font-size: 1.1rem;
+  transition: color 0.2s, background 0.2s;
   box-shadow: none;
   outline: none;
   display: inline-flex;
@@ -898,16 +948,40 @@ td {
   justify-content: center;
 }
 
-.icon-btn:hover,
-.icon-btn:focus {
-  color: var(--azul-petroleo, #003B5C); /* Azul al pasar el mouse */
-  background: none;
-  outline: none;
+/* SOLO aplica color si NO tiene variante */
+.icon-btn:not(.ver):not(.editar):not(.eliminar) {
+  color: var(--azul-petroleo);
 }
 
-.icon-btn:active {
-  color: #1565c0; /* Un azul más fuerte al hacer clic */
+/* Variantes de color */
+.icon-btn.ver,
+.icon-btn.editar,
+.icon-btn.eliminar,
+.icon-btn.guardar,
+.icon-btn.cancelar {
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  font-size: 1.2rem;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0 2px;
 }
+
+.icon-btn.ver    { background-color: #00bcd4; color: #fff; }
+.icon-btn.editar { background-color: #ffca28; color: #222; }
+.icon-btn.eliminar { background-color: #ef5350; color: #fff; }
+.icon-btn.guardar  { background-color: #4CAF50; color: #fff; }
+.icon-btn.cancelar { background-color: #f44336; color: #fff; }
+
+.icon-btn.ver:hover      { filter: brightness(0.95); }
+.icon-btn.editar:hover   { filter: brightness(0.95); }
+.icon-btn.eliminar:hover { filter: brightness(0.95); }
+.icon-btn.guardar:hover  { filter: brightness(0.95); }
+.icon-btn.cancelar:hover { filter: brightness(0.95); }
 
 .table-header-flex {
   display: flex;
@@ -1011,3 +1085,5 @@ td {
     height: 40px;
   }
 }
+
+

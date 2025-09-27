@@ -114,16 +114,16 @@ function habilitarEdicion(filaElement, filaIndex) {
   // Cambiar botones a Guardar/Cancelar
   const tdAcciones = filaElement.lastElementChild;
   tdAcciones.innerHTML = `
-    <button class="icon-btn guardar-btn" title="Guardar"><i class="fas fa-save"></i></button>
-    <button class="icon-btn cancelar-btn" title="Cancelar"><i class="fas fa-times"></i></button>
+    <button class="icon-btn guardar" title="Guardar"><i class="fas fa-save"></i></button>
+    <button class="icon-btn cancelar" title="Cancelar"><i class="fas fa-times"></i></button>
   `;
 
   // Eventos para guardar/cancelar
-  tdAcciones.querySelector(".guardar-btn").addEventListener("click", () => {
+  tdAcciones.querySelector(".guardar").addEventListener("click", () => {
     guardarEdicion(filaElement, filaIndex);
   });
 
-  tdAcciones.querySelector(".cancelar-btn").addEventListener("click", () => {
+  tdAcciones.querySelector(".cancelar").addEventListener("click", () => {
     cancelarEdicion(filaElement);
   });
 }
@@ -220,9 +220,11 @@ function actualizarFilaUI(filaElement, nuevosDatos) {
   // Restaurar botones normales
   const tdAcciones = filaElement.lastElementChild;
   tdAcciones.innerHTML = `
-    <button class="icon-btn" title="Ver"><i class="fas fa-eye"></i></button>
-    <button class="icon-btn" title="Editar"><i class="fas fa-edit"></i></button>
-    <button class="icon-btn" title="Eliminar"><i class="fas fa-trash-alt"></i></button>
+<!-- Ejemplo de botón estilo tabla -->
+<!-- Ejemplo correcto -->
+<button class="icon-btn ver" title="Ver"><i class="fas fa-eye"></i></button>
+<button class="icon-btn editar" title="Editar"><i class="fas fa-edit"></i></button>
+<button class="icon-btn eliminar" title="Eliminar"><i class="fas fa-trash-alt"></i></button>
   `;
 
   // Reagregar eventos
@@ -301,10 +303,10 @@ function renderTabla(registros) {
 
     const tdAcciones = document.createElement("td");
     tdAcciones.innerHTML = `
-      <button class="icon-btn" title="Ver"><i class="fas fa-eye"></i></button>
-      <button class="icon-btn" title="Editar"><i class="fas fa-edit"></i></button>
-      <button class="icon-btn" title="Eliminar"><i class="fas fa-trash-alt"></i></button>
-    `;
+  <!-- Ejemplo correcto -->
+<button class="icon-btn ver" title="Ver"><i class="fas fa-eye"></i></button>
+<button class="icon-btn editar" title="Editar"><i class="fas fa-edit"></i></button>
+<button class="icon-btn eliminar" title="Eliminar"><i class="fas fa-trash-alt"></i></button>    `;
     tr.appendChild(tdAcciones);
     tbody.appendChild(tr);
 
