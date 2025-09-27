@@ -34,13 +34,13 @@ function initTypesChart() {
               `;
             }
         },
-        grid: {
-            left: '30%',
-            right: '3%',
-            bottom: '3%',
-            top: '5%',
-            containLabel: false
-        },
+       grid: {
+    left: '8%',
+    right: '4%',
+    bottom: 60,   // Más espacio para etiquetas
+    top: 40,
+    containLabel: true // <-- Esto es clave
+},
         xAxis: {
             type: 'category',
             data: fechas,
@@ -109,6 +109,16 @@ function initTypesChart() {
         animationEasing: 'elasticOut',
         animationDelayUpdate: function (idx) {
             return idx * 40;
+        },
+        options: {
+          layout: {
+            padding: {
+              bottom: 30 // Espacio para las etiquetas
+            }
+          },
+          plugins: {
+            legend: { display: false }
+          }
         }
     };
 
@@ -239,13 +249,13 @@ function initBarChart({ elementId, label, color }) {
                 `;
             }
         },
-        grid: {
-            left: '30%',
-            right: '3%',
-            bottom: '3%',
-            top: '5%',
-            containLabel: false
-        },
+       grid: {
+    left: '8%',
+    right: '4%',
+    bottom: 60,   // Más espacio para etiquetas
+    top: 40,
+    containLabel: true // <-- Esto es clave
+},
         xAxis: {
             type: 'value',
             name: 'Cantidad',
