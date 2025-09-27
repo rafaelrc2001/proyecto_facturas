@@ -25,9 +25,11 @@
   flex-direction: column;
   justify-content: flex-start;
   z-index: 1000;
-  background-color: var(--azul-petroleo);
-  color: white;
+  background: #22313a;
+  color: #fff;
   transition: all 0.3s ease;
+  box-shadow: 2px 0 8px rgba(0,0,0,0.08);
+  border-right: none;
 }
 
 .sidebar.collapsed {
@@ -100,21 +102,19 @@
 
 .logo-icon {
   font-size: 1.5rem;
-  color: var(--blanco-neutro); /* Ahora es blanco */
+  color: #ff6f00;
   transition: transform 0.3s ease, color 0.3s ease;
   display: flex;
   align-items: center;
 }
 
 .logo-text {
-  font-family: 'Montserrat', 'Roboto', Arial, sans-serif;
-  font-size: 1.6rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 2px;
   color: #fff;
+  font-size: 1.3rem;
+  font-weight: bold;
+  letter-spacing: 1px;
   background: none;
-  text-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  text-shadow: none;
   transition: all 0.3s ease;
   position: relative;
   padding-left: 5px;
@@ -172,10 +172,10 @@
 }
 
 .collapse-btn {
+  color: #fff;
   background: none;
   border: none;
-  color: white;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -194,32 +194,42 @@
 }
 
 .sidebar-nav ul {
+  padding: 0;
+  margin: 0;
   list-style: none;
+}
+
+.sidebar-nav li {
+  margin: 0;
 }
 
 .sidebar-nav li a {
   display: flex;
   align-items: center;
-  padding: 12px 20px;
-  color: rgba(255, 255, 255, 0.8);
-  text-decoration: none;
-  transition: all 0.3s ease;
   gap: 12px;
+  padding: 12px 18px;
+  color: #fff;
+  font-weight: 500;
+  font-size: 1rem;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
+  text-decoration: none; /* Quita el subrayado */
 }
 
 .sidebar-nav li a i {
-  font-size: 1.1rem;
+  font-size: 1.2rem;
 }
 
 .sidebar-nav li a:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: white;
+  background: #2c3e50;
+  color: #fff;
 }
 
 .sidebar-nav li.active a {
-  background-color: rgba(255, 255, 255, 0.2);
-  color: white;
-  border-left: 4px solid var(--naranja-seguridad);
+  background: #31404d;
+  color: #fff;
+  font-weight: bold;
+  box-shadow: 0 2px 8px rgba(255,111,0,0.04);
 }
 
 /* ===============================
@@ -243,39 +253,28 @@
 }
 
 .submenu a {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.7);
-  opacity: 0.85;
-  padding: 8px 20px;
-  display: block;
+  color: #e0e0e0;
+  font-size: 0.95rem;
+  padding: 8px 18px;
   border-radius: 4px;
+  display: block;
   transition: all 0.3s ease;
 }
 
-.submenu a:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  opacity: 1;
-  color: white;
-}
-
+.submenu a:hover,
 .submenu li.active-sub a {
-  background-color: rgba(255, 255, 255, 0.2);
-  border-left: 3px solid var(--verde-tecnico);
-  font-weight: 600;
-  color: white;
+  background: #31404d;
+  color: #fff;
 }
 
-/* ===============================
-   ICONO SUBMENÚ
-   =============================== */
 .submenu-icon {
-  font-size: 0.8rem;
   margin-left: auto;
+  color: #ff6f00;
   transition: transform 0.3s;
 }
 
 .has-submenu:hover .submenu-icon {
-  transform: rotate(180deg);
+  transform: rotate(90deg);
 }
 
 /* ===============================
@@ -596,3 +595,13 @@
     width: 100vw;
   }
 }
+
+/* ...existing code... */
+.sidebar-nav li a {
+  font-size: 1.1rem; /* antes 1rem */
+  padding: 13px 20px; /* antes 12px 18px */
+}
+.sidebar-nav li a i {
+  font-size: 1.32rem; /* antes 1.2rem */
+}
+/* ...existing code... */
