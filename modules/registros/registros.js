@@ -6,7 +6,7 @@ const URL = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${
 
 // CSV público como alternativa
 const SHEET_URL =
-  "https://docs.google.com/spreadsheets/d/e/2PACX-1vSfS8EokIwk13JmEuvtulVtWBmxrbhhS58K-ySn2kU8snRLxko_GytDpExoAW7FX0DA1VLO9mt6QeoH/pub?output=csv";
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vQFNxPS_lZrhCuH7xrQfeMJgZIb3vaHirtKySurmZCvrQmKV45caRB-eJAqJ6sju3Mxdwy6ituHWBEA/pub?gid=0&single=true&output=csv";
 
 // ------------------- CONFIGURACIÓN APPS SCRIPT -------------------
 const APPS_SCRIPT_URL =
