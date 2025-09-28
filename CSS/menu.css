@@ -108,6 +108,14 @@
   align-items: center;
 }
 
+.logo-icon {
+  transition: color 0.5s;
+}
+
+.logo-container:hover .logo-icon {
+  color: #FF6F00;
+}
+
 .logo-text {
   color: #fff;
   font-size: 1.3rem;
@@ -132,11 +140,7 @@
   transition: background 0.3s;
 }
 
-/* Hover effect */
-.logo-container:hover .logo-icon {
-  transform: rotate(45deg);
-  color: #ffffff;
-}
+
 
 .logo-container:hover .logo-text {
   background: linear-gradient(90deg, #ffffff, #ffffff);
@@ -216,8 +220,17 @@
   text-decoration: none; /* Quita el subrayado */
 }
 
+.sidebar-nav li a {
+  font-size: 1.1rem; /* antes 1rem */
+  padding: 13px 20px; /* antes 12px 18px */
+}
+
 .sidebar-nav li a i {
   font-size: 1.2rem;
+}
+
+.sidebar-nav li a i {
+  font-size: 1.32rem; /* antes 1.2rem */
 }
 
 .sidebar-nav li a:hover {
@@ -596,12 +609,15 @@
   }
 }
 
-/* ...existing code... */
-.sidebar-nav li a {
-  font-size: 1.1rem; /* antes 1rem */
-  padding: 13px 20px; /* antes 12px 18px */
+@keyframes logoBounce {
+  0%   { transform: scale(1) translateY(0); }
+  25%  { transform: scale(1.03) translateY(-1.5px); }
+  50%  { transform: scale(0.98) translateY(0.8px); }
+  75%  { transform: scale(1.01) translateY(-0.5px); }
+  100% { transform: scale(1) translateY(0); }
 }
-.sidebar-nav li a i {
-  font-size: 1.32rem; /* antes 1.2rem */
+
+.sidebar.collapsed .logo-icon,
+.sidebar.compact .logo-icon {
+  animation: logoBounce 0.7s cubic-bezier(.4,.8,.4,1);
 }
-/* ...existing code... */

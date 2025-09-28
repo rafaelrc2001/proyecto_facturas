@@ -22,11 +22,11 @@
       <!-- Sidebar -->
       <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-          <h2 class="logo-container">
-           
-            <span class="logo-text">Scanalyze</span>
-           <i class="ri-database-2-line logo-icon"></i>
-          </h2>
+         <h2 class="logo-container">
+  <i class="ri-line-chart-line logo-icon" style="color:#FF6F00; font-size:1em;"></i>
+
+          <span class="logo-text">Scanalyze</span>
+ </h2>
           <button class="collapse-btn" id="sidebarToggle">
             <i class="ri-menu-line menu-icon"></i>
             <i class="ri-arrow-right-s-line collapse-icon"></i>
@@ -171,6 +171,19 @@
       <i class="ri-search-line"></i>
     </div>
 
+    <!-- Filtro desplegable -->
+<div class="filter-dropdown">
+  <button class="filter-btn">
+    <i class="ri-filter-3-line"></i>
+    <i class="ri-arrow-down-s-line"></i>
+    <span>Filtrar</span>
+  </button>
+  <div class="filter-menu">
+    <div class="filter-option">Facturas</div>
+    <div class="filter-option">Tickets</div>
+  </div>
+</div>
+
 
             <button class="btn primary">
               <i class="ri-download-line"></i> Descargar CSV
@@ -182,8 +195,10 @@
 
 <div class="tabla-container" style="border-top: 5px solid #FF6F00; border-radius: 2px;">
 
-            <h3 class="listado-title">Listado de Facturas y Tickets</h3>
-
+          <h3 class="listado-title">
+  <i class="ri-table-line" style="color:#FF6F00; margin-right:1px; font-size:1.2em;"></i>
+  Listado de Facturas y Tickets
+</h3>
 
 
 
@@ -193,7 +208,8 @@
           <tr>
             <th>Fecha</th>
             <th>Tipo</th>
-            <th>Factura</th>
+            <th>Rfc/Folio</th>
+            <th>Establecimiento</th>
             <th>Subtotal</th>
             <th>IVA</th>
             <th>Total</th>
