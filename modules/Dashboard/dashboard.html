@@ -67,61 +67,59 @@
       <main class="main-content">
         <!-- Header -->
 
-    <header class="main-header" style="background: #f7f8f6; box-shadow: none; padding: 16px 0 10px 0;">
-  <div style="width: 100%; display: flex; justify-content: flex-start;">
+    <!-- Ejemplo para dashboard.html -->
+<header class="main-header">
+  <div style="
+    background: #fff;
+    border-radius: 3px;
+    box-shadow: 0 2px 12px rgba(0,59,92,0.07);
+    padding: 18px 32px 12px 32px;
+    width: 100%;
+    margin-left: 0;
+    display: flex;
+    align-items: center;
+    border: 1px solid #ececec;
+    border-bottom: 7px solid #003B5C;
+    gap: 12px;
+  ">
     <div style="
-      background: #fff;
-      border-radius: 1px;
-      box-shadow: 0 2px 12px rgba(0,59,92,0.07);
-      padding: 18px 32px 12px 32px;
-      width: 100%;
-      max-width: 100%;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: #003B5C;
       display: flex;
       align-items: center;
-      border: 1px solid #ececec;
-      gap: 10px;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(255,111,0,0.08);
+      flex-shrink: 0;
+      margin-left: 0;
+      margin-right: 0px;
     ">
-   
-   <div style="
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  background: #003B5C;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(255,111,0,0.08);
-  flex-shrink: 0;
-  margin-left: 0;
-  margin-right: 2px; /* Reduce el espacio entre el icono y las letras */
-">
-  <i class="ri-bar-chart-grouped-line" style="font-size: 1.5rem; color:#fff3e0 ;"></i>
-</div>
-<div style="display: flex; flex-direction: column; align-items: flex-start; margin-left: 0;">
-  <h1 style="
-    font-size: 1.5rem;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 700;
-    color: #003B5C;
-    margin-bottom: 5px;
-    text-align: left;
-  ">
-    Dashboard
-  </h1>
-  <div class="header-subtitle" style="
-    font-size: 0.8rem;
-    color: #276080;
-    font-weight: 600;
-    text-align: left;
-    margin-bottom: 0;
-  ">
-    Bienvenido.
-  </div>
-</div>
+      <i class="ri-bar-chart-2-line" style="font-size: 1.5rem; color:#f7f7f7"></i>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: flex-start; margin-left: 0;">
+      <h1 style="
+        font-size: 1.5rem;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 700;
+        color: #003B5C;
+        margin-bottom: 5px;
+        text-align: left;
+      ">
+        Dashboard
+      </h1>
+      <div class="header-subtitle" style="
+        font-size: 0.8rem;
+        color: #276080;
+        font-weight: 600;
+        text-align: left;
+        margin-bottom: 0;
+      ">
+        Bienvenido al Sistema.
+      </div>
     </div>
   </div>
 </header>
-
      
     
         
@@ -132,51 +130,46 @@
   <section class="kpi-cards">
     <div class="kpi-card border-right">
       <div class="kpi-title">Total de Gastos</div>
-      <div class="kpi-number">-</div>
-      
+      <div class="kpi-number" id="total-gastos">-</div>
     </div>
     <div class="kpi-card border-right">
       <div class="kpi-title">Facturas</div>
-      <div class="kpi-number">-</div>
-     
+      <div class="kpi-number" id="facturas-gastos">-</div>
     </div>
     <div class="kpi-card border-right">
       <div class="kpi-title">Tickets</div>
-      <div class="kpi-number">-</div>
+      <div class="kpi-number" id="tickets-gastos">-</div>
     </div>
   </section>
 
 
 
- <div class="dashboard-summary-row">
-  <input type="text" class="dashboard-search" placeholder="Buscar..." />
-  
-  <div class="filter-dropdown">
-   <button class="filter-btn">
-  <i class="ri-store-2-line"></i>
-  <span>Elegir tienda</span>
-  <i class="ri-arrow-down-s-line"></i>
-</button>
-    <div class="filter-menu">
-      <div class="filter-option">OXXO</div>
-      <div class="filter-option">SAM'S</div>
-      <div class="filter-option">COEL</div>
-      <div class="filter-option">SYSCOM</div>
-      <div class="filter-option">ELECTRONIC</div>
+<div class="dashboard-summary-row">
+  <div class="dashboard-summary-left">
+    <input type="text" class="dashboard-search" placeholder="Buscar..." />
+    <div class="filter-dropdown">
+      <button class="filter-btn">
+        <i class="ri-store-2-line"></i>
+        <span>Tienda</span>
+        <i class="ri-arrow-down-s-line"></i>
+      </button>
+      <div class="filter-menu">
+        <!-- Opciones de tiendas aquí -->
+      </div>
     </div>
   </div>
 
   <div class="summary-cards">
     <div class="summary-card border-right">
-      <div class="summary-value">-</div>
+      <div class="summary-value" id="total-count">-</div>
       <div class="summary-label">Total registros</div>
     </div>
     <div class="summary-card border-right">
-      <div class="summary-value">-</div>
+      <div class="summary-value" id="facturas-count">-</div>
       <div class="summary-label">Total facturas</div>
     </div>
     <div class="summary-card border-right">
-      <div class="summary-value">-</div>
+      <div class="summary-value" id="tickets-count">-</div>
       <div class="summary-label">Total tickets</div>
     </div>
   </div>
@@ -218,5 +211,6 @@
       </main>
     </div>
     <script src="../../Js/menu.js"></script>
+    <script src="dashboard.js"></script>
   </body>
 </html>

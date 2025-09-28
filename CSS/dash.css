@@ -53,16 +53,16 @@ h1, h2, h3, h4, h5, h6 {
 
 .main-header {
   position: relative;
-  padding-top: 32px;
-  padding-bottom: 24px;
-  background: linear-gradient(90deg, #fff 0%, #f7fafc 100%);
-  box-shadow: 0 2px 12px rgba(0,59,92,0.07);
-  border-bottom: 4px solid var(--naranja-seguridad);
-  border-radius: 0;
-  padding-left: 32px;
-  padding-right: 32px;
+  padding-top: 0px;      /* antes 32px */
+  padding-bottom: 0px;  /* antes 24px */
   margin-bottom: 0;
-  text-align: center;
+  background: #fff;
+  border-radius: 0;
+  box-shadow: none;
+  border-bottom: 7px solid #003B5C;
+  padding-left: 0;
+  padding-right: 0;
+  text-align: left;
 }
 
 .main-header h1 {
@@ -211,7 +211,7 @@ h1, h2, h3, h4, h5, h6 {
   gap: 32px;
   justify-content: center;
   padding: 32px 0 0 0;
-  background: transparent;
+  margin-bottom: 36px; /* Espacio debajo de las tarjetas */
 }
 
 .card {
@@ -623,14 +623,6 @@ td {
   min-width: 200px;
 }
 
-.filter-dropdown i {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-  color: var(--gris-acero);
-}
 
 /* ===============================
    MODAL
@@ -986,16 +978,16 @@ td {
 /* Banner principal */
 .main-header {
   position: relative;
-  padding-top: 32px;
-  padding-bottom: 24px;
-  background: linear-gradient(90deg, #fff 0%, #f7fafc 100%);
-  box-shadow: 0 2px 12px rgba(0,59,92,0.07);
-  border-bottom: none;
-  border-radius: 0;
-  padding-left: 32px;
-  padding-right: 32px;
+  padding-top: 0px;      /* antes 32px */
+  padding-bottom: 0px;  /* antes 24px */
   margin-bottom: 0;
-  text-align: center;
+  background: #fff;
+  border-radius: 0;
+  box-shadow: none;
+  border-bottom: 7px solid #003B5C;
+  padding-left: 0;
+  padding-right: 0;
+  text-align: left;
 }
 
 .main-header h1 {
@@ -1037,6 +1029,7 @@ td {
   gap: 32px;
   justify-content: center;
   padding: 32px 0 0 0;
+  margin-bottom: 36px; /* Espacio debajo de las tarjetas */
 }
 
 .card {
@@ -1071,266 +1064,21 @@ td {
   }
 }
 
-.cards-section {
-  display: flex;
-  gap: 32px;
-  justify-content: center;
-  padding: 32px 0 0 0;
-  margin-bottom: 36px; /* <-- Espacio entre tarjetas y gráficas */
+.cards-section,
+.kpi-cards {
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+  gap: 32px !important;
+  margin-bottom: 36px;
 }
 
-
-/* Card visual para gráficas */
-.chart-card {
-  background-color: #fff;
-  border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(0,59,92,0.08);
-  min-height: 340px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden; /* <-- Limpia los bordes */
-  padding: 0;
+.dashboard-top-grid {
+  padding-left: 0px;       /* Separación del borde izquierdo */
+  padding-right: 0px;      /* Separación del borde derecho */
+  margin-top: 0px;         /* Separación arriba del menú/filtros */
+  gap: 0px                /* Espacio entre filas de tarjetas */
 }
 
-/* Contenedor de la gráfica */
-.chart-container {
-  height: 320px;
-  min-height: 280px;
-  width: 100%;
-  padding: 0 24px 24px 24px; /* Más espacio abajo para labels */
-  box-sizing: border-box;
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
-}
-
-/* Canvas y SVG ocupan todo el espacio */
-.chart-card canvas,
-.chart-card svg {
-  width: 100% !important;
-  height: 100% !important;
-  display: block;
-  margin: 0 auto;
-}
-
-/* Espacio entre cards de gráficas */
-.chart-container {
-  height: 360px;
-  min-height: 320px;
-  width: 100%;
-  padding: 0 24px 40px 24px; /* Más espacio abajo para labels */
-  box-sizing: border-box;
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
-}
-
-/* Responsive: apila las gráficas en móviles */
-@media (max-width: 900px) {
-  .charts-container {
-    grid-template-columns: 1fr;
-    gap: 20px;
-    padding: 0 10px 20px;
-  }
-  .chart-container {
-    padding: 0 8px 16px 8px;
-    min-height: 220px;
-    height: 220px;
-  }
-}
-
-
-
-.main-header {
-  padding-top: 0 !important;
-  margin-top: 0 !important;
-}
-.main-header > div {
-  padding-top: 0 !important;
-  margin-top: 0 !important;
-}
-
-
-/* dashboard.css */
-
-/* Sección general para cada "cuadro" */
-.dashboard-section {
-  background: #fff;
-  border: 2px solid #e3e8ee;
-  border-radius: 18px;
-  box-shadow: 0 2px 12px rgba(0,59,92,0.07);
-  padding: 32px 24px;
-  margin-bottom: 32px;
-  max-width: 1200px;
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.dashboard-section.dashboard-top {
-  background: #fff;
-  border: 2px solid #e3e8ee;
-  border-radius: 18px;
-  box-shadow: 0 2px 12px rgba(0,59,92,0.07);
-  padding: 32px 24px;
-  margin-bottom: 32px;
-  max-width: 1200px;
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-}
-
-/* KPIs Cards */
-.cards-section {
-  display: flex;
-  gap: 24px;
-  background: transparent;
-  justify-content: center;
-}
-
-.simple-card {
-  background: #fff;
-  border: 1.5px solid #90a4ae;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(96,125,139,0.04);
-  padding: 24px 32px;
-  min-width: 180px;
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.card-title {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #003B5C;
-  margin-bottom: 8px;
-}
-
-.card-number {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #003B5C;
-  margin-bottom: 6px;
-}
-
-.card-sub {
-  font-size: 0.98rem;
-  color: #4A4A4A;
-  font-weight: 500;
-}
-
-.dashboard-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 32px;
-  justify-content: center;
-}
-
-.dashboard-filters {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 220px;
-}
-
-.dashboard-search {
-  padding: 6px 12px;
-  border: 1px solid #90a4ae;
-  border-radius: 7px;
-  font-size: 1rem;
-  min-width: 140px;
-  background: #fff;
-  height: 36px;
-}
-
-.dashboard-filter-btn,
-.dashboard-icon-btn {
-  background: #607d8b;
-  border: none;
-  border-radius: 7px;
-  padding: 0 12px;
-  color: #fff;
-  cursor: pointer;
-  font-size: 1.3rem;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s;
-}
-
-.dashboard-filter-btn:hover,
-.dashboard-icon-btn:hover {
-  background: #455a64;
-}
-
-.dashboard-cards {
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-}
-
-.dashboard-card {
-  border: 1.5px solid #90a4ae;
-  border-radius: 10px;
-  padding: 12px 24px;
-  min-width: 120px;
-  max-width: 140px;
-  text-align: center;
-  background: #fff;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  box-shadow: 0 2px 8px rgba(96,125,139,0.04);
-}
-
-.card-value {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: #222;
-  margin-bottom: 2px;
-  letter-spacing: 1px;
-}
-
-.card-label {
-  font-size: 0.95rem;
-  color: #222;
-  font-weight: 500;
-}
-
-/* Responsive para móviles */
-@media (max-width: 900px) {
-  .dashboard-section.dashboard-top {
-    padding: 18px 8px;
-    max-width: 98vw;
-    gap: 18px;
-  }
-  .cards-section {
-    flex-direction: column;
-    gap: 12px;
-    align-items: stretch;
-  }
-  .dashboard-row {
-    flex-direction: column;
-    gap: 18px;
-    align-items: stretch;
-  }
-  .dashboard-cards {
-    flex-direction: row;
-    justify-content: center;
-    gap: 12px;
-  }
-  .dashboard-card {
-    min-width: 90px;
-    max-width: 120px;
-    padding: 10px 10px;
-  }
-}
 
 /* Tarjetas KPIs y resumen estilo moderno */
 .dashboard-top-grid {
@@ -1348,7 +1096,7 @@ td {
 .kpi-cards {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 18px;
+  gap: 32px;           /* Espacio entre tarjetas */
 }
 
 .kpi-card {
@@ -1382,11 +1130,12 @@ td {
 }
 
 .dashboard-summary-row {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  width: 100%;
-  margin-top: 1px;
+  display: flex !important;
+  align-items: center !important;
+  gap: 1px !important;              /* Espacio entre los elementos */
+  padding-left: 8px !important;    /* Espacio izquierdo */
+  padding-right: 0px !important;   /* Espacio derecho */
+  margin-bottom: 0px !important;
 }
 
 .dashboard-search {
@@ -1402,9 +1151,13 @@ td {
 
 .summary-cards {
   display: flex;
-  gap: 18px;
-  justify-content: flex-end;
-  flex: 1;
+  gap: 25px;
+  justify-content: flex-end;   /* Alinea las tarjetas a la derecha */
+  padding-left: 0;             /* Elimina el padding fijo */
+  padding-right: 32px;
+  margin-bottom: 12px;
+  width: 100%;                 /* Ocupa todo el ancho disponible */
+  box-sizing: border-box;
 }
 
 .summary-card {
@@ -1443,7 +1196,8 @@ td {
   .dashboard-summary-row {
     flex-direction: column;
     gap: 12px;
-    align-items: stretch;
+    padding-left: 8px;
+    padding-right: 8px;
   }
   .summary-cards {
     flex-direction: row;
@@ -1523,4 +1277,42 @@ td {
 .filter-option:hover {
   background: #FF6F00;
   color: #fff;
+}
+
+.filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 120px;
+  height: 44px;
+  padding: 0 16px;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1.5px solid #ececec;
+  background: #fff;
+  color: #003B5C;
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(0,59,92,0.07);
+}
+
+.filter-btn i {
+  font-size: 1em;
+  margin-left: 0;
+  vertical-align: middle;
+}
+
+
+@media (max-width: 900px) {
+  .cards-section {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    gap: 20px !important;
+  }
+}
+
+.dashboard-summary-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }

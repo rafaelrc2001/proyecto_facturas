@@ -87,22 +87,38 @@ function actualizarGraficaEstatus(registros) {
 }
 
 function actualizarTarjetasDashboard(registros) {
+  console.log("Registros recibidos:", registros); // <-- Depuración
   let conteoTickets = 0;
   let conteoFacturas = 0;
+  let sumaTotalGastos = 0;
+  let sumaFacturas = 0;
+  let sumaTickets = 0;
 
   registros.forEach((fila) => {
-    if (fila.length > 2) {
-      const tipo = fila[2].toLowerCase().trim(); // Usa índice 2 como en registros.js
+    if (fila.length > 3) {
+      const tipo = fila[2].toLowerCase().trim();
+      const total = parseFloat(fila[3]) || 0; // Columna 'total' en índice 3
+
+      sumaTotalGastos += total;
+
       if (tipo === "ticket" || tipo === "tickets") {
         conteoTickets++;
+        sumaTickets += total;
       } else if (tipo === "factura" || tipo === "facturas") {
         conteoFacturas++;
+        sumaFacturas += total;
       }
     }
   });
 
   const totalGeneral = conteoTickets + conteoFacturas;
 
+  // KPIs de gastos
+  document.getElementById("total-gastos").textContent = sumaTotalGastos.toFixed(2) + "$";
+  document.getElementById("facturas-gastos").textContent = sumaFacturas.toFixed(2) + "$";
+  document.getElementById("tickets-gastos").textContent = sumaTickets.toFixed(2) + "$";
+
+  // Summary cards
   document.getElementById("total-count").textContent = totalGeneral;
   document.getElementById("tickets-count").textContent = conteoTickets;
   document.getElementById("facturas-count").textContent = conteoFacturas;
