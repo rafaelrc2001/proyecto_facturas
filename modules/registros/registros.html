@@ -23,8 +23,9 @@
       <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
           <h2 class="logo-container">
-            <i class="ri-database-2-line logo-icon"></i>
+           
             <span class="logo-text">Scanalyze</span>
+           <i class="ri-database-2-line logo-icon"></i>
           </h2>
           <button class="collapse-btn" id="sidebarToggle">
             <i class="ri-menu-line menu-icon"></i>
@@ -35,7 +36,7 @@
           <ul>
             <li>
               <a href="../Dashboard/dashboard.html">
-                <i class="ri-dashboard-line"></i>
+                <i class="ri-pie-chart-2-line"></i>
                 <span>Dashboard</span>
               </a>
             </li>
@@ -63,16 +64,60 @@
 
       <!-- Main Content -->
       <main class="main-content">
-        <header class="main-header" style="background: none; box-shadow: none; padding-bottom: 0;">
-  <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
-    
-    <h1 style="font-size: 2rem; font-family: 'Montserrat', sans-serif; font-weight: 700; color: #222; margin: 0; display: flex; align-items: center; gap: 8px;">
+      
+<header class="main-header" style="background: #f7f8f6; box-shadow: none; padding: 0px 0 0px 0;"></header> 
+
+<div style="width: 100%; display: flex; justify-content: flex-start; margin: 0;">
+    <div style="
+      background: #fff;
+      border-radius:  3; /* Solo arriba si quieres esquinas redondeadas */
+      box-shadow: 0 2px 12px rgba(0,59,92,0.07);
+      padding: 18px 32px 12px 32px;
+      width: 100%;
+      margin-left: 0;
+      display: flex;
+      align-items: center;
+      border: 1px solid #ececec;
+     border-bottom: 7px solid #003B5C;
+      gap: 12px;
+    ">
+      <div style="
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: #003B5C;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 8px rgba(255,111,0,0.08);
+        flex-shrink: 0;
+        margin-left: 0;
+        margin-right: 0px;
+      ">
+        <i class="ri-file-list-2-line" style="font-size: 1.5rem; color:#f7f7f7"></i>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: flex-start; margin-left: 0;">
+        <h1 style="
+          font-size: 1.5rem;
+          font-family: 'Montserrat', sans-serif;
+          font-weight: 700;
+          color: #003B5C;
+          margin-bottom: 5px;
+          text-align: left;
+        ">
           Registros de Facturas y Tickets
-    </h1>
-    <div class="header-subtitle">
-      Sistema INXITE / Gestión de Gastos
+        </h1>
+        <div class="header-subtitle" style="
+          font-size: 0.8rem;
+          color: #276080;
+          font-weight: 600;
+          text-align: left;
+          margin-bottom: 0;
+        ">
+          Sistema INXITE / Gestión de Gastos
+        </div>
+      </div>
     </div>
-  
   </div>
 </header>
 
@@ -89,8 +134,8 @@
           </div>
 
           <div class="card">
-            <div class="card-icon" style="background-color: #fff8e1">
-              <i class="ri-ticket-line" style="color: #ff8f00"></i>
+            <div class="card-icon"style="background-color: #eceff1">
+              <i class="ri-ticket-line" style="color: #455a64"></i>
             </div>
             <div class="card-content">
               <h3>Tickets</h3>
@@ -99,8 +144,8 @@
           </div>
 
           <div class="card">
-            <div class="card-icon" style="background-color: #e8f5e9">
-              <i class="ri-file-text-line" style="color: #2e7d32"></i>
+            <div class="card-icon" style="background-color: #eceff1">
+              <i class="ri-file-text-line" style="color: #455a64"></i>
             </div>
             <div class="card-content">
               <h3>Facturas</h3>
@@ -119,8 +164,7 @@
         <!-- Registros Table -->
         <section class="permits-table">
           <div class="table-header-flex">
-            <h3>Listado de Facturas y Tickets</h3>
-
+           
 
              <div class="search-bar" style="min-width: 260px;">
       <input type="text" placeholder="Buscar en el sistema..." />
@@ -134,7 +178,15 @@
            
           </div>
 
-          <div class="tabla-container">
+
+
+<div class="tabla-container" style="border-top: 5px solid #FF6F00; border-radius: 2px;">
+
+            <h3 class="listado-title">Listado de Facturas y Tickets</h3>
+
+
+
+
     <div class="table-container">
       <table id="facturasTable">
         <thead>

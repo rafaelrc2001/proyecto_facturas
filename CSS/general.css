@@ -1,3 +1,4 @@
+
 /* ===============================
    VARIABLES DE COLOR (INDUSTRIAL)
    =============================== */
@@ -58,7 +59,7 @@ h1, h2, h3, h4, h5, h6 {
   padding-bottom: 24px;
   background: linear-gradient(90deg, #fff 0%, #f7fafc 100%);
   box-shadow: 0 2px 12px rgba(0,59,92,0.07);
-  border-bottom: 4px solid var(--naranja-seguridad);
+ 
   border-radius: 0;
   padding: 32px 32px 0 32px;
   margin-bottom: 0;
@@ -99,11 +100,11 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .main-header .search-bar input {
-  border-radius: 8px;
+  border-radius: 1px;
   border: 1.5px solid var(--plata-industrial);
   background: #fff;
   font-size: 1rem;
-  color: var(--azul-petroleo);
+  color: solid var(--plata-industrial);
   box-shadow: 0 1px 6px rgba(0,59,92,0.04);
   transition: border 0.2s, box-shadow 0.2s;
 }
@@ -121,7 +122,7 @@ h1, h2, h3, h4, h5, h6 {
   right: 0;
   bottom: 0;
   height: 4px;
-  background: var(--naranja-seguridad, #ff6f00);
+  background: var(--naranja-seguridad, var(--azul-petroleo));
   border-radius: 0 !important; /* Fuerza que sea recta */
   z-index: 1;
 }
@@ -194,17 +195,17 @@ h1, h2, h3, h4, h5, h6 {
 
 .search-bar input {
   padding: 12px 16px 12px 38px;
-  border-radius: 10px;
+  border-radius: 5px;
   border: 1.5px solid var(--plata-industrial);
   background: #fff;
   font-size: 1rem;
-  color: var(--azul-petroleo);
+  color: solid var(--plata-industrial);
   box-shadow: 0 1px 6px rgba(0,59,92,0.04);
   transition: border 0.2s, box-shadow 0.2s;
 }
 
 .search-bar input:focus {
-  border-color: var(--naranja-seguridad);
+  border-color: var(--azul-petroleo);
   box-shadow: 0 0 0 2px rgba(255,111,0,0.10);
 }
 
@@ -255,19 +256,24 @@ h1, h2, h3, h4, h5, h6 {
   gap: 32px;
   padding: 32px 32px 16px 32px;
   background: transparent;
+  
 }
 
 .card {
   background: #fff;
-  border-radius: var(--radius);
+  border-radius: 5px;
   box-shadow: 0 2px 12px rgba(0,59,92,0.07);
   padding: 28px 24px;
   display: flex;
   align-items: center;
   gap: 18px;
   min-width: 260px;
+  height: 100px;
   flex: 1;
   transition: box-shadow 0.25s, transform 0.25s;
+   
+    border-right: 4px solid var(--azul-petroleo);
+
 }
 
 .card:hover {
@@ -278,7 +284,7 @@ h1, h2, h3, h4, h5, h6 {
 .card-icon {
   width: 56px;
   height: 56px;
-  border-radius: 12px;
+  border-radius: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -334,9 +340,9 @@ h1, h2, h3, h4, h5, h6 {
 .btn.primary {
   background: var(--naranja-seguridad);
   color: #fff;
-  border-radius: 24px;
+  border-radius: 5px;
   font-weight: 700;
-  font-size: 1.08rem;
+  font-size: 1.04rem;
   box-shadow: 0 2px 12px rgba(255,111,0,0.07);
   padding: 12px 28px;
   border: none;
@@ -403,7 +409,7 @@ h1, h2, h3, h4, h5, h6 {
 .table-container input[type="number"] {
   padding: 8px 12px;
   border: 1px solid var(--plata-industrial);
-  border-radius: 6px;
+  border-radius: 1px;
   font-size: 0.95rem;
   color: var(--negro-carbon);
   background: #f7fafc;
@@ -1253,4 +1259,36 @@ h1, h2, h3, h4, h5, h6 {
   /* El wrapper limita el ancho real */
 }
 
+.listado-title {
+  font-family: 'Montserrat', 'Roboto', sans-serif;
+  font-size: 1.3rem;         /* Más pequeño */
+  font-weight: 600;
+  color: #003B5C;
+  letter-spacing: 0.5px;
+  margin-top: 28px;
+  margin-bottom: 14px;
+  padding-left: 8px;
+  border-left: 4px solid #003B5C;
+  background: linear-gradient(90deg, #f7f8f6 80%);
+  box-shadow: 0 2px 8px rgba(0,59,92,0.07);
+  border-radius: 4px;
+  display: inline-block;
+}
 
+.division-line {
+  border: none;
+  height: 4px;
+  background: linear-gradient(90deg, var(--azul-petroleo) );
+  border-radius: 0px;
+  margin: 20px 0px 0px 0px;
+  width: 100%;
+  opacity: 0.7;
+}
+
+.tabla-container {
+  padding-top: 11px; /* Reduce el espacio arriba de la tabla */
+}
+
+.listado-title {
+  margin-top: 5px;   /* Reduce el espacio arriba del título */
+}

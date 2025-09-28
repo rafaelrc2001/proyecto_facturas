@@ -23,9 +23,10 @@
       <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
     <h2 class="logo-container">
-      <i class="ri-database-2-line logo-icon"></i>
+    
       <span class="logo-text">Scanalyze</span>
     </h2>
+      <i class="ri-database-2-line logo-icon"></i>
     <button class="collapse-btn" id="sidebarToggle">
       <i class="ri-menu-line menu-icon"></i>
       <i class="ri-arrow-right-s-line collapse-icon"></i>
@@ -35,7 +36,7 @@
           <ul>
             <li class="active">
               <a href="#">
-                <i class="ri-dashboard-line"></i>
+                <i class="ri-pie-chart-2-line"></i>
                 <span>Dashboard</span>
               </a>
             </li>
@@ -63,131 +64,142 @@
 
       <!-- Main Content -->
       <main class="main-content">
-        <header class="main-header">
-  
-       
-          
-          <h1>Registros de Facturas y Tickets</h1>
-  <div class="header-subtitle">Sistema INXITE / Gestión de Gastos</div>
-  
-     <div style="display: flex; justify-content: center; margin-top: 12px;">
-    <img src="../../img/inxite.png" alt="Logo INXITE" style="height: 70px;"/>
+        <!-- Header -->
+
+    <header class="main-header" style="background: #f7f8f6; box-shadow: none; padding: 16px 0 10px 0;">
+  <div style="width: 100%; display: flex; justify-content: flex-start;">
+    <div style="
+      background: #fff;
+      border-radius: 1px;
+      box-shadow: 0 2px 12px rgba(0,59,92,0.07);
+      padding: 18px 32px 12px 32px;
+      width: 100%;
+      max-width: 100%;
+      display: flex;
+      align-items: center;
+      border: 1px solid #ececec;
+      gap: 10px;
+    ">
+   
+   <div style="
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: #003B5C;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(255,111,0,0.08);
+  flex-shrink: 0;
+  margin-left: 0;
+  margin-right: 2px; /* Reduce el espacio entre el icono y las letras */
+">
+  <i class="ri-bar-chart-grouped-line" style="font-size: 1.5rem; color:#fff3e0 ;"></i>
+</div>
+<div style="display: flex; flex-direction: column; align-items: flex-start; margin-left: 0;">
+  <h1 style="
+    font-size: 1.5rem;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 700;
+    color: #003B5C;
+    margin-bottom: 5px;
+    text-align: left;
+  ">
+    Dashboard
+  </h1>
+  <div class="header-subtitle" style="
+    font-size: 0.8rem;
+    color: #276080;
+    font-weight: 600;
+    text-align: left;
+    margin-bottom: 0;
+  ">
+    Bienvenido, aquí está el resumen de hoy.
+  </div>
+</div>
+    </div>
   </div>
 </header>
-<!-- ...existing code... -->
 
-        <!-- Cards Section -->
-        <section class="cards-section">
-          <div class="card">
-            <div class="card-icon" style="background-color: #eceff1">
-              <i class="ri-file-list-2-line" style="color: #455a64"></i>
-            </div>
-            <div class="card-content">
-              <h3>Total de Registros</h3>
-              <p class="count" id="total-count">-</p>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-icon" style="background-color: #fff8e1">
-              <i class="ri-ticket-line" style="color: #ff8f00"></i>
-            </div>
-            <div class="card-content">
-              <h3>Tickets</h3>
-              <p class="count" id="tickets-count">-</p>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-icon" style="background-color: #e8f5e9">
-              <i class="ri-file-text-line" style="color: #2e7d32"></i>
-            </div>
-            <div class="card-content">
-              <h3>Facturas</h3>
-              <p class="count" id="facturas-count">-</p>
-            </div>
-          </div>
-
- 
-
-
-
-          <!-- Search Bar moved here -->
-          
-        </section>
-
-
-        <!-- Gráficas Inferiores: Tendencias y Montos -->
-        <div class="charts-container">
-          <!-- Gráfica de Facturas por Día -->
-          <div class="chart-card">
-            <div class="chart-title">
-              <i
-                class="ri-line-chart-line"
-                style="color: var(--naranja-seguridad)"
-              ></i>
-              Facturas por Día
-            </div>
-            <div id="type-chart" class="chart-container"></div> <!-- <--- CORREGIDO -->
-          </div>
-
-          <!-- Gráfica de Tickets por Día -->
-          <div class="chart-card">
-            <div class="chart-title">
-              <i
-                class="ri-bar-chart-line"
-                style="color: var(--verde-tecnico)"
-              ></i>
-              Tickets por Día
-            </div>
-            <div id="tickets-dia-chart" class="chart-container"></div> <!-- <--- CORREGIDO -->
-          </div>
-
-          
-        </div>
-      
+     
+    
         
-        <!-- Dashboard Grid: Tabla + Gráfica de Resumen -->
-        <div class="dashboard-grid">
-          <!-- Tabla de Registros -->
-          
-          
+        <!-- KPIs Cards -->
+        <section class="cards-section" style="gap:24px; margin-bottom:32px; background: #f7f8f6;">
+  <div class="simple-card">
+    <div class="card-title">Total Usuarios</div>
+    <div class="card-number">1,234</div>
+    <div class="card-sub">+12% desde el mes pasado</div>
+  </div>
+  <div class="simple-card">
+    <div class="card-title">Ingresos</div>
+    <div class="card-number">$45,231</div>
+    <div class="card-sub">+8% este mes</div>
+  </div>
+  <div class="simple-card">
+    <div class="card-title">Ventas</div>
+    <div class="card-number">2,345</div>
+    <div class="card-sub">-5% este mes</div>
+  </div>
+  <div class="simple-card">
+    <div class="card-title">Crecimiento</div>
+    <div class="card-number">32%</div>
+    <div class="card-sub">+3% este mes</div>
+  </div>
+</section>
 
-          <!-- Gráfica de Resumen -->
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid" style="gap:24px;">
+          <!-- Analytics Overview (Gráfica) -->
           <div class="chart-card">
-            <div class="chart-title">
-              <i
-                class="ri-pie-chart-2-line"
-                style="color: var(--azul-petroleo)"
-              ></i>
-              Distribución por Tipo
+            <div class="chart-title">Analytics Overview</div>
+            <div class="chart-container">
+              <!-- Puedes reemplazar esto por un canvas/echarts dinámico -->
+              <svg width="100%" height="220">
+                <polyline points="20,180 60,140 100,160 140,120 180,140 220,100 260,80"
+                  style="fill:none;stroke:#003B5C;stroke-width:3"/>
+                <circle cx="20" cy="180" r="5" fill="#FF6F00"/>
+                <circle cx="60" cy="140" r="5" fill="#FF6F00"/>
+                <circle cx="100" cy="160" r="5" fill="#FF6F00"/>
+                <circle cx="140" cy="120" r="5" fill="#FF6F00"/>
+                <circle cx="180" cy="140" r="5" fill="#FF6F00"/>
+                <circle cx="220" cy="100" r="5" fill="#FF6F00"/>
+                <circle cx="260" cy="80" r="5" fill="#FF6F00"/>
+                <!-- Ejes y labels -->
+                <text x="20" y="210" font-size="12" fill="#4A4A4A">Jan</text>
+                <text x="60" y="210" font-size="12" fill="#4A4A4A">Feb</text>
+                <text x="100" y="210" font-size="12" fill="#4A4A4A">Mar</text>
+                <text x="140" y="210" font-size="12" fill="#4A4A4A">Apr</text>
+                <text x="180" y="210" font-size="12" fill="#4A4A4A">May</text>
+                <text x="220" y="210" font-size="12" fill="#4A4A4A">Jun</text>
+                <text x="260" y="210" font-size="12" fill="#4A4A4A">Jul</text>
+              </svg>
             </div>
-            <div id="distribution-chart" class="chart-container"></div>
+          </div>
+          <!-- Actividades Recientes -->
+          <div class="chart-card">
+            <div class="chart-title">Actividades Recientes</div>
+            <div style="padding:24px;">
+              <div style="margin-bottom:18px;">
+                <strong>New User Registration</strong>
+                <div style="color:var(--gris-acero);font-size:0.98rem;">John Doe creó una nueva cuenta</div>
+                <div style="color:var(--plata-industrial);font-size:0.9rem;">hace 2 minutos</div>
+              </div>
+              <div style="margin-bottom:18px;">
+                <strong>Sales Update</strong>
+                <div style="color:var(--gris-acero);font-size:0.98rem;">Meta mensual superada en 15%</div>
+                <div style="color:var(--plata-industrial);font-size:0.9rem;">hace 1 hora</div>
+              </div>
+              <div>
+                <strong>System Update</strong>
+                <div style="color:var(--gris-acero);font-size:0.98rem;">Versión 2.1.0 desplegada exitosamente</div>
+                <div style="color:var(--plata-industrial);font-size:0.9rem;">hace 3 horas</div>
+              </div>
+            </div>
           </div>
         </div>
       </main>
     </div>
-
-    <script src="graficas/grafica-barra.js"></script>
-    <script src="graficas/grafica-pastel.js"></script>
-    <script src="dashboard.js"></script>
     <script src="../../Js/menu.js"></script>
-    <script>
-      // Función para mostrar la fecha actual
-      function mostrarFecha() {
-        const fecha = new Date();
-        const opciones = {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        };
-        const fechaFormateada = fecha.toLocaleDateString("es-ES", opciones);
-        document.getElementById("current-date").textContent = fechaFormateada;
-      }
-
-      // Ejecutar al cargar la página
-      document.addEventListener("DOMContentLoaded", mostrarFecha);
-    </script>
   </body>
 </html>
