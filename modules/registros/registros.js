@@ -695,3 +695,41 @@ function doGet(e) {
   return ContentService.createTextOutput(JSON.stringify(values)).setMimeType(ContentService.MimeType.JSON);
 }
 
+// Mostrar/ocultar el menú al hacer clic en el botón
+document.querySelector('.filter-btn').addEventListener('click', function(e) {
+  e.stopPropagation();
+  const menu = document.querySelector('.filter-menu');
+  menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+});
+
+// Ocultar el menú si se hace clic fuera
+document.addEventListener('click', function() {
+  const menu = document.querySelector('.filter-menu');
+  menu.style.display = 'none';
+});
+
+// Filtrar por tipo al hacer clic en una opción
+document.querySelectorAll('.filter-option').forEach(option => {
+  option.addEventListener('click', function() {
+    const tipo = this.textContent.toLowerCase().trim();
+    if (tipo === 'todos') {
+      registrosFiltrados = registrosGlobal;
+    } else {
+      registrosFiltrados = registrosGlobal.filter(fila => {
+        const valorTipo = fila[2] ? fila[2].toLowerCase().trim() : "";
+        if (tipo === 'tickets') {
+          return valorTipo === 'ticket' || valorTipo === 'tickets';
+        }
+        if (tipo === 'facturas') {
+          return valorTipo === 'factura' || valorTipo === 'facturas';
+        }
+        return false;
+      });
+    }
+    paginaActual = 1;
+    renderTabla(registrosFiltrados);
+    actualizarTarjetasDashboard(registrosFiltrados); // <-- agrega esta línea
+    document.querySelector('.filter-menu').style.display = 'none';
+  });
+});
+
