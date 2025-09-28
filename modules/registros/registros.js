@@ -10,7 +10,7 @@ const SHEET_URL =
 
 // ------------------- CONFIGURACIÓN APPS SCRIPT -------------------
 const APPS_SCRIPT_URL =
-"https://script.google.com/macros/s/AKfycbzNSOIMO4vyf1D8hYpLU2br6LPaMVI-cbLFnJyHh49JiprSYkdbNXxsbPByCXogl_GMlA/exec";
+"https://script.google.com/macros/s/AKfycbzyVw9wo1jh8KrTH2_LqzTjTYx2fQ9eSRtyyXzVyZBlu0qqD2BHwBx1AXxsByTTgocpFw/exec";
 async function cargarDatosCSV() {
   const response = await fetch(SHEET_URL);
   const data = await response.text();
@@ -133,9 +133,9 @@ async function guardarEdicion(filaElement, filaIndex) {
   const inputs = filaElement.querySelectorAll(".edit-input");
   const valores = Array.from(inputs).map(i => i.value);
 
-  // seguridad: debe haber 6 inputs (Fecha..Total)
-  if (valores.length < 6) {
-    console.warn("Esperaba 6 inputs (Fecha..Total). Encontrados:", valores.length);
+  // seguridad: debe haber 7 inputs (Fecha..Total)
+  if (valores.length < 7) {
+    console.warn("Esperaba 7 inputs (Fecha..Total). Encontrados:", valores.length);
   }
 
   const filaActual = registrosGlobal[filaIndex] || [];
@@ -148,9 +148,10 @@ async function guardarEdicion(filaElement, filaIndex) {
     valores[0] || "",      // Fecha
     valores[1] || "",      // Tipo
     valores[2] || "",      // Factura
-    valores[3] || "",      // Subtotal
-    valores[4] || "",      // IVA
-    valores[5] || "",      // Total
+    valores[3] || "",      // Establecimiento <-- NUEVO
+    valores[4] || "",      // Subtotal
+    valores[5] || "",      // IVA
+    valores[6] || "",      // Total
     linkValue || "",       // Link (no tocar)
     sheetRowNumber         // número de fila (último)
   ];
@@ -166,9 +167,10 @@ async function guardarEdicion(filaElement, filaIndex) {
   formData.append("Fecha", valores[0] || "");
   formData.append("Tipo", valores[1] || "");
   formData.append("Factura", valores[2] || "");
-  formData.append("Subtotal", valores[3] || "");
-  formData.append("IVA", valores[4] || "");
-  formData.append("Total", valores[5] || "");
+  formData.append("Establecimiento", valores[3] || "");
+  formData.append("Subtotal", valores[4] || "");
+  formData.append("IVA", valores[5] || "");
+  formData.append("Total", valores[6] || "");
 
   // Opcional: feedback visual en el botón Guardar
   const guardarBtn = filaElement.querySelector(".guardar-btn");
@@ -293,7 +295,15 @@ function renderTabla(registros) {
       fechaFormateada = fechaObj.toLocaleDateString("es-ES");
     }
 
-    const columnas = [fechaFormateada, fila[2], fila[3], fila[4], fila[5], fila[6]];
+    const columnas = [
+      fechaFormateada, // Fecha
+      fila[2],         // Tipo
+      fila[3],         // Factura
+      fila[4],         // Establecimiento <-- NUEVO
+      fila[5],         // Subtotal
+      fila[6],         // IVA
+      fila[7]          // Total
+    ];
     columnas.forEach((valor) => {
       const td = document.createElement("td");
       td.textContent = valor || "";

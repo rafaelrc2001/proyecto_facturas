@@ -1373,12 +1373,19 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .filter-btn {
-  min-width: 260px;
+  min-width: 160px;
   height: 44px;
-  margin: 0;
   padding: 0 18px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  justify-content: flex-start;
+  gap: 8px;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1.5px solid #ececec;
+  background: #fff;
+  color: #003B5C;
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(0,59,92,0.07);
 }
