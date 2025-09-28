@@ -1,10 +1,16 @@
 const SHEET_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vQFNxPS_lZrhCuH7xrQfeMJgZIb3vaHirtKySurmZCvrQmKV45caRB-eJAqJ6sju3Mxdwy6ituHWBEA/pub?gid=0&single=true&output=csv";
-  async function cargarDatosDashboard() {
+let registrosOriginales = []; // Guarda todos los registros
+
+async function cargarDatosDashboard() {
   const response = await fetch(SHEET_URL);
   const data = await response.text();
   const filas = data.split("\n").map((row) => row.split(","));
   const registros = filas.slice(1); // omite encabezado
+
+  registrosOriginales = registros; // Guarda para filtrar después
+
+  mostrarTiendas(registros); // <-- Aquí se rellenan las tiendas
 
   actualizarTarjetasDashboard(registros);
 
@@ -12,7 +18,7 @@ const SHEET_URL =
   actualizarGraficaTipos(registros);
   actualizarGraficaEstatus(registros);
   actualizarGraficaTicketsPorDia(registros);
-  actualizarGraficaPastel(registros);
+  // actualizarGraficaPastel(registros); // <-- Comenta o elimina esta línea
 }
 
 // Procesa y actualiza la gráfica de tipos
@@ -159,4 +165,68 @@ function actualizarGraficaTicketsPorDia(registros) {
   });
 }
 
-document.addEventListener("DOMContentLoaded", cargarDatosDashboard);
+// Filtra por establecimiento o factura
+function filtrarRegistros(valor) {
+  valor = valor.toLowerCase();
+  // Ajusta los índices según tu CSV: 0=establecimiento, 1=factura
+  const filtrados = registrosOriginales.filter(fila =>
+    fila[0].toLowerCase().includes(valor) || // establecimiento
+    fila[1].toLowerCase().includes(valor)    // factura
+  );
+  actualizarTarjetasDashboard(filtrados);
+  // Aquí puedes actualizar también la tabla si tienes una
+}
+
+// Muestra las tiendas disponibles en los registros
+function mostrarTiendas(registros) {
+  const TIENDA_INDEX = 4; // <-- Cambia este número si tu columna de tienda es diferente
+
+  const tiendasSet = new Set();
+  registros.forEach(fila => {
+    if (fila[TIENDA_INDEX]) tiendasSet.add(fila[TIENDA_INDEX].trim());
+  });
+  const tiendas = Array.from(tiendasSet);
+
+  const menu = document.querySelector('.filter-menu');
+  menu.innerHTML = ""; // Limpia opciones previas
+
+  // Opción "Todos"
+  const opcionTodos = document.createElement('div');
+  opcionTodos.className = 'filter-option';
+  opcionTodos.textContent = "Todos";
+  opcionTodos.onclick = () => {
+    actualizarTarjetasDashboard(registrosOriginales);
+    document.querySelector('.filter-dropdown').classList.remove('active');
+  };
+  menu.appendChild(opcionTodos);
+
+  tiendas.forEach(tienda => {
+    const opcion = document.createElement('div');
+    opcion.className = 'filter-option';
+    opcion.textContent = tienda;
+    opcion.onclick = () => {
+      filtrarPorTienda(tienda);
+      document.querySelector('.filter-dropdown').classList.remove('active');
+    };
+    menu.appendChild(opcion);
+  });
+
+  // Depuración
+  console.log("Tiendas agregadas:", tiendas);
+  console.log("Opciones en el menú:", menu.innerHTML);
+}
+
+// Filtra los registros por tienda seleccionada
+function filtrarPorTienda(tienda) {
+  const filtrados = registrosOriginales.filter(fila => fila[0].trim() === tienda);
+  actualizarTarjetasDashboard(filtrados);
+  // Si tienes una tabla, actualízala aquí también
+}
+
+// Evento para el input de búsqueda
+document.addEventListener("DOMContentLoaded", () => {
+  cargarDatosDashboard();
+  document.querySelector('.filter-btn').addEventListener('click', function() {
+    document.querySelector('.filter-dropdown').classList.toggle('active');
+  });
+});

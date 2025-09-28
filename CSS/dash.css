@@ -608,9 +608,10 @@ td {
 /* ===============================
    FILTER DROPDOWN
    =============================== */
+/* Menú desplegable para tiendas */
 .filter-dropdown {
   position: relative;
-  margin-left: auto;
+  display: inline-block;
 }
 
 .filter-dropdown select {
@@ -623,6 +624,31 @@ td {
   min-width: 200px;
 }
 
+.filter-menu {
+  display: none;
+  position: absolute;
+  background: #fff;
+  border: 1px solid #ececec;
+  z-index: 10;
+  min-width: 120px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border-radius: 6px;
+  margin-top: 4px;
+}
+
+.filter-dropdown.active .filter-menu {
+  display: block;
+}
+
+.filter-option {
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.filter-option:hover {
+  background: #f0f0f0;
+}
 
 /* ===============================
    MODAL
@@ -1252,31 +1278,26 @@ td {
 .filter-menu {
   display: none;
   position: absolute;
-  top: 110%;
-  left: 0;
-  min-width: 160px;
   background: #fff;
-  border: 1.5px solid #ececec;
-  border-radius: 8px;
-  box-shadow: 0 4px 18px rgba(0,59,92,0.07);
+  border: 1px solid #ececec;
   z-index: 10;
+  min-width: 120px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  border-radius: 6px;
+  margin-top: 4px;
 }
 
-.filter-dropdown.open .filter-menu {
+.filter-dropdown.active .filter-menu {
   display: block;
 }
 
 .filter-option {
-  padding: 10px 18px;
+  padding: 8px 16px;
   cursor: pointer;
-  color: #003B5C;
-  font-size: 1rem;
-  transition: background 0.2s;
 }
 
 .filter-option:hover {
-  background: #FF6F00;
-  color: #fff;
+  background: #f0f0f0;
 }
 
 .filter-btn {
