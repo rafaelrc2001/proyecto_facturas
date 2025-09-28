@@ -1177,6 +1177,7 @@ h1, h2, h3, h4, h5, h6 {
   background: #fff;
   vertical-align: middle;
   transition: background 0.2s;
+  white-space: nowrap; 
 }
 
 /* Centrar encabezados y registros de la tabla */
@@ -1441,4 +1442,29 @@ h1, h2, h3, h4, h5, h6 {
 .filter-option:hover {
   background: #FF9733;
   color: #fff;
+}
+
+
+.badge {
+  display: inline-block;
+  padding: 2px 14px;
+  border-radius: 16px;
+  font-size: 0.95em;
+  font-weight: 600;
+  background: #f7f7f7;
+  color: #555;
+  border: 1.5px solid #ececec;
+  letter-spacing: 0.5px;
+}
+
+.badge-ticket {
+  background: #FFF3E0;
+  color: var(--naranja-seguridad, #FF6F00);
+  border: 1.5px solid var(--naranja-seguridad, #FF6F00);
+}
+
+.badge-factura {
+  background: #E3F2FD;
+  color: var(--azul-petroleo, #003B5C);
+  border: 1.5px solid var(--azul-petroleo, #003B5C);
 }

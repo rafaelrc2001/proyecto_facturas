@@ -295,9 +295,19 @@ function renderTabla(registros) {
       fechaFormateada = fechaObj.toLocaleDateString("es-ES");
     }
 
+    const tipo = fila[2] ? fila[2].toLowerCase().trim() : "";
+    let tipoBadge = "";
+    if (tipo === "ticket") {
+      tipoBadge = `<span class="badge badge-ticket">Ticket</span>`;
+    } else if (tipo === "factura") {
+      tipoBadge = `<span class="badge badge-factura">Factura</span>`;
+    } else {
+      tipoBadge = `<span class="badge">${fila[2]}</span>`;
+    }
+
     const columnas = [
       fechaFormateada, // Fecha
-      fila[2],         // Tipo
+      tipoBadge,         // Tipo
       fila[3],         // Factura
       fila[4],         // Establecimiento <-- NUEVO
       fila[5],         // Subtotal
@@ -306,7 +316,7 @@ function renderTabla(registros) {
     ];
     columnas.forEach((valor) => {
       const td = document.createElement("td");
-      td.textContent = valor || "";
+      td.innerHTML = valor || ""; // <-- Cambia textContent por innerHTML
       tr.appendChild(td);
     });
 
