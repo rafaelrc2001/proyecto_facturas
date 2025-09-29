@@ -244,11 +244,11 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelector('.dashboard-search').addEventListener('input', function(e) {
     const valor = e.target.value.toLowerCase();
     const filtrados = registrosOriginales.filter(fila =>
-      (fila[4] && fila[4].toLowerCase().includes(valor)) ||
-      (fila[1] && fila[1].toLowerCase().includes(valor))
+      (fila[4] && fila[4].toLowerCase().includes(valor)) || // Establecimiento/Folio
+      (fila[3] && fila[3].toLowerCase().includes(valor))    // Columna 3 (ej. factura)
     );
 
-    actualizarTarjetasDashboard(filtrados, window.totalIndex); // <-- CORREGIDO
+    actualizarTarjetasDashboard(filtrados, window.totalIndex);
     actualizarGraficaPastel(filtrados);
     actualizarGraficaEstablecimientosTipo(filtrados);
     // ...otras gráficas si tienes
