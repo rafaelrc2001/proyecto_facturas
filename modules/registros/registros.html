@@ -259,30 +259,32 @@
 <div id="modal-editar" class="modal" style="display: none;">
   <div class="modal-content">
     <span class="modal-close">&times;</span>
-    <h2>Editar Registro</h2>
+    <h2 class="modal-title">Editar Registro</h2>
+    <div class="modal-title-line"></div>
     <form id="form-editar">
-      <label>Fecha</label>
-      <input type="text" id="edit-fecha" required>
+      <div style="display: grid; grid-template-columns: 120px 1fr; gap: 12px 18px; align-items: center;">
+        <label style="text-align: right;">Fecha</label>
+        <input type="text" id="edit-fecha" required>
 
-      <label>Tipo</label>
-      <input type="text" id="edit-tipo" required>
+        <label style="text-align: right;">Tipo</label>
+        <input type="text" id="edit-tipo" required>
 
-      <label>Factura</label>
-      <input type="text" id="edit-factura">
+        <label style="text-align: right;">Factura</label>
+        <input type="text" id="edit-factura">
 
-      <label>Establecimiento</label>
-      <input type="text" id="edit-establecimiento">
+        <label style="text-align: right;">Establecimiento</label>
+        <input type="text" id="edit-establecimiento">
 
-      <label>Subtotal</label>
-      <input type="text" id="edit-subtotal">
+        <label style="text-align: right;">Subtotal</label>
+        <input type="text" id="edit-subtotal">
 
-      <label>IVA</label>
-      <input type="text" id="edit-iva">
+        <label style="text-align: right;">IVA</label>
+        <input type="text" id="edit-iva">
 
-      <label>Total</label>
-      <input type="text" id="edit-total">
-
-      <div class="modal-actions">
+        <label style="text-align: right;">Total</label>
+        <input type="text" id="edit-total">
+      </div>
+      <div class="modal-actions" style="margin-top: 24px;">
         <button type="button" id="cancelar-editar" class="btn">Cancelar</button>
         <button type="submit" class="btn primary">Guardar</button>
       </div>
