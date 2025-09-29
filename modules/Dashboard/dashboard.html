@@ -207,5 +207,53 @@
     <script src="dashboard.js"></script>
     <script src="../../modules/Dashboard/graficas/grafica-pastel.js"></script>
   <script src="../../modules/Dashboard/graficas/grafica-barra.js"></script>
+
+  <!-- Modal de edición -->
+<div id="modal-editar" class="modal" style="display: none;">
+  <div class="modal-content executive-view">
+    <div class="modal-header">
+      <h2>Editar Registro</h2>
+      <span class="close-modal" id="close-modal-editar">&times;</span>
+    </div>
+    <div class="modal-body">
+      <form id="form-editar">
+        <div class="executive-grid">
+          <div class="executive-item">
+            <label>Fecha:</label>
+            <input type="date" id="edit-fecha" required />
+          </div>
+          <div class="executive-item">
+            <label>Tipo:</label>
+            <input type="text" id="edit-tipo" required />
+          </div>
+          <div class="executive-item">
+            <label>Factura:</label>
+            <input type="text" id="edit-factura" required />
+          </div>
+          <div class="executive-item">
+            <label>Establecimiento:</label>
+            <input type="text" id="edit-establecimiento" required />
+          </div>
+          <div class="executive-item">
+            <label>Subtotal:</label>
+            <input type="number" id="edit-subtotal" step="0.01" required />
+          </div>
+          <div class="executive-item">
+            <label>IVA:</label>
+            <input type="number" id="edit-iva" step="0.01" required />
+          </div>
+          <div class="executive-item">
+            <label>Total:</label>
+            <input type="number" id="edit-total" step="0.01" required />
+          </div>
+        </div>
+        <div style="margin-top: 20px; display: flex; gap: 12px;">
+          <button type="button" class="btn" id="cancelar-edicion">Cancelar</button>
+          <button type="submit" class="btn primary" id="guardar-edicion">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
   </body>
 </html>

@@ -506,10 +506,9 @@ function agregarEventosAcciones(filaElement, filaGlobalIndex) {
   const verBtn = filaElement.querySelector('.icon-btn[title="Ver"]');
   if (verBtn) {
     verBtn.addEventListener("click", function () {
-      // Link normalmente está en la columna 8 (índice 7) si doGet NO añadió rowNumber,
-      // o en índice 7 también si doGet añadió rowNumber en posición 8 (fila[7] = Link).
-      // Como fallback intento usar registro[7] o el penúltimo.
-      const link = registro[7] || registro[registro.length - 2] || null;
+      // Cambia el índice del link sumando uno
+      const link = registro[8] || registro[registro.length - 2] || null;
+      console.log("URL para VER:", link); // Muestra el valor en consola
       if (link) window.open(link, '_blank');
       else mostrarNotificacion("No hay enlace disponible", "info");
     });

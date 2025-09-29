@@ -251,64 +251,41 @@
           </div>
           <span class="close-modal">&times;</span>
         </div>
+<!-- MODAL EDITAR -->
+<div id="modal-editar" class="modal">
+  <div class="modal-content">
+    <span class="modal-close">&times;</span>
+    <h2>Editar Registro</h2>
+    <form id="form-editar">
+      <label>Fecha</label>
+      <input type="date" id="edit-fecha" required>
 
-        <!-- Cuerpo del Modal -->
-        <div class="modal-body">
-          <!-- Sección 1: Información General -->
-          <div class="executive-section">
-            <div class="section-header">
-              <i class="ri-information-line"></i>
-              <h3>Información General</h3>
-            </div>
-            <div class="executive-grid">
-              <div class="executive-item">
-                <label>Fecha:</label>
-                <p class="highlight" id="modal-fecha"></p>
-              </div>
-              <div class="executive-item">
-                <label>Tipo:</label>
-                <p id="modal-tipo"></p>
-              </div>
-              <div class="executive-item">
-                <label>Número:</label>
-                <p id="modal-numero-doc"></p>
-              </div>
-              <div class="executive-item">
-                <label>Estado:</label>
-                <p class="highlight" id="modal-estado"></p>
-              </div>
-              <div class="executive-item full-width">
-                <label>Descripción:</label>
-                <p class="description-box" id="modal-descripcion"></p>
-              </div>
-            </div>
-          </div>
+      <label>Tipo</label>
+      <input type="text" id="edit-tipo" required>
 
-          <!-- Sección 2: Detalles Financieros -->
-          <div class="executive-section">
-            <div class="section-header">
-              <i class="ri-money-dollar-circle-line"></i>
-              <h3>Detalles Financieros</h3>
-            </div>
-            <div class="executive-grid">
-              <div class="executive-item">
-                <label>Subtotal:</label>
-                <p id="modal-subtotal"></p>
-              </div>
-              <div class="executive-item">
-                <label>IVA:</label>
-                <p id="modal-iva"></p>
-              </div>
-              <div class="executive-item">
-                <label>Total:</label>
-                <p class="highlight" id="modal-total"></p>
-              </div>
-            </div>
-          </div>
+      <label>Factura</label>
+      <input type="text" id="edit-factura">
 
-          <!-- Agrega este div para el detalle dinámico -->
-          <div id="modal-detalle"></div>
-        </div>
+      <label>Establecimiento</label>
+      <input type="text" id="edit-establecimiento">
+
+      <label>Subtotal</label>
+      <input type="number" step="0.01" id="edit-subtotal">
+
+      <label>IVA</label>
+      <input type="number" step="0.01" id="edit-iva">
+
+      <label>Total</label>
+      <input type="number" step="0.01" id="edit-total">
+
+      <div class="modal-actions">
+        <button type="button" id="cancelar-editar" class="btn">Cancelar</button>
+        <button type="submit" class="btn primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+          
       </div>
     </div>
 
