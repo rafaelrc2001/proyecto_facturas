@@ -1347,8 +1347,8 @@ td {
   font-family: 'Montserrat', sans-serif;
   font-size: 1.08rem;
   padding-bottom: 6px;
-  border-bottom: 3px solid var(--azul-petroleo); /* #003B5C */
-  border-left: 3px solid var(--azul-petroleo); /* #003B5C */
+  border-top: 3px solid var(--azul-petroleo); /* #003B5C */
+  
   width: 100%;
   margin-bottom: 12px;
 }

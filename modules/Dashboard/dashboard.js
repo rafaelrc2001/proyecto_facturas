@@ -19,6 +19,9 @@ async function cargarDatosDashboard() {
   actualizarGraficaEstatus(registros);
   actualizarGraficaTicketsPorDia(registros);
   actualizarGraficaPastel(registros); // <-- Agrega esta línea
+  actualizarGraficaEstablecimientos(registros);
+  // Gráfica de barras por establecimiento y tipo
+  actualizarGraficaEstablecimientosTipo(registros);
 }
 
 // Procesa y actualiza la gráfica de tipos
@@ -230,3 +233,154 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelector('.filter-dropdown').classList.toggle('active');
   });
 });
+
+function actualizarGraficaEstablecimientos(registros) {
+  const TIENDA_INDEX = 4; // Columna de establecimiento
+  const conteo = {};
+
+  registros.forEach(fila => {
+    const tienda = (fila[TIENDA_INDEX] || '').trim();
+    if (tienda) {
+      conteo[tienda] = (conteo[tienda] || 0) + 1;
+    }
+  });
+
+  // Ordena por cantidad descendente
+  const establecimientos = Object.keys(conteo);
+  const cantidades = establecimientos.map(e => conteo[e]);
+  const ordenados = establecimientos
+    .map((nombre, i) => ({ nombre, cantidad: cantidades[i] }))
+    .sort((a, b) => b.cantidad - a.cantidad);
+
+  const categorias = ordenados.map(e => e.nombre);
+  const valores = ordenados.map(e => e.cantidad);
+
+  // Inicializa o actualiza la gráfica
+  const chartDom = document.getElementById('establecimientos-chart');
+  if (!chartDom) return;
+  const chart = echarts.init(chartDom);
+
+  chart.setOption({
+    backgroundColor: "#fff",
+    grid: {
+      left: '10%',
+      right: '8%',
+      top: 30,
+      bottom: 20,
+      containLabel: true
+    },
+    xAxis: {
+      type: 'value',
+      show: false
+    },
+    yAxis: {
+      type: 'category',
+      data: categorias,
+      axisLabel: {
+        color: '#003B5C',
+        fontSize: 13,
+        fontWeight: 500
+      },
+      axisLine: { show: false },
+      axisTick: { show: false }
+    },
+    series: [{
+      type: 'bar',
+      data: valores,
+      barWidth: 22,
+      itemStyle: {
+        color: '#77ABB7',
+        borderRadius: [6, 6, 6, 6]
+      },
+      label: {
+        show: true,
+        position: 'right',
+        fontSize: 12,
+        color: '#003B5C'
+      }
+    }]
+  });
+
+  window.addEventListener('resize', function() {
+    chart.resize();
+  });
+}
+
+function actualizarGraficaEstablecimientosTipo(registros) {
+  const TIENDA_INDEX = 4; // Columna de establecimiento
+  const TIPO_INDEX = 2; // Columna de tipo (factura/ticket)
+  const conteo = {};
+
+  registros.forEach(fila => {
+    const tienda = (fila[TIENDA_INDEX] || '').trim();
+    const tipo = (fila[TIPO_INDEX] || '').trim().toLowerCase();
+    if (tienda && (tipo === 'factura' || tipo === 'ticket')) {
+      const clave = `${tienda}-${tipo}`;
+      conteo[clave] = (conteo[clave] || 0) + 1;
+    }
+  });
+
+  // Ordena por cantidad descendente
+  const claves = Object.keys(conteo);
+  const cantidades = claves.map(c => conteo[c]);
+  const ordenados = claves
+    .map((clave, i) => ({ clave, cantidad: cantidades[i] }))
+    .sort((a, b) => b.cantidad - a.cantidad);
+
+  const categorias = ordenados.map(e => e.clave);
+  const valores = ordenados.map(e => e.cantidad);
+
+  // Inicializa o actualiza la gráfica
+  const chartDom = document.getElementById('establecimientos-tipo-chart');
+  if (!chartDom) return;
+  const chart = echarts.init(chartDom);
+
+  chart.setOption({
+    backgroundColor: "#fff",
+    grid: {
+      left: '10%',
+      right: '8%',
+      top: 30,
+      bottom: 20,
+      containLabel: true
+    },
+    xAxis: {
+      type: 'value',
+      show: false
+    },
+    yAxis: {
+      type: 'category',
+      data: categorias,
+      axisLabel: {
+        color: '#003B5C',
+        fontSize: 13,
+        fontWeight: 500
+      },
+      axisLine: { show: false },
+      axisTick: { show: false }
+    },
+    series: [{
+      type: 'bar',
+      data: valores,
+      barWidth: 22,
+      itemStyle: {
+        color: '#1D3E53',
+        borderRadius: [6, 6, 6, 6]
+      },
+      label: {
+        show: true,
+        position: 'right',
+        fontSize: 12,
+        color: '#003B5C'
+      }
+    }]
+  });
+
+  window.addEventListener('resize', function() {
+    chart.resize();
+  });
+}
+
+// Llama después de cargar los datos
+actualizarGraficaEstablecimientosTipo(registros);
+actualizarGraficaEstablecimientosGradiente(registros);

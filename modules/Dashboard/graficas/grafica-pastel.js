@@ -303,7 +303,7 @@ function actualizarGraficaPastel(registros) {
     color: '#003B5C'
   };
 
-  function getCentralGraphic(percent, label, color) {
+  function getCentralGraphic(value, label, color) {
     return [
       {
         type: 'group',
@@ -313,7 +313,7 @@ function actualizarGraficaPastel(registros) {
           {
             type: 'text',
             style: {
-              text: percent,
+              text: value,
               font: '400 28px Montserrat, Roboto, Arial',
               fill: color,
               textAlign: 'center',
@@ -438,7 +438,7 @@ function actualizarGraficaPastel(registros) {
     if (params.seriesType === 'pie') {
       chart.setOption({
         graphic: getCentralGraphic(
-          `${params.percent}%`,
+          `${params.value}`, // Muestra cantidad en vez de porcentaje
           params.name,
           params.data.itemStyle.color
         )

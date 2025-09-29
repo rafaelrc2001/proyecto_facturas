@@ -359,3 +359,270 @@ window.ticketsChartInstance = initBarChart({
     label: 'Tickets',
     color: '#1D3E53' // --color-sidebar
 });
+
+// Mantén solo las funciones que realmente usas con datos reales:
+// actualizarGraficaEstablecimientosTipo(registros)
+// actualizarGraficaEstablecimientosGradiente(registros)
+// createSoftTextureBarra()
+
+// Así solo se mostrará la gráfica dinámica y elegante con tus datos.
+
+function actualizarGraficaEstablecimientosTipo(registros) {
+  const TIENDA_INDEX = 4; // Columna de establecimiento
+  const TIPO_INDEX = 2;   // Columna de tipo (ticket/factura)
+
+  // Conteo por establecimiento y tipo
+  const conteo = {};
+  registros.forEach(fila => {
+    const tienda = (fila[TIENDA_INDEX] || '').trim();
+    const tipo = (fila[TIPO_INDEX] || '').trim().toLowerCase();
+    if (!tienda || !tipo) return;
+    if (!conteo[tienda]) conteo[tienda] = { ticket: 0, factura: 0 };
+    if (tipo === 'ticket') conteo[tienda].ticket++;
+    else if (tipo === 'factura') conteo[tienda].factura++;
+  });
+
+  // Ordena por suma total descendente
+  const establecimientos = Object.keys(conteo)
+    .map(nombre => ({
+      nombre,
+      total: conteo[nombre].ticket + conteo[nombre].factura,
+      ticket: conteo[nombre].ticket,
+      factura: conteo[nombre].factura
+    }))
+    .sort((a, b) => b.total - a.total);
+
+  const categorias = establecimientos.map(e => e.nombre);
+  const tickets = establecimientos.map(e => e.ticket);
+  const facturas = establecimientos.map(e => e.factura);
+
+  const chartDom = document.getElementById('establecimientos-chart');
+  if (!chartDom) return;
+  const chart = echarts.init(chartDom);
+
+  chart.setOption({
+    backgroundColor: {
+      type: 'pattern',
+      image: createSoftTextureBarra(),
+      repeat: 'repeat'
+    },
+    grid: {
+      left: '4%',
+      right: '8%',
+      top: 40,
+      bottom: 20,
+      containLabel: true
+    },
+    title: {
+      text: '',
+      left: 'center',
+      top: 10
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'shadow' },
+      backgroundColor: 'rgba(255,255,255,0.97)',
+      borderColor: '#B0BEC5',
+      borderWidth: 1,
+      textStyle: { color: '#003B5C', fontWeight: 'normal', fontSize: 13 },
+      formatter: params => {
+        let txt = `<strong>${params[0].name}</strong><br>`;
+        params.forEach(p => {
+          txt += `<span style="display:inline-block;margin-right:6px;width:10px;height:10px;background:${p.color};border-radius:2px;"></span>
+            ${p.seriesName}: <strong>${p.value}</strong><br>`;
+        });
+        return txt;
+      }
+    },
+    legend: {
+      data: ['Tickets', 'Facturas'],
+      top: 8,
+      left: 'center',
+      itemWidth: 18,
+      itemHeight: 10,
+      icon: 'rect',
+      textStyle: {
+        color: '#003B5C',
+        fontWeight: 500,
+        fontSize: 15
+      }
+    },
+    xAxis: {
+      type: 'value',
+      show: false
+    },
+    yAxis: {
+      type: 'category',
+      data: categorias,
+      axisLabel: {
+        color: '#003B5C',
+        fontSize: 14,
+        fontWeight: 600,
+        padding: [0, 0, 0, 4]
+      },
+      axisLine: { show: false },
+      axisTick: { show: false }
+    },
+    series: [
+      {
+        name: 'Tickets',
+        type: 'bar',
+        stack: 'total',
+        data: tickets,
+        barWidth: 22,
+        itemStyle: {
+          color: '#FF6F00', // naranja-seguridad
+          borderRadius: [6, 6, 6, 6],
+          shadowBlur: 8,
+          shadowColor: 'rgba(255,111,0,0.10)'
+        },
+        label: {
+          show: true,
+          position: 'right',
+          fontSize: 13,
+          color: '#FF6F00',
+          fontWeight: 600,
+          formatter: v => v.value > 0 ? v.value : ''
+        },
+        emphasis: {
+          focus: 'series'
+        },
+        animationDelay: idx => idx * 120
+      },
+      {
+        name: 'Facturas',
+        type: 'bar',
+        stack: 'total',
+        data: facturas,
+        barWidth: 22,
+        itemStyle: {
+          color: '#003B5C', // azul-petroleo
+          borderRadius: [6, 6, 6, 6],
+          shadowBlur: 8,
+          shadowColor: 'rgba(0,59,92,0.10)'
+        },
+        label: {
+          show: true,
+          position: 'right',
+          fontSize: 13,
+          color: '#003B5C',
+          fontWeight: 600,
+          formatter: v => v.value > 0 ? v.value : ''
+        },
+        emphasis: {
+          focus: 'series'
+        },
+        animationDelay: idx => idx * 120 + 60
+      }
+    ],
+    animationEasing: 'elasticOut',
+    animationDuration: 900
+  });
+
+  window.addEventListener('resize', function() {
+    chart.resize();
+  });
+}
+
+function actualizarGraficaEstablecimientosGradiente(registros) {
+  const TIENDA_INDEX = 4; // Columna de establecimiento
+
+  // Conteo por establecimiento
+  const conteo = {};
+  registros.forEach(fila => {
+    const tienda = (fila[TIENDA_INDEX] || '').trim();
+    if (!tienda) return;
+    conteo[tienda] = (conteo[tienda] || 0) + 1;
+  });
+
+  // Ordena por cantidad descendente
+  const establecimientos = Object.keys(conteo)
+    .map(nombre => ({
+      nombre,
+      cantidad: conteo[nombre]
+    }))
+    .sort((a, b) => b.cantidad - a.cantidad);
+
+  const categorias = establecimientos.map(e => e.nombre);
+  const valores = establecimientos.map(e => e.cantidad);
+
+  const chartDom = document.getElementById('establecimientos-chart');
+  if (!chartDom) return;
+  const chart = echarts.init(chartDom);
+
+  chart.setOption({
+    backgroundColor: "#fff",
+    grid: {
+      left: '8%',
+      right: '8%',
+      top: 20,
+      bottom: 20,
+      containLabel: true
+    },
+    xAxis: {
+      type: 'value',
+      show: false
+    },
+    yAxis: {
+      type: 'category',
+      data: categorias,
+      axisLabel: {
+        color: '#003B5C',
+        fontSize: 15,
+        fontWeight: 600,
+        padding: [0, 0, 0, 4]
+      },
+      axisLine: { show: false },
+      axisTick: { show: false }
+    },
+    series: [{
+      type: 'bar',
+      data: valores,
+      barWidth: 22,
+      itemStyle: {
+        borderRadius: [8, 8, 8, 8],
+        color: new echarts.graphic.LinearGradient(1, 0, 0, 0, [
+          { offset: 0, color: '#003B5C' }, // azul-petroleo
+          { offset: 1, color: '#FF6F00' }  // naranja-seguridad
+        ])
+      },
+      label: {
+        show: true,
+        position: 'right',
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#003B5C',
+        formatter: v => v.value > 0 ? v.value : ''
+      },
+      emphasis: {
+        itemStyle: {
+          shadowBlur: 12,
+          shadowColor: '#FF6F00'
+        }
+      },
+      animationDelay: idx => idx * 120
+    }],
+    animationEasing: 'elasticOut',
+    animationDuration: 900
+  });
+
+  window.addEventListener('resize', function() {
+    chart.resize();
+  });
+}
+
+// Textura SVG elegante para fondo de barras
+function createSoftTextureBarra() {
+  const svg = `
+    <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="40" height="40" fill="#fff"/>
+      <rect x="0" y="20" width="40" height="2" fill="#B0BEC5" opacity="0.10"/>
+      <rect x="0" y="10" width="40" height="1" fill="#B0BEC5" opacity="0.07"/>
+      <circle cx="10" cy="30" r="1.2" fill="#FF6F00" opacity="0.10"/>
+      <circle cx="30" cy="10" r="1.2" fill="#003B5C" opacity="0.10"/>
+    </svg>
+  `;
+  const img = new Image();
+  img.src = 'data:image/svg+xml;base64,' + btoa(svg);
+  return img;
+}
