@@ -98,33 +98,13 @@ let registrosFiltrados = []; // Nueva variable para registros filtrados
 let paginaActual = 1;
 const registrosPorPagina = 15; // Cambiado de 7 a 15
 
+let filaEditandoIndex = null;
+
 // ------------------- FUNCIONES DE EDICIÓN Y ELIMINACIÓN -------------------
 
 // Función para habilitar edición en una fila
 function habilitarEdicion(filaElement, filaIndex) {
-  const celdas = filaElement.querySelectorAll("td:not(:last-child)");
-
-  // Hacer celdas editables
-  celdas.forEach((td, index) => {
-    const valorOriginal = td.textContent;
-    td.innerHTML = `<input type="text" value="${valorOriginal}" class="edit-input">`;
-  });
-
-  // Cambiar botones a Guardar/Cancelar
-  const tdAcciones = filaElement.lastElementChild;
-  tdAcciones.innerHTML = `
-    <button class="icon-btn guardar" title="Guardar"><i class="fas fa-save"></i></button>
-    <button class="icon-btn cancelar" title="Cancelar"><i class="fas fa-times"></i></button>
-  `;
-
-  // Eventos para guardar/cancelar
-  tdAcciones.querySelector(".guardar").addEventListener("click", () => {
-    guardarEdicion(filaElement, filaIndex);
-  });
-
-  tdAcciones.querySelector(".cancelar").addEventListener("click", () => {
-    cancelarEdicion(filaElement);
-  });
+  abrirModalEdicion(filaIndex);
 }
 
 // Función para guardar los cambios en Apps Script
@@ -741,4 +721,103 @@ document.querySelectorAll('.filter-option').forEach(option => {
     document.querySelector('.filter-menu').style.display = 'none';
   });
 });
+
+// Abre el modal de edición y carga los datos
+function abrirModalEdicion(filaIndex) {
+  const fila = registrosGlobal[filaIndex];
+  if (!fila) return;
+
+  document.getElementById("edit-fecha").value = formatearFecha(fila[1]);
+  document.getElementById("edit-tipo").value = fila[2] || "";
+  document.getElementById("edit-factura").value = fila[3] || "";
+  document.getElementById("edit-establecimiento").value = fila[4] || "";
+  document.getElementById("edit-subtotal").value = fila[5] || "";
+  document.getElementById("edit-iva").value = fila[6] || "";
+  document.getElementById("edit-total").value = fila[7] || "";
+
+  const modalContent = document.querySelector("#modal-editar .modal-content");
+modalContent.classList.remove("show-anim");
+void modalContent.offsetWidth; // Reinicia la animación
+modalContent.classList.add("show-anim");
+document.getElementById("modal-editar").style.display = "block";
+}
+
+// Cerrar modal edición
+document.getElementById("cancelar-editar").addEventListener("click", () => {
+  document.getElementById("modal-editar").style.display = "none";
+});
+document.querySelector("#modal-editar .modal-close").addEventListener("click", () => {
+  document.getElementById("modal-editar").style.display = "none";
+});
+window.addEventListener("click", (e) => {
+  if (e.target.id === "modal-editar") {
+    document.getElementById("modal-editar").style.display = "none";
+  }
+});
+
+// Guardar cambios desde el modal
+document.getElementById("form-editar").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  if (filaEditandoIndex === null) return;
+
+  const filaActual = registrosGlobal[filaEditandoIndex];
+  const sheetRowNumber = filaActual[filaActual.length - 1];
+  const linkValue = filaActual[filaActual.length - 2] || "";
+
+  const nuevaFila = [
+    filaActual[0],
+    document.getElementById("edit-fecha").value,
+    document.getElementById("edit-tipo").value,
+    document.getElementById("edit-factura").value,
+    document.getElementById("edit-establecimiento").value,
+    document.getElementById("edit-subtotal").value,
+    document.getElementById("edit-iva").value,
+    document.getElementById("edit-total").value,
+    linkValue,
+    sheetRowNumber
+  ];
+
+  registrosGlobal[filaEditandoIndex] = nuevaFila;
+  registrosFiltrados = registrosGlobal;
+
+  const formData = new FormData();
+  formData.append("action", "update");
+  formData.append("row", sheetRowNumber);
+  formData.append("Fecha", nuevaFila[1]);
+  formData.append("Tipo", nuevaFila[2]);
+  formData.append("Factura", nuevaFila[3]);
+  formData.append("Establecimiento", nuevaFila[4]);
+  formData.append("Subtotal", nuevaFila[5]);
+  formData.append("IVA", nuevaFila[6]);
+  formData.append("Total", nuevaFila[7]);
+
+  try {
+    const response = await fetch(APPS_SCRIPT_URL, { method: "POST", body: formData });
+    const result = await response.json();
+    if (result.success) {
+      renderTabla(registrosFiltrados);
+      mostrarNotificacion("✅ Registro actualizado", "success");
+    } else {
+      throw new Error(result.error || "Error al guardar");
+    }
+  } catch (err) {
+    mostrarNotificacion("❌ " + err.message, "error");
+    await cargarDatosDesdeAppsScript();
+  }
+
+  document.getElementById("modal-editar").style.display = "none";
+});
+
+function formatearFecha(fechaOriginal) {
+  if (!fechaOriginal) return "";
+  // Si ya está en formato YYYY-MM-DD, regresa igual
+  if (/^\d{4}-\d{2}-\d{2}$/.test(fechaOriginal)) return fechaOriginal;
+  // Si viene en formato ISO, extrae solo la fecha
+  const fecha = new Date(fechaOriginal);
+  if (!isNaN(fecha.getTime())) {
+    return fecha.toISOString().slice(0, 10);
+  }
+  return fechaOriginal;
+}
 

@@ -1502,3 +1502,25 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: flex-end;
   gap: 10px;
 }
+
+
+/* Animación de entrada para el modal */
+@keyframes slideDownModal {
+  from {
+    transform: translateY(-60px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal .modal-content {
+  animation: slideDownModal 0.4s cubic-bezier(.25,.8,.25,1);
+}
+
+/* Animación aún más suave para el modal */
+.show-anim {
+  animation: slideDownModal 1s ease;
+}

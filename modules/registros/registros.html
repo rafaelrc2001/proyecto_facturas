@@ -251,14 +251,18 @@
           </div>
           <span class="close-modal">&times;</span>
         </div>
-<!-- MODAL EDITAR -->
-<div id="modal-editar" class="modal">
+        <div id="modal-detalle"></div>
+      </div>
+    </div>
+
+    <!-- MODAL EDITAR (fuera del modal-ver) -->
+<div id="modal-editar" class="modal" style="display: none;">
   <div class="modal-content">
     <span class="modal-close">&times;</span>
     <h2>Editar Registro</h2>
     <form id="form-editar">
       <label>Fecha</label>
-      <input type="date" id="edit-fecha" required>
+      <input type="text" id="edit-fecha" required>
 
       <label>Tipo</label>
       <input type="text" id="edit-tipo" required>
@@ -270,13 +274,13 @@
       <input type="text" id="edit-establecimiento">
 
       <label>Subtotal</label>
-      <input type="number" step="0.01" id="edit-subtotal">
+      <input type="text" id="edit-subtotal">
 
       <label>IVA</label>
-      <input type="number" step="0.01" id="edit-iva">
+      <input type="text" id="edit-iva">
 
       <label>Total</label>
-      <input type="number" step="0.01" id="edit-total">
+      <input type="text" id="edit-total">
 
       <div class="modal-actions">
         <button type="button" id="cancelar-editar" class="btn">Cancelar</button>
@@ -285,10 +289,6 @@
     </form>
   </div>
 </div>
-          
-      </div>
-    </div>
-
     <script src="registros.js"></script>
     <script src="../../Js/menu.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
