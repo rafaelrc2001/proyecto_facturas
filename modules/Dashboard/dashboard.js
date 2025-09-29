@@ -2,25 +2,34 @@ const SHEET_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vQFNxPS_lZrhCuH7xrQfeMJgZIb3vaHirtKySurmZCvrQmKV45caRB-eJAqJ6sju3Mxdwy6ituHWBEA/pub?gid=0&single=true&output=csv";
 let registrosOriginales = []; // Guarda todos los registros
 
+function getColIndex(nombreColumna, filas) {
+  // Busca el índice por el nombre en la primera fila (encabezado)
+  if (!filas || !filas.length) return -1;
+  return filas[0].findIndex(col => col.trim().toLowerCase() === nombreColumna.trim().toLowerCase());
+}
+
+// Ejemplo de uso en cargarDatosDashboard:
 async function cargarDatosDashboard() {
   const response = await fetch(SHEET_URL);
   const data = await response.text();
   const filas = data.split("\n").map((row) => row.split(","));
   const registros = filas.slice(1); // omite encabezado
 
-  registrosOriginales = registros; // Guarda para filtrar después
+  // Obtén el índice de la columna "Total"
+  window.totalIndex = getColIndex("Total", filas);
+  console.log("Índice de columna 'Total':", window.totalIndex);
 
-  mostrarTiendas(registros); // <-- Aquí se rellenan las tiendas
+  registrosOriginales = registros;
 
-  actualizarTarjetasDashboard(registros);
+  mostrarTiendas(registros);
 
-  // --- Procesar datos para gráficas ---
+  actualizarTarjetasDashboard(registros, window.totalIndex);
+
   actualizarGraficaTipos(registros);
   actualizarGraficaEstatus(registros);
   actualizarGraficaTicketsPorDia(registros);
-  actualizarGraficaPastel(registros); // <-- Agrega esta línea
+  actualizarGraficaPastel(registros);
   actualizarGraficaEstablecimientos(registros);
-  // Gráfica de barras por establecimiento y tipo
   actualizarGraficaEstablecimientosTipo(registros);
 }
 
@@ -95,8 +104,11 @@ function actualizarGraficaEstatus(registros) {
   }
 }
 
-function actualizarTarjetasDashboard(registros) {
-  console.log("Registros recibidos:", registros); // <-- Depuración
+function actualizarTarjetasDashboard(registros, totalIndex) {
+  registros.forEach((fila, idx) => {
+    console.log(`Fila ${idx}:`, fila); // Imprime todas las columnas de cada fila
+  });
+
   let conteoTickets = 0;
   let conteoFacturas = 0;
   let sumaTotalGastos = 0;
@@ -104,12 +116,13 @@ function actualizarTarjetasDashboard(registros) {
   let sumaTickets = 0;
 
   registros.forEach((fila) => {
-    if (fila.length > 3) {
-      const tipo = fila[2].toLowerCase().trim();
-      const total = parseFloat(fila[3]) || 0; // Columna 'total' en índice 3
+    if (fila.length > totalIndex && totalIndex >= 0) {
+      const total = parseFloat(fila[totalIndex]) || 0; // Columna 'total' en índice 3
 
       sumaTotalGastos += total;
+      console.log("Sumando valor:", total);
 
+      const tipo = fila[2].toLowerCase().trim();
       if (tipo === "ticket" || tipo === "tickets") {
         conteoTickets++;
         sumaTickets += total;
@@ -171,18 +184,17 @@ function actualizarGraficaTicketsPorDia(registros) {
 // Filtra por establecimiento o factura
 function filtrarRegistros(valor) {
   valor = valor.toLowerCase();
-  // Ajusta los índices según tu CSV: 0=establecimiento, 1=factura
   const filtrados = registrosOriginales.filter(fila =>
-    fila[0].toLowerCase().includes(valor) || // establecimiento
-    fila[1].toLowerCase().includes(valor)    // factura
+    fila[0].toLowerCase().includes(valor) ||
+    fila[1].toLowerCase().includes(valor)
   );
-  actualizarTarjetasDashboard(filtrados);
+  actualizarTarjetasDashboard(filtrados, window.totalIndex); // <-- CORREGIDO
   // Aquí puedes actualizar también la tabla si tienes una
 }
 
 // Muestra las tiendas disponibles en los registros
 function mostrarTiendas(registros) {
-  const TIENDA_INDEX = 4; // <-- Cambia este número si tu columna de tienda es diferente
+  const TIENDA_INDEX = 4;
 
   const tiendasSet = new Set();
   registros.forEach(fila => {
@@ -191,14 +203,14 @@ function mostrarTiendas(registros) {
   const tiendas = Array.from(tiendasSet);
 
   const menu = document.querySelector('.filter-menu');
-  menu.innerHTML = ""; // Limpia opciones previas
+  menu.innerHTML = "";
 
   // Opción "Todos"
   const opcionTodos = document.createElement('div');
   opcionTodos.className = 'filter-option';
   opcionTodos.textContent = "Todos";
   opcionTodos.onclick = () => {
-    actualizarTarjetasDashboard(registrosOriginales);
+    actualizarTarjetasDashboard(registrosOriginales, window.totalIndex); // <-- CORREGIDO
     document.querySelector('.filter-dropdown').classList.remove('active');
   };
   menu.appendChild(opcionTodos);
@@ -214,7 +226,6 @@ function mostrarTiendas(registros) {
     menu.appendChild(opcion);
   });
 
-  // Depuración
   console.log("Tiendas agregadas:", tiendas);
   console.log("Opciones en el menú:", menu.innerHTML);
 }
@@ -222,15 +233,25 @@ function mostrarTiendas(registros) {
 // Filtra los registros por tienda seleccionada
 function filtrarPorTienda(tienda) {
   const filtrados = registrosOriginales.filter(fila => fila[0].trim() === tienda);
-  actualizarTarjetasDashboard(filtrados);
+  actualizarTarjetasDashboard(filtrados, window.totalIndex); // <-- CORREGIDO
   // Si tienes una tabla, actualízala aquí también
 }
 
 // Evento para el input de búsqueda
 document.addEventListener("DOMContentLoaded", () => {
   cargarDatosDashboard();
-  document.querySelector('.filter-btn').addEventListener('click', function() {
-    document.querySelector('.filter-dropdown').classList.toggle('active');
+
+  document.querySelector('.dashboard-search').addEventListener('input', function(e) {
+    const valor = e.target.value.toLowerCase();
+    const filtrados = registrosOriginales.filter(fila =>
+      (fila[4] && fila[4].toLowerCase().includes(valor)) ||
+      (fila[1] && fila[1].toLowerCase().includes(valor))
+    );
+
+    actualizarTarjetasDashboard(filtrados, window.totalIndex); // <-- CORREGIDO
+    actualizarGraficaPastel(filtrados);
+    actualizarGraficaEstablecimientosTipo(filtrados);
+    // ...otras gráficas si tienes
   });
 });
 
@@ -384,3 +405,8 @@ function actualizarGraficaEstablecimientosTipo(registros) {
 // Llama después de cargar los datos
 actualizarGraficaEstablecimientosTipo(registros);
 actualizarGraficaEstablecimientosGradiente(registros);
+// Al cargar los datos
+window.totalIndex = getColIndex("Total", filas);
+
+// En el filtro del buscador
+actualizarTarjetasDashboard(filtrados, window.totalIndex);
