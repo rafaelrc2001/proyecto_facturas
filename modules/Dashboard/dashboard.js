@@ -18,7 +18,7 @@ async function cargarDatosDashboard() {
   actualizarGraficaTipos(registros);
   actualizarGraficaEstatus(registros);
   actualizarGraficaTicketsPorDia(registros);
-  // actualizarGraficaPastel(registros); // <-- Comenta o elimina esta línea
+  actualizarGraficaPastel(registros); // <-- Agrega esta línea
 }
 
 // Procesa y actualiza la gráfica de tipos

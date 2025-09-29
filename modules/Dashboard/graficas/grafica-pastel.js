@@ -232,101 +232,245 @@ function initStatusChart() {
     };
 }
 
-// Auto-inicializar cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', function() {
-  const chartDom = document.getElementById('distribution-chart');
-  if (!chartDom) return;
-  const chart = echarts.init(chartDom);
-
-  // Datos de ejemplo, reemplaza por tus datos reales
-  const data = [
-    { value: 42, name: 'Tickets' },
-    { value: 45, name: 'Facturas' }
-  ];
-
-  chart.setOption({
-    backgroundColor: "#fff",
-    tooltip: {
-      trigger: 'item',
-      formatter: '{b}: {c} ({d}%)'
-    },
-    legend: {
-      orient: 'vertical',
-      left: 'left',
-      data: data.map(d => d.name),
-      textStyle: { color: '#476D7C', fontSize: 12 }
-    },
-    series: [{
-      name: 'Distribución',
-      type: 'pie',
-      radius: '60%',
-      center: ['55%', '55%'],
-      data: data,
-      label: {
-        color: '#111827',
-        fontSize: 12,
-        formatter: '{b}: {c}'
-      },
-      itemStyle: {
-        borderRadius: 6,
-        borderColor: '#fff',
-        borderWidth: 2
-      }
-    }]
-  });
-
-  window.distributionChartInstance = chart;
-});
+// Elimina o comenta este bloque para evitar la gráfica de ejemplo:
+// document.addEventListener('DOMContentLoaded', function() {
+//   const chartDom = document.getElementById('distribution-chart');
+//   if (!chartDom) return;
+//   const chart = echarts.init(chartDom);
+//
+//   // Datos de ejemplo, reemplaza por tus datos reales
+//   const data = [
+//     { value: 42, name: 'Tickets' },
+//     { value: 45, name: 'Facturas' }
+//   ];
+//
+//   chart.setOption({
+//     backgroundColor: "#fff",
+//     tooltip: {
+//       trigger: 'item',
+//       formatter: '{b}: {c} ({d}%)'
+//     },
+//     legend: {
+//       orient: 'vertical',
+//       left: 'left',
+//       data: data.map(d => d.name),
+//       textStyle: { color: '#476D7C', fontSize: 12 }
+//     },
+//     series: [{
+//       name: 'Distribución',
+//       type: 'pie',
+//       radius: '60%',
+//       center: ['55%', '55%'],
+//       data: data,
+//       label: {
+//         color: '#111827',
+//         fontSize: 12,
+//         formatter: '{b}: {c}'
+//       },
+//       itemStyle: {
+//         borderRadius: 6,
+//         borderColor: '#fff',
+//         borderWidth: 2
+//       }
+//     }]
+//   });
+//
+//   window.distributionChartInstance = chart;
+// });
 
 function actualizarGraficaPastel(registros) {
   let totalFacturas = 0;
   let totalTickets = 0;
 
   registros.forEach((fila) => {
-    const tipo = (fila[2] || "").trim().toLowerCase(); // Tipo en columna 2
+    const tipo = (fila[2] || "").trim().toLowerCase();
     if (tipo === "factura") totalFacturas++;
     else if (tipo === "ticket") totalTickets++;
   });
 
-  const data = [
-    { value: totalTickets, name: 'Tickets' },
-    { value: totalFacturas, name: 'Facturas' }
-  ];
+  const total = totalFacturas + totalTickets;
+  const percentTickets = total ? ((totalTickets / total) * 100).toFixed(2) : 0;
+  const percentFacturas = total ? ((totalFacturas / total) * 100).toFixed(2) : 0;
 
   const chartDom = document.getElementById('distribution-chart');
   if (!chartDom) return;
   const chart = echarts.init(chartDom);
 
+  // Estado central dinámico
+  let centralText = {
+    percent: `${total}`,
+    label: 'Total registros',
+    color: '#003B5C'
+  };
+
+  function getCentralGraphic(percent, label, color) {
+    return [
+      {
+        type: 'group',
+        left: 'center',
+        top: 'center',
+        children: [
+          {
+            type: 'text',
+            style: {
+              text: percent,
+              font: '400 28px Montserrat, Roboto, Arial',
+              fill: color,
+              textAlign: 'center',
+              transition: 'all 0.3s'
+            },
+            left: 'center',
+            top: -10
+          },
+          {
+            type: 'text',
+            style: {
+              text: label,
+              font: '400 15px Montserrat, Roboto, Arial',
+              fill: '#4A4A4A',
+              textAlign: 'center',
+              transition: 'all 0.3s'
+            },
+            left: 'center',
+            top: 22
+          }
+        ]
+      }
+    ];
+  }
+
   chart.setOption({
-    backgroundColor: "#fff",
-    tooltip: {
-      trigger: 'item',
-      formatter: '{b}: {c} ({d}%)'
+    backgroundColor: {
+      type: 'pattern',
+      image: createSoftTexture(),
+      repeat: 'repeat'
     },
     legend: {
-      orient: 'vertical',
-      left: 'left',
-      data: data.map(d => d.name),
-      textStyle: { color: '#476D7C', fontSize: 12 }
+      orient: 'horizontal',
+      top: 10,
+      left: 'center',
+      data: ['Facturas', 'Tickets'],
+      textStyle: {
+        color: '#003B5C',
+        fontWeight: 500,
+        fontSize: 15
+      },
+      itemWidth: 18,
+      itemHeight: 10,
+      icon: 'circle'
+    },
+    tooltip: {
+      trigger: 'item',
+      backgroundColor: 'rgba(255,255,255,0.97)',
+      borderColor: '#B0BEC5',
+      borderWidth: 1,
+      textStyle: { color: '#4A4A4A', fontWeight: 'normal', fontSize: 13 },
+      formatter: params => `
+        <div style="font-weight:500;color:#003B5C;">${params.name}</div>
+        <div style="color:#4A4A4A;">Cantidad: <strong>${params.value}</strong></div>
+        <div style="color:#FF6F00;">Porcentaje: ${params.percent}%</div>
+      `
     },
     series: [{
       name: 'Distribución',
       type: 'pie',
-      radius: '60%',
-      center: ['55%', '55%'],
-      data: data,
+      radius: ['60%', '80%'],
+      center: ['50%', '55%'],
+      avoidLabelOverlap: false,
       label: {
-        color: '#111827',
-        fontSize: 12,
-        formatter: '{b}: {c}'
+        show: true,
+        position: 'outside',
+        fontSize: 15,
+        color: '#4A4A4A',
+        formatter: '{b}\n{d}%'
+      },
+      labelLine: {
+        show: true,
+        length: 25,
+        length2: 10,
+        lineStyle: {
+          color: '#B0BEC5',
+          width: 1.5
+        }
       },
       itemStyle: {
-        borderRadius: 6,
+        borderRadius: 12,
         borderColor: '#fff',
-        borderWidth: 2
-      }
-    }]
+        borderWidth: 4,
+        shadowBlur: 12,
+        shadowColor: 'rgba(0,59,92,0.10)'
+      },
+      emphasis: {
+        scale: true,
+        scaleSize: 10,
+        itemStyle: {
+          shadowBlur: 24,
+          shadowColor: '#FF6F00'
+        }
+      },
+      animationType: 'scale',
+      animationEasing: 'cubicOut',
+      animationDelay: idx => idx * 120,
+      data: [
+        {
+          value: totalFacturas,
+          name: 'Facturas',
+          itemStyle: {
+            color: '#003B5C',
+            shadowColor: 'rgba(0,35,60,0.25)'
+          }
+        },
+        {
+          value: totalTickets,
+          name: 'Tickets',
+          itemStyle: {
+            color: '#FF6F00',
+            shadowColor: 'rgba(255,111,0,0.18)'
+          }
+        }
+      ]
+    }],
+    graphic: getCentralGraphic(centralText.percent, centralText.label, centralText.color)
+  });
+
+  // Evento dinámico para el centro
+  chart.on('mouseover', function(params) {
+    if (params.seriesType === 'pie') {
+      chart.setOption({
+        graphic: getCentralGraphic(
+          `${params.percent}%`,
+          params.name,
+          params.data.itemStyle.color
+        )
+      });
+    }
+  });
+
+  chart.on('mouseout', function(params) {
+    chart.setOption({
+      graphic: getCentralGraphic(
+        centralText.percent,
+        centralText.label,
+        centralText.color
+      )
+    });
   });
 
   window.distributionChartInstance = chart;
+}
+
+// Textura SVG más suave y elegante
+function createSoftTexture() {
+  const svg = `
+    <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="40" height="40" fill="#fff"/>
+      <circle cx="10" cy="10" r="1.2" fill="#B0BEC5" opacity="0.13"/>
+      <circle cx="30" cy="30" r="1.2" fill="#B0BEC5" opacity="0.13"/>
+      <circle cx="30" cy="10" r="1" fill="#FF6F00" opacity="0.09"/>
+      <circle cx="10" cy="30" r="1" fill="#003B5C" opacity="0.09"/>
+    </svg>
+  `;
+  const img = new Image();
+  img.src = 'data:image/svg+xml;base64,' + btoa(svg);
+  return img;
 }
