@@ -136,9 +136,9 @@ function actualizarTarjetasDashboard(registros, totalIndex) {
   const totalGeneral = conteoTickets + conteoFacturas;
 
   // KPIs de gastos
-  document.getElementById("total-gastos").textContent = sumaTotalGastos.toFixed(2) + "$";
-  document.getElementById("facturas-gastos").textContent = sumaFacturas.toFixed(2) + "$";
-  document.getElementById("tickets-gastos").textContent = sumaTickets.toFixed(2) + "$";
+  document.getElementById("total-gastos").textContent = "$" + sumaTotalGastos.toFixed(2);
+  document.getElementById("facturas-gastos").textContent = "$" + sumaFacturas.toFixed(2);
+  document.getElementById("tickets-gastos").textContent = "$" + sumaTickets.toFixed(2);
 
   // Summary cards
   document.getElementById("total-count").textContent = totalGeneral;
