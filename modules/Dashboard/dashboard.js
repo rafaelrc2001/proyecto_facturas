@@ -117,18 +117,20 @@ function actualizarTarjetasDashboard(registros, totalIndex) {
 
   registros.forEach((fila) => {
     if (fila.length > totalIndex && totalIndex >= 0) {
-      const total = parseFloat(fila[totalIndex]) || 0; // Columna 'total' en índice 3
+      // Limpia el valor: quita $ y espacios
+      let valor = (fila[totalIndex] || "").replace(/[$,\s]/g, "");
+      let total = parseFloat(valor);
+      if (!isNaN(total)) {
+        sumaTotalGastos += total;
 
-      sumaTotalGastos += total;
-      console.log("Sumando valor:", total);
-
-      const tipo = fila[2].toLowerCase().trim();
-      if (tipo === "ticket" || tipo === "tickets") {
-        conteoTickets++;
-        sumaTickets += total;
-      } else if (tipo === "factura" || tipo === "facturas") {
-        conteoFacturas++;
-        sumaFacturas += total;
+        const tipo = (fila[2] || "").toLowerCase().trim();
+        if (tipo === "ticket" || tipo === "tickets") {
+          conteoTickets++;
+          sumaTickets += total;
+        } else if (tipo === "factura" || tipo === "facturas") {
+          conteoFacturas++;
+          sumaFacturas += total;
+        }
       }
     }
   });
