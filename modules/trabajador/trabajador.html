@@ -216,18 +216,7 @@
     <!-- Modal de detalle -->
     
 
-    <!-- Modal Nuevo Trabajador -->
-<div id="modalNuevoTrabajador" class="modal" style="display:none;">
-  <div>
-    <button id="cerrarModalNuevoTrabajador">Cerrar</button>
-    <form id="formNuevoTrabajador">
-      <input type="text" name="nombre" />
-      <input type="text" name="puesto" />
-      <input type="text" name="idEmpleado" />
-      <button type="submit">Guardar</button>
-    </form>
-  </div>
-</div>
+
 
     <!-- Modal Asignar Proyecto -->
 <div id="modalAsignarProyecto" class="modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); justify-content:center; align-items:center; z-index:1000;">
@@ -243,6 +232,21 @@
   <select name="proyecto" id="selectProyecto" style="width:100%; margin-bottom:18px; padding:8px; border-radius:6px; border:1px solid #ececec;"></select>
   <button type="submit" style="background:#FF6F00; color:#fff; border:none; padding:10px 18px; border-radius:6px; cursor:pointer;">Asignar</button>
 </form>
+  </div>
+</div>
+
+
+<!-- Modal Nuevo Trabajador -->
+<div id="modalNuevoTrabajador" class="modal" style="display:none;">
+  <div>
+    <button id="cerrarModalNuevoTrabajador">✕</button>
+    <h2 style="margin-bottom:18px; color:#003B5C;">Nuevo Trabajador</h2>
+    <form id="formNuevoTrabajador">
+      <input type="text" name="nombre" placeholder="Nombre" required />
+      <input type="text" name="puesto" placeholder="Puesto" required />
+      <input type="text" name="idEmpleado" placeholder="ID Empleado" required />
+      <button type="submit">Guardar</button>
+    </form>
   </div>
 </div>
 

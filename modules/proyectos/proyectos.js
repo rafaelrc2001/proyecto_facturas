@@ -1,7 +1,10 @@
-import { insertarProyecto, obtenerProyectos } from '../../supabase/proyecto.js';
+import { insertarProyecto, obtenerProyectos, eliminarProyecto, actualizarProyecto } from '../../supabase/proyecto.js';
+
+let proyectosData = [];
 
 async function cargarProyectos() {
   const { data, error } = await obtenerProyectos();
+  proyectosData = data || [];
   const tbody = document.getElementById('table-body');
   tbody.innerHTML = '';
 
@@ -49,9 +52,33 @@ async function cargarProyectos() {
       form.ubicacion.value = proyecto.ubicación || '';
       form.fecha_inicio.value = proyecto.fecha_inicio || '';
       form.fecha_final.value = proyecto.fecha_final || '';
-      form.responsable.value = proyecto.responsable || '';
+    //  form.responsable.value = proyecto.responsable || '';
       modal.style.display = 'flex';
       form.dataset.index = index;
+    });
+  });
+
+  // Después de crear las filas en cargarProyectos()
+  document.querySelectorAll('.btn-eliminar').forEach(btn => {
+    btn.addEventListener('click', async function() {
+      const index = this.parentElement.querySelector('.btn-editar').getAttribute('data-index');
+      const proyecto = data[index];
+      if (confirm('¿Seguro que deseas eliminar este proyecto?')) {
+        const { error } = await eliminarProyecto(proyecto.id_proyecto);
+        if (error) {
+          if (
+            error.message &&
+            error.message.includes('violates foreign key constraint')
+          ) {
+            mostrarAlertaRelacion();
+          } else {
+            alert('Error al eliminar: ' + error.message);
+          }
+        } else {
+          alert('Proyecto eliminado correctamente');
+          cargarProyectos();
+        }
+      }
     });
   });
 }
@@ -115,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function() {
       form.ubicacion.value = proyecto.ubicación || '';
       form.fecha_inicio.value = proyecto.fecha_inicio || '';
       form.fecha_final.value = proyecto.fecha_final || '';
-      form.responsable.value = proyecto.responsable || '';
+    //  form.responsable.value = proyecto.responsable || '';
       modal.style.display = 'flex';
       // Puedes guardar el id o index si lo necesitas para editar
       form.dataset.index = index;
@@ -134,4 +161,102 @@ document.addEventListener('DOMContentLoaded', function() {
       modal.style.display = 'none';
     }
   });
+
+  document.querySelectorAll('#modal-nuevo-proyecto textarea, #modal-editar-proyecto textarea').forEach(textarea => {
+    textarea.addEventListener('input', function() {
+      this.style.height = 'auto';
+      this.style.height = (this.scrollHeight) + 'px';
+    });
+  });
+});
+
+// Agrega esta función para mostrar la alerta personalizada
+function mostrarAlertaRelacion() {
+  // Crea el modal si no existe
+  let modal = document.getElementById('modal-relacion');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'modal-relacion';
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100vw';
+    modal.style.height = '100vh';
+    modal.style.background = 'rgba(0,0,0,0.35)';
+    modal.style.display = 'flex';
+    modal.style.justifyContent = 'center';
+    modal.style.alignItems = 'center';
+    modal.style.zIndex = '2000';
+    modal.innerHTML = `
+      <div style="
+        background:#fff;
+        border-radius:14px;
+        box-shadow:0 4px 24px rgba(0,59,92,0.12);
+        padding:32px 32px 24px 32px;
+        min-width:340px;
+        max-width:420px;
+        position:relative;
+        display:flex;
+        flex-direction:column;
+        gap:18px;
+        align-items:center;
+      ">
+        <span style="position:absolute;top:16px;right:16px;font-size:1.3em;cursor:pointer;color:#003B5C;" id="cerrar-modal-relacion">&times;</span>
+        <h2 style="color:#FF6F00;font-family:'Montserrat',sans-serif;font-size:1.2rem;font-weight:700;">No se puede eliminar</h2>
+        <div style="color:#003B5C;font-size:1em;text-align:center;">
+          Este proyecto tiene relación en otras tablas.<br>
+          Elimina primero las asignaciones relacionadas antes de eliminar este proyecto.
+        </div>
+        <button id="btn-cerrar-relacion" style="
+          margin-top:18px;
+          background:#FF6F00;
+          color:#fff;
+          border:none;
+          border-radius:8px;
+          padding:10px 22px;
+          font-size:1em;
+          font-family:'Montserrat',sans-serif;
+          font-weight:600;
+          cursor:pointer;
+          transition:background 0.2s;
+        ">Cerrar</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    document.getElementById('cerrar-modal-relacion').onclick = cerrarModalRelacion;
+    document.getElementById('btn-cerrar-relacion').onclick = cerrarModalRelacion;
+    modal.onclick = function(e) {
+      if (e.target === modal) cerrarModalRelacion();
+    };
+  }
+  modal.style.display = 'flex';
+}
+
+function cerrarModalRelacion() {
+  const modal = document.getElementById('modal-relacion');
+  if (modal) modal.style.display = 'none';
+}
+
+// Agrega el evento submit para el formulario de edición
+document.getElementById('form-editar-proyecto').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const index = e.target.dataset.index;
+  const proyecto = proyectosData[index];
+  const id = proyecto.id_proyecto;
+
+  const cliente = e.target.cliente.value;
+  const nombre = e.target.nombre.value;
+  const ubicación = e.target.ubicacion.value;
+  const fecha_inicio = e.target.fecha_inicio.value;
+  const fecha_final = e.target.fecha_final.value;
+  // const descripción = e.target.descripcion.value;
+
+  const { error } = await actualizarProyecto(id, { cliente, nombre, /*descripción,*/ ubicación, fecha_inicio, fecha_final });
+  if (error) {
+    alert('Error al actualizar: ' + error.message);
+  } else {
+    alert('Proyecto actualizado correctamente');
+    document.getElementById('modal-editar-proyecto').style.display = 'none';
+    cargarProyectos();
+  }
 });

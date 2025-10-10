@@ -38,7 +38,9 @@ async function cargarTrabajadores() {
   // Asignar eventos a los botones de eliminar
   document.querySelectorAll('.btn-eliminar').forEach(btn => {
     btn.addEventListener('click', async (e) => {
-      const id = e.target.getAttribute('data-id');
+      // Obtén el botón aunque el clic sea en el ícono
+      const button = e.currentTarget;
+      const id = button.getAttribute('data-id');
       if (confirm('¿Seguro que deseas eliminar este trabajador?')) {
         const { error } = await eliminarTrabajador(id);
         if (error) {
@@ -52,18 +54,20 @@ async function cargarTrabajadores() {
 
   // Asignar eventos a los botones de editar
   document.querySelectorAll('.btn-editar').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const id = e.target.getAttribute('data-id');
-      const trabajador = data.find(t => t.id_trabajador == id);
-      if (trabajador) {
-        trabajadorEditandoId = id;
-        document.getElementById('modalNuevoTrabajador').style.display = 'flex';
-        document.querySelector('[name="nombre"]').value = trabajador.nombre;
-        document.querySelector('[name="puesto"]').value = trabajador.puesto;
-        document.querySelector('[name="idEmpleado"]').value = trabajador.id_empleado || '';
-      }
-    });
+  btn.addEventListener('click', (e) => {
+    const button = e.currentTarget;
+    const id = button.getAttribute('data-id');
+    const trabajador = data.find(t => t.id_trabajador == id);
+    if (trabajador) {
+      trabajadorEditandoId = id;
+      document.getElementById('modalNuevoTrabajador').style.display = 'flex';
+      document.querySelector('[name="nombre"]').value = trabajador.nombre;
+      document.querySelector('[name="puesto"]').value = trabajador.puesto;
+      document.querySelector('[name="idEmpleado"]').value = trabajador.id_empleado || '';
+    }
   });
+});
+
 }
 
 // Llama la función al cargar la página
@@ -72,11 +76,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Abrir modal "Nuevo Trabajador"
   document.querySelector('.btn-nuevo').addEventListener('click', () => {
-    trabajadorEditandoId = null;
-    document.getElementById('modalNuevoTrabajador').style.display = 'flex';
-    document.querySelector('[name="nombre"]').value = '';
-    document.querySelector('[name="puesto"]').value = '';
-    document.querySelector('[name="idEmpleado"]').value = '';
+  trabajadorEditandoId = null;
+  document.getElementById('modalNuevoTrabajador').style.display = 'flex';
+  document.querySelector('[name="nombre"]').value = '';
+  document.querySelector('[name="puesto"]').value = '';
+  document.querySelector('[name="idEmpleado"]').value = '';
   });
 
   // Cerrar modal "Nuevo Trabajador"
@@ -123,16 +127,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // Trabajadores
     const { data: trabajadores } = await obtenerTrabajadores();
     const selectTrabajador = document.getElementById('selectTrabajador');
-    selectTrabajador.innerHTML = trabajadores.map(t =>
-      `<option value="${t.id_trabajador}">${t.nombre}</option>`
-    ).join('');
+    selectTrabajador.innerHTML =
+      `<option value="" disabled selected>Selecciona un encargado</option>` +
+      trabajadores.map(t =>
+        `<option value="${t.id_trabajador}">${t.nombre}</option>`
+      ).join('');
 
     // Proyectos
     const { data: proyectos } = await obtenerProyectos();
     const selectProyecto = document.getElementById('selectProyecto');
-    selectProyecto.innerHTML = proyectos.map(p =>
-      `<option value="${p.id_proyecto}">${p.nombre}</option>`
-    ).join('');
+    selectProyecto.innerHTML =
+      `<option value="" disabled selected>Selecciona un proyecto</option>` +
+      proyectos.map(p =>
+        `<option value="${p.id_proyecto}">${p.nombre}</option>`
+      ).join('');
   }
 
   // Guardar asignación
