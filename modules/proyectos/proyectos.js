@@ -36,6 +36,24 @@ async function cargarProyectos() {
 
   // Actualiza el contador de registros
   document.getElementById('contador-registros').textContent = data.length;
+
+  // Asigna eventos a los botones editar DESPUÉS de crear las filas
+  document.querySelectorAll('.btn-editar').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const index = this.getAttribute('data-index');
+      const proyecto = data[index];
+      const modal = document.getElementById('modal-editar-proyecto');
+      const form = document.getElementById('form-editar-proyecto');
+      form.cliente.value = proyecto.cliente || '';
+      form.nombre.value = proyecto.nombre || '';
+      form.ubicacion.value = proyecto.ubicación || '';
+      form.fecha_inicio.value = proyecto.fecha_inicio || '';
+      form.fecha_final.value = proyecto.fecha_final || '';
+      form.responsable.value = proyecto.responsable || '';
+      modal.style.display = 'flex';
+      form.dataset.index = index;
+    });
+  });
 }
 
 document.addEventListener('DOMContentLoaded', function() {

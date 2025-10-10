@@ -216,7 +216,6 @@
     <!-- Modal de detalle -->
     
 
-    <script src="proyectos.js"></script>
     <script src="../../Js/menu.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
     <script type="module" src="../../modules/proyectos/proyectos.js"></script>
@@ -264,19 +263,41 @@
 </div>
 
 
-<!-- Puedes agregar esto en proyectos.html -->
+<!-- Actualiza el contenido del modal así -->
 <div id="modal-editar-proyecto" class="modal" style="display:none;">
   <div class="modal-content">
     <button id="close-modal-editar" class="close-modal" title="Cerrar">&times;</button>
     <h2>Editar proyecto</h2>
     <form id="form-editar-proyecto">
-      <input type="text" name="cliente" placeholder="Cliente" required />
-      <input type="text" name="nombre" placeholder="Nombre" required />
-      <input type="text" name="ubicacion" placeholder="Ubicación" required />
-      <input type="date" name="fecha_inicio" placeholder="Fecha inicio" required />
-      <input type="date" name="fecha_final" placeholder="Fecha fin" required />
-      <input type="text" name="responsable" placeholder="Responsable" required />
-      <button type="submit">Guardar cambios</button>
+      <div class="modal-form-grid">
+        <div class="modal-form-group">
+          <label for="editar-cliente">Cliente</label>
+          <input type="text" id="editar-cliente" name="cliente" required />
+        </div>
+        <div class="modal-form-group">
+          <label for="editar-nombre">Nombre</label>
+          <input type="text" id="editar-nombre" name="nombre" required />
+        </div>
+        <div class="modal-form-group">
+          <label for="editar-ubicacion">Ubicación</label>
+          <input type="text" id="editar-ubicacion" name="ubicacion" required />
+        </div>
+        <div class="modal-form-group">
+          <label for="editar-fecha-inicio">Fecha inicio</label>
+          <input type="date" id="editar-fecha-inicio" name="fecha_inicio" required />
+        </div>
+        <div class="modal-form-group">
+          <label for="editar-fecha-final">Fecha fin</label>
+          <input type="date" id="editar-fecha-final" name="fecha_final" required />
+        </div>
+        <div class="modal-form-group">
+          <label for="editar-responsable">Responsable</label>
+          <input type="text" id="editar-responsable" name="responsable" required />
+        </div>
+      </div>
+      <button type="submit" class="btn primary">Guardar cambios</button>
     </form>
   </div>
 </div>
+
+<span id="contador-registros"></span>

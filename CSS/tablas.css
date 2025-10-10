@@ -461,3 +461,123 @@
   margin-left: auto;
 }
 
+/* Modal de edición de proyecto */
+#modal-editar-proyecto.modal {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.35);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+#modal-editar-proyecto .modal-content {
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 24px rgba(0,59,92,0.12);
+  padding: 32px 32px 24px 32px;
+  min-width: 800px;   /* <-- Cambia de 400px a 800px */
+  max-width: 900px;   /* <-- Cambia de 540px a 900px */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+#modal-editar-proyecto h2 {
+  margin-bottom: 12px;
+  color: #003B5C;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  text-align: left;
+}
+
+.modal-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 24px;
+}
+
+.modal-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.modal-form-group label {
+  font-size: 0.98em;
+  color: #276080;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+#modal-editar-proyecto input[type="text"],
+#modal-editar-proyecto input[type="date"] {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #cfd8dc;
+  border-radius: 8px;
+  font-size: 1em;
+  font-family: 'Roboto', sans-serif;
+  background: #f7f8f6;
+  color: #003B5C;
+  outline: none;
+  transition: border 0.2s;
+}
+
+#modal-editar-proyecto input[type="text"]:focus,
+#modal-editar-proyecto input[type="date"]:focus {
+  border-color: #FF6F00;
+}
+
+#modal-editar-proyecto button[type="submit"] {
+  margin-top: 18px;
+  width: 100%;
+  background: #FF6F00;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 0;
+  font-size: 1.1em;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#modal-editar-proyecto button[type="submit"]:hover {
+  background: #e65c00;
+}
+
+#close-modal-editar {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  font-size: 1.3em;
+  color: #003B5C;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+#close-modal-editar:hover {
+  color: #FF6F00;
+}
+
+/* Responsive modal */
+@media (max-width: 700px) {
+  #modal-editar-proyecto .modal-content {
+    min-width: 95vw;
+    max-width: 98vw;
+    padding: 18px 8px 16px 8px;
+  }
+  .modal-form-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+}
