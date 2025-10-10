@@ -63,6 +63,7 @@ async function cargarRegistrosSupabase() {
       // Llena los campos del modal
       document.getElementById('edit-fecha').value = registro.fecha || '';
       document.getElementById('edit-tipo').value = registro.tipo || '';
+      document.getElementById('edit-pago').value = registro.pago || ''; // <-- agrega esta línea
       document.getElementById('edit-factura').value = registro.folio || '';
       document.getElementById('edit-establecimiento').value = registro.establecimiento || '';
       document.getElementById('edit-subtotal').value = registro.subtotal || '';
@@ -91,6 +92,15 @@ async function cargarRegistrosSupabase() {
       }
     });
   });
+
+  // Contadores
+  const total = data.length;
+  const tickets = data.filter(r => r.tipo && r.tipo.toLowerCase() === 'ticket').length;
+  const facturas = data.filter(r => r.tipo && r.tipo.toLowerCase() === 'factura').length;
+
+  document.getElementById('total-count').textContent = total;
+  document.getElementById('tickets-count').textContent = tickets;
+  document.getElementById('facturas-count').textContent = facturas;
 }
 
 // Cerrar modal
@@ -109,6 +119,7 @@ document.getElementById('form-editar').onsubmit = async function(e) {
   const cambios = {
     fecha: document.getElementById('edit-fecha').value,
     tipo: document.getElementById('edit-tipo').value,
+    pago: document.getElementById('edit-pago').value, // <-- agrega esta línea
     folio: document.getElementById('edit-factura').value,
     establecimiento: document.getElementById('edit-establecimiento').value,
     subtotal: document.getElementById('edit-subtotal').value,
