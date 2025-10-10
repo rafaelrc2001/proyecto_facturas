@@ -1,4 +1,6 @@
 import { insertarTrabajador, obtenerTrabajadores, eliminarTrabajador, actualizarTrabajador } from '../../supabase/trabajador.js';
+import { obtenerProyectos } from '../../supabase/proyecto.js';
+import { insertarAsignacion } from '../../supabase/asignar_proyecto.js';
 
 let trabajadorEditandoId = null;
 
@@ -83,6 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Abrir modal "Asignar Proyecto"
   document.querySelector('.btn-asignar').addEventListener('click', () => {
     document.getElementById('modalAsignarProyecto').style.display = 'flex';
+    llenarSelectsAsignarProyecto();
   });
 
   // Cerrar modal "Asignar Proyecto"
@@ -111,6 +114,38 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('modalNuevoTrabajador').style.display = 'none';
       e.target.reset();
       cargarTrabajadores();
+    }
+  });
+
+  async function llenarSelectsAsignarProyecto() {
+    // Trabajadores
+    const { data: trabajadores } = await obtenerTrabajadores();
+    const selectTrabajador = document.getElementById('selectTrabajador');
+    selectTrabajador.innerHTML = trabajadores.map(t =>
+      `<option value="${t.id_trabajador}">${t.nombre}</option>`
+    ).join('');
+
+    // Proyectos
+    const { data: proyectos } = await obtenerProyectos();
+    const selectProyecto = document.getElementById('selectProyecto');
+    selectProyecto.innerHTML = proyectos.map(p =>
+      `<option value="${p.id_proyecto}">${p.nombre}</option>`
+    ).join('');
+  }
+
+  // Guardar asignación
+  document.getElementById('formAsignarProyecto').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const id_trabajador = document.getElementById('selectTrabajador').value;
+    const id_proyecto = document.getElementById('selectProyecto').value;
+
+    const { error } = await insertarAsignacion({ id_trabajador, id_proyecto });
+    if (error) {
+      alert('Error al asignar: ' + error.message);
+    } else {
+      alert('Proyecto asignado correctamente');
+      document.getElementById('modalAsignarProyecto').style.display = 'none';
+      e.target.reset();
     }
   });
 });
