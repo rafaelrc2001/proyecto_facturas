@@ -19,19 +19,21 @@ async function cargarTrabajadores() {
     return;
   }
 
-  data.forEach(trabajador => {
-    tbody.innerHTML += `
-      <tr>
-        <td>${trabajador.nombre}</td>
-        <td>${trabajador.puesto}</td>
-        <td>${trabajador.cliente || ''}</td>
-        <td>
-          <button class="btn-editar" data-id="${trabajador.id_trabajador}">Editar</button>
-          <button class="btn-eliminar" data-id="${trabajador.id_trabajador}">Eliminar</button>
-        </td>
-      </tr>
-    `;
-  });
+ data.forEach(trabajador => {
+  tbody.innerHTML += `
+    <tr>
+      <td>${trabajador.nombre}</td>
+      <td>${trabajador.puesto}</td>
+      <td>${trabajador.cliente || ''}</td>
+      <td>
+        <div class="acciones-btns">
+          <button class="btn-accion btn-editar" title="Editar" data-id="${trabajador.id_trabajador}"><i class="ri-edit-2-line"></i></button>
+          <button class="btn-accion btn-eliminar" title="Eliminar" data-id="${trabajador.id_trabajador}"><i class="ri-delete-bin-line"></i></button>
+        </div>
+      </td>
+    </tr>
+  `;
+});
 
   // Asignar eventos a los botones de eliminar
   document.querySelectorAll('.btn-eliminar').forEach(btn => {

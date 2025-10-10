@@ -1,0 +1,463 @@
+/* Contenedor principal de la tabla */
+.tabla-container {
+  background: #fff;
+  border-radius: 14px 14px 0 0; /* Bordes superiores redondeados */
+  box-shadow: 0 2px 12px rgba(0,59,92,0.07);
+  border-top: 5px solid #FF6F00;
+  border: none;
+  margin-top: 18px;
+  padding-bottom: 0;
+  overflow: hidden;
+}
+
+/* Título de la tabla */
+.listado-title {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #003B5C;
+  background: #f7f8f6;
+  padding: 16px 24px 8px 24px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  border-bottom: none;
+  border-radius: 14px 14px 0 0; /* Redondeo arriba */
+}
+
+/* Tabla */
+#proyectosTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.98rem;
+  background: #fff;
+  border-radius: 0 0 8px 8px;
+  overflow: hidden;
+}
+
+/* Cabecera de la tabla */
+#proyectosTable thead tr {
+  background: #004366;
+  color: #fff;
+  border-radius: 12px 12px 0 0;
+}
+
+#proyectosTable th {
+  padding: 14px 10px;
+  font-weight: 600;
+  text-align: left;
+  font-size: 1em;
+  letter-spacing: 0.02em;
+  border-right: 1px solid #e0e0e0;
+  background: #004366;
+}
+
+#proyectosTable th:first-child {
+  border-radius: 10px 0 0 0;
+}
+#proyectosTable th:last-child {
+  border-right: none;
+  border-radius: 0 10px 0 0;
+}
+
+/* Filas del cuerpo */
+#proyectosTable tbody tr {
+  border-bottom: 1px solid #ececec;
+  transition: background 0.2s;
+}
+
+#proyectosTable tbody tr:nth-child(even) {
+  background: #f7f8f6;
+}
+
+#proyectosTable tbody tr:hover {
+  background: #eaf3fa;
+}
+
+#proyectosTable td {
+  padding: 12px 10px;
+  color: #003B5C;
+  font-size: 0.97em;
+  border-right: 1px solid #f0f0f0;
+  vertical-align: middle;
+  background: transparent;
+}
+
+#proyectosTable td:last-child {
+  border-right: none;
+}
+
+/* Footer y paginación */
+.table-footer {
+  background: #f7f8f6;
+  padding: 12px 24px;
+  border-top: 1px solid #ececec;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  border-radius: 0 0 14px 14px;
+}
+
+.pagination {
+  display: flex;
+  gap: 6px;
+}
+
+.pagination-btn {
+  background: #fff;
+  border: 1px solid #004366;
+  color: #004366;
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  outline: none;
+}
+
+.pagination-btn.active,
+.pagination-btn:hover {
+  background: #004366;
+  color: #fff;
+  border-color: #004366;
+}
+
+.pagination-btn i {
+  font-size: 1.2em;
+  vertical-align: middle;
+}
+
+/* --- Estilo para la tabla de trabajadores --- */
+#trabajadorTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-family: 'Roboto', sans-serif;
+  font-size: 0.98rem;
+  background: #fff;
+  border-radius: 0 0 8px 8px;
+  overflow: hidden;
+}
+
+#trabajadorTable thead tr {
+  background: #004366;
+  color: #fff;
+  border-radius: 12px 12px 0 0;
+}
+
+#trabajadorTable th {
+  padding: 14px 10px;
+  font-weight: 600;
+  text-align: left;
+  font-size: 1em;
+  letter-spacing: 0.02em;
+  border-right: 1px solid #e0e0e0;
+  background: #004366;
+}
+
+#trabajadorTable th:first-child {
+  border-radius: 10px 0 0 0;
+}
+#trabajadorTable th:last-child {
+  border-right: none;
+  border-radius: 0 10px 0 0;
+}
+
+#trabajadorTable tbody tr {
+  border-bottom: 1px solid #ececec;
+  transition: background 0.2s;
+}
+
+#trabajadorTable tbody tr:nth-child(even) {
+  background: #f7f8f6;
+}
+
+#trabajadorTable tbody tr:hover {
+  background: #eaf3fa;
+}
+
+#trabajadorTable td {
+  padding: 12px 10px;
+  color: #003B5C;
+  font-size: 0.97em;
+  border-right: 1px solid #f0f0f0;
+  vertical-align: middle;
+  background: transparent;
+}
+
+#trabajadorTable td:last-child {
+  border-right: none;
+}
+
+/* Responsive */
+@media (max-width: 700px) {
+  .tabla-container {
+    padding: 0;
+    border-radius: 0;
+  }
+  .listado-title,
+  .table-footer {
+    padding: 10px;
+  }
+  #proyectosTable th,
+  #proyectosTable td {
+    padding: 8px 4px;
+    font-size: 0.95em;
+  }
+  #trabajadorTable th,
+  #trabajadorTable td {
+    padding: 8px 4px;
+    font-size: 0.95em;
+  }
+}
+
+
+.acciones-btns {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-accion {
+  border: none;
+  outline: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3em;
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.2s;
+  box-shadow: 0 2px 8px rgba(0,59,92,0.07);
+}
+
+.btn-ver {
+  background: #00BCD4;
+  color: #fff;
+}
+
+.btn-editar {
+  background: #FFD54F;
+  color: #333;
+}
+
+.btn-eliminar {
+  background: #F44336;
+  color: #fff;
+}
+
+.btn-accion:hover {
+  box-shadow: 0 4px 12px rgba(0,59,92,0.15);
+  transform: scale(1.08);
+  opacity: 0.85;
+}
+
+
+.acciones-btns {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.btn-accion {
+  border: none;
+  outline: none;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3em;
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.2s;
+  box-shadow: 0 2px 8px rgba(0,59,92,0.07);
+}
+
+.btn-ver {
+  background: #00BCD4;
+  color: #fff;
+}
+
+.btn-editar {
+  background: #FFD54F;
+  color: #333;
+}
+
+.btn-eliminar {
+  background: #F44336;
+  color: #fff;
+}
+
+.btn-accion:hover {
+  box-shadow: 0 4px 12px rgba(0,59,92,0.15);
+  transform: scale(1.08);
+  opacity: 0.85;
+}
+
+
+
+
+/* Barra de herramientas de proyectos */
+.proyectos-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 18px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,59,92,0.07);
+  padding: 16px 24px;
+  border: 1px solid #ececec;
+}
+
+/* Botón Nuevo proyecto */
+.btn-nuevo {
+  background: #FF6F00;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 1em;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(255,111,0,0.08);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.btn-nuevo:hover {
+  background: #e65c00;
+  box-shadow: 0 4px 16px rgba(255,111,0,0.15);
+}
+
+/* Search bar */
+.search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 260px;
+}
+
+.input-buscar {
+  width: 100%;
+  padding: 8px 38px 8px 38px;
+  border: 1px solid #cfd8dc;
+  border-radius: 8px;
+  font-size: 1em;
+  font-family: 'Roboto', sans-serif;
+  background: #f7f8f6;
+  color: #003B5C;
+  outline: none;
+  transition: border 0.2s;
+}
+
+.input-buscar:focus {
+  border-color: #FF6F00;
+}
+
+.search-bar i {
+  position: absolute;
+  left: 12px;
+  font-size: 1.2em;
+  color: #276080;
+  pointer-events: none;
+}
+
+/* Barra de herramientas para trabajador y proyectos */
+.proyectos-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 18px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,59,92,0.07);
+  padding: 16px 24px;
+  border: 1px solid #ececec;
+}
+
+/* Botón Nuevo Trabajador y Asignar proyecto */
+.btn-nuevo,
+.btn-asignar {
+  background: #FF6F00;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 1em;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(255,111,0,0.08);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+.btn-nuevo:hover,
+.btn-asignar:hover {
+  background: #e65c00;
+  box-shadow: 0 4px 16px rgba(255,111,0,0.15);
+}
+
+/* Search bar */
+.search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 260px;
+}
+
+.input-buscar {
+  width: 100%;
+  padding: 8px 38px 8px 38px;
+  border: 1px solid #cfd8dc;
+  border-radius: 8px;
+  font-size: 1em;
+  font-family: 'Roboto', sans-serif;
+  background: #f7f8f6;
+  color: #003B5C;
+  outline: none;
+  transition: border 0.2s;
+}
+
+.input-buscar:focus {
+  border-color: #FF6F00;
+}
+
+.search-bar i {
+  position: absolute;
+  left: 12px;
+  font-size: 1.2em;
+  color: #276080;
+  pointer-events: none;
+}
+
+/* Ajuste para mover el botón asignar proyecto a la derecha */
+.proyectos-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 18px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,59,92,0.07);
+  padding: 16px 24px;
+  border: 1px solid #ececec;
+}
+
+.proyectos-toolbar .btn-asignar {
+  margin-left: auto;
+}
+

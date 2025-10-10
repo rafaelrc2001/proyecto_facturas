@@ -15,16 +15,20 @@ async function cargarProyectos() {
     return;
   }
 
-  data.forEach(proyecto => {
+  data.forEach((proyecto, index) => {
     tbody.innerHTML += `
       <tr>
         <td>${proyecto.cliente}</td>
+        <td>${proyecto.nombre || ''}</td>
         <td>${proyecto.ubicación || ''}</td>
         <td>${proyecto.fecha_inicio || ''}</td>
         <td>${proyecto.fecha_final || ''}</td>
         <td>${proyecto.responsable || ''}</td>
         <td>
-          <!-- Botones de acciones -->
+          <div class="acciones-btns">
+            <button class="btn-accion btn-editar" title="Editar" data-index="${index}"><i class="ri-edit-2-line"></i></button>
+            <button class="btn-accion btn-eliminar" title="Eliminar"><i class="ri-delete-bin-line"></i></button>
+          </div>
         </td>
       </tr>
     `;
@@ -77,6 +81,39 @@ document.addEventListener('DOMContentLoaded', function() {
       document.getElementById('modal-nuevo-proyecto').style.display = 'none';
       e.target.reset();
       cargarProyectos();
+    }
+  });
+
+  // Después de cargar las filas, asigna el evento a los botones editar
+  document.querySelectorAll('.btn-editar').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const index = this.getAttribute('data-index');
+      const proyecto = data[index];
+      const modal = document.getElementById('modal-editar-proyecto');
+      const form = document.getElementById('form-editar-proyecto');
+      // Rellena el formulario con los datos del proyecto
+      form.cliente.value = proyecto.cliente || '';
+      form.nombre.value = proyecto.nombre || '';
+      form.ubicacion.value = proyecto.ubicación || '';
+      form.fecha_inicio.value = proyecto.fecha_inicio || '';
+      form.fecha_final.value = proyecto.fecha_final || '';
+      form.responsable.value = proyecto.responsable || '';
+      modal.style.display = 'flex';
+      // Puedes guardar el id o index si lo necesitas para editar
+      form.dataset.index = index;
+    });
+  });
+
+  // Cerrar el modal de edición
+  document.getElementById('close-modal-editar').addEventListener('click', function() {
+    document.getElementById('modal-editar-proyecto').style.display = 'none';
+  });
+
+  // Opcional: cerrar al hacer click fuera del modal
+  window.addEventListener('click', function(e) {
+    const modal = document.getElementById('modal-editar-proyecto');
+    if (e.target === modal) {
+      modal.style.display = 'none';
     }
   });
 });

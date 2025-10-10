@@ -14,6 +14,7 @@
     />
     <link rel="stylesheet" href="../../CSS/general.css" />
     <link rel="stylesheet" href="../../CSS/menu.css" />
+    <link rel="stylesheet" href="../../CSS/tablas.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="icon" href="../../img/inxiteblanco.png" type="image/png" />
   </head>
@@ -169,37 +170,45 @@
     <!-- Filtro desplegable -->
 
    
-<div class="tabla-container" style="border-top: 5px solid #FF6F00; border-radius: 2px;">
 
-          <h3 class="listado-title">
+
+    <div class="tabla-container" style="border-top: 5px solid #FF6F00; border-radius: 2px;">
+  <h3 class="listado-title">
     <i class="ri-table-line" style="color:#FF6F00; margin-right:1px; font-size:1.2em;"></i>
-   Listado de proyectos
-       </h3>
-
-  
-       <div class="table-container">
-      <table id="proyectosTable ">
-        <thead>
-          <tr>
-            <th>Cliente</th>
-            <th>Ubicación</th>
-            <th>Fecha inicio</th>
-            <th>Fecha fin</th>
-            <th>Responsable</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="table-body">
-          <!-- Aquí se llenarán los datos con JS -->
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Contador de registros centrado debajo de la tabla -->
-<div class="contador-registros">
-  Total de registros: <span id="contador-registros">0</span>
-</div>
+    Listado de proyectos
+  </h3>
+  <div class="table-container">
+    <table id="proyectosTable">
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Nombre</th>
+          <th>Ubicación</th>
+          <th>Fecha inicio</th>
+          <th>Fecha fin</th>
+          <th>Responsable</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <!-- Aquí se llenarán los datos con JS -->
+      </tbody>
+    </table>
   </div>
+  <div class="table-footer">
+    <div class="pagination">
+      <button class="pagination-btn">
+        <i class="ri-arrow-left-s-line"></i>
+      </button>
+      <button class="pagination-btn active">1</button>
+      <button class="pagination-btn">2</button>
+      <button class="pagination-btn">3</button>
+      <button class="pagination-btn">
+        <i class="ri-arrow-right-s-line"></i>
+      </button>
+    </div>
+  </div>
+</div>
         </section>
       </main>
     </div>
@@ -213,6 +222,7 @@
     <script type="module" src="../../modules/proyectos/proyectos.js"></script>
   </body>
 </html>
+
 <div id="modal-nuevo-proyecto" class="modal" style="display: none;">
   <div class="modal-content modal-proyecto">
     <span class="modal-close" id="close-modal-nuevo">&times;</span>
@@ -249,6 +259,24 @@
         <button type="submit" class="btn primary">Guardar</button>
         <button type="button" class="btn" id="cancelar-modal-nuevo">Cancelar</button>
       </div>
+    </form>
+  </div>
+</div>
+
+
+<!-- Puedes agregar esto en proyectos.html -->
+<div id="modal-editar-proyecto" class="modal" style="display:none;">
+  <div class="modal-content">
+    <button id="close-modal-editar" class="close-modal" title="Cerrar">&times;</button>
+    <h2>Editar proyecto</h2>
+    <form id="form-editar-proyecto">
+      <input type="text" name="cliente" placeholder="Cliente" required />
+      <input type="text" name="nombre" placeholder="Nombre" required />
+      <input type="text" name="ubicacion" placeholder="Ubicación" required />
+      <input type="date" name="fecha_inicio" placeholder="Fecha inicio" required />
+      <input type="date" name="fecha_final" placeholder="Fecha fin" required />
+      <input type="text" name="responsable" placeholder="Responsable" required />
+      <button type="submit">Guardar cambios</button>
     </form>
   </div>
 </div>
