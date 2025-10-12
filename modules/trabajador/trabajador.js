@@ -8,27 +8,42 @@ let trabajadoresList = [];
 let proyectosList = [];
 let trabajadorSeleccionadoId = null;
 let proyectoSeleccionadoId = null;
+const TRABAJADORES_POR_PAGINA = 7;
+let paginaActual = 1;
+let trabajadoresFiltrados = [];
 
 async function cargarTrabajadores() {
   const { data: trabajadores, error } = await obtenerTrabajadores();
+  trabajadoresList = trabajadores || [];
   const { data: asignaciones } = await supabase
     .from('asignar_proyecto')
     .select('id_trabajador, proyecto:proyecto(cliente)');
+  window.asignaciones = asignaciones; // Para usar en la función de renderizado
+
+  if (error) {
+    mostrarTrabajadoresPaginados([]);
+    return;
+  }
+  mostrarTrabajadoresPaginados(trabajadoresList);
+}
+
+function mostrarTrabajadoresPaginados(trabajadores) {
+  trabajadoresFiltrados = trabajadores;
+  const totalPaginas = Math.ceil(trabajadores.length / TRABAJADORES_POR_PAGINA);
+  if (paginaActual > totalPaginas) paginaActual = totalPaginas || 1;
+  const inicio = (paginaActual - 1) * TRABAJADORES_POR_PAGINA;
+  const fin = inicio + TRABAJADORES_POR_PAGINA;
+  const trabajadoresPagina = trabajadores.slice(inicio, fin);
 
   const tbody = document.getElementById('table-body');
   tbody.innerHTML = '';
 
-  if (error) {
-    tbody.innerHTML = `<tr><td colspan="4">Error al cargar trabajadores</td></tr>`;
-    return;
-  }
-
-  if (trabajadores.length === 0) {
+  if (trabajadoresPagina.length === 0) {
     tbody.innerHTML = `<tr><td colspan="4">No hay trabajadores</td></tr>`;
     return;
   }
 
-  trabajadores.forEach(trabajador => {
+  trabajadoresPagina.forEach(trabajador => {
     // Busca la asignación de proyecto para este trabajador
     const asignacion = asignaciones?.find(a => a.id_trabajador === trabajador.id_trabajador);
     const cliente = asignacion?.proyecto?.cliente || '';
@@ -47,6 +62,10 @@ async function cargarTrabajadores() {
       </tr>
     `;
   });
+
+  document.getElementById('contador-registros').textContent = `Registros Totales: ${trabajadores.length}`;
+
+  renderizarPaginacionTrabajadores(totalPaginas);
 
   // Asignar eventos a los botones de eliminar
   document.querySelectorAll('.btn-eliminar').forEach(btn => {
@@ -81,6 +100,48 @@ async function cargarTrabajadores() {
   });
 });
 
+}
+
+function renderizarPaginacionTrabajadores(totalPaginas) {
+  const pagDiv = document.querySelector('.pagination');
+  pagDiv.innerHTML = '';
+  if (totalPaginas <= 1) return;
+
+  // Botón anterior
+  const btnPrev = document.createElement('button');
+  btnPrev.textContent = 'Anterior';
+  btnPrev.disabled = paginaActual === 1;
+  btnPrev.onclick = () => {
+    if (paginaActual > 1) {
+      paginaActual--;
+      mostrarTrabajadoresPaginados(trabajadoresFiltrados);
+    }
+  };
+  pagDiv.appendChild(btnPrev);
+
+  // Números de página
+  for (let i = 1; i <= totalPaginas; i++) {
+    const btn = document.createElement('button');
+    btn.textContent = i;
+    btn.className = (i === paginaActual) ? 'active' : '';
+    btn.onclick = () => {
+      paginaActual = i;
+      mostrarTrabajadoresPaginados(trabajadoresFiltrados);
+    };
+    pagDiv.appendChild(btn);
+  }
+
+  // Botón siguiente
+  const btnNext = document.createElement('button');
+  btnNext.textContent = 'Siguiente';
+  btnNext.disabled = paginaActual === totalPaginas;
+  btnNext.onclick = () => {
+    if (paginaActual < totalPaginas) {
+      paginaActual++;
+      mostrarTrabajadoresPaginados(trabajadoresFiltrados);
+    }
+  };
+  pagDiv.appendChild(btnNext);
 }
 
 // Llama la función al cargar la página
@@ -232,5 +293,16 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('click', function(e) {
     if (!listTrabajador.contains(e.target) && e.target !== inputTrabajador) listTrabajador.innerHTML = '';
     if (!listProyecto.contains(e.target) && e.target !== inputProyecto) listProyecto.innerHTML = '';
+  });
+
+  // Si tienes filtro, úsalo así:
+  document.querySelector('.input-buscar').addEventListener('input', function() {
+    const valor = this.value.trim().toLowerCase();
+    const filtrados = trabajadoresList.filter(t =>
+      t.nombre.toLowerCase().includes(valor) ||
+      t.puesto.toLowerCase().includes(valor)
+    );
+    paginaActual = 1;
+    mostrarTrabajadoresPaginados(filtrados);
   });
 });

@@ -151,6 +151,7 @@
 </header>
 
         <!-- Cards Section -->
+        
         <section class="cards-section">
           <div class="card">
             <div class="card-icon" style="background-color: #eceff1">
@@ -181,13 +182,6 @@
               <p class="count" id="facturas-count">-</p>
             </div>
           </div>
-
-         
-        </section>
-
-  
-
-   
         </section>
 
         <!-- Registros Table -->
@@ -281,41 +275,70 @@
       </div>
     </div>
 
-    <!-- MODAL EDITAR (fuera del modal-ver) -->
-<div id="modal-editar" class="modal" style="display: none;">
-  <div class="modal-content">
-    <span class="modal-close">&times;</span>
-    <h2 class="modal-title">Editar Registro</h2>
-    <div class="modal-title-line"></div>
-    <form id="form-editar">
-      <div style="display: grid; grid-template-columns: 120px 1fr; gap: 12px 18px; align-items: center;">
-        <label style="text-align: right;">Fecha</label>
-        <input type="text" id="edit-fecha" required>
 
-        <label style="text-align: right;">Tipo</label>
-        <input type="text" id="edit-tipo" required>
 
-         <label style="text-align: right;">Pago</label>
-        <input type="text" id="edit-pago">
-
-        <label style="text-align: right;">Factura</label>
-        <input type="text" id="edit-factura">
-
-        <label style="text-align: right;">Establecimiento</label>
-        <input type="text" id="edit-establecimiento">
-
-        <label style="text-align: right;">Subtotal</label>
-        <input type="text" id="edit-subtotal">
-
-        <label style="text-align: right;">IVA</label>
-        <input type="text" id="edit-iva">
-
-        <label style="text-align: right;">Total</label>
-        <input type="text" id="edit-total">
+    <!-- Modal Editar Gasto (nuevo formato) -->
+<div id="modal-editar-gasto" class="modal" style="display:none;">
+  <div id="editar-modal-content">
+       <span class="modal-close" id="close-modal-editar">&times;</span>
+    <h2 class="modal-title" id="editar-modal-title">Editar gasto</h2>
+    <div class="modal-title-line" id="editar-modal-title-line"></div>
+    <form id="form-editar-gasto">
+      <div class="modal-form-grid" id="editar-form-grid">
+        <div class="modal-form-group" id="grupo-fecha-cargo">
+          <label for="editar-fecha_cargo" id="label-fecha-cargo">Fecha de cargo</label>
+          <input type="date" id="editar-fecha_cargo" name="fecha_cargo" required>
+        </div>
+        <div class="modal-form-group" id="grupo-fecha-facturacion">
+          <label for="editar-fecha_facturacion" id="label-fecha-facturacion">Fecha de Facturación</label>
+          <input type="date" id="editar-fecha_facturacion" name="fecha_facturacion" required>
+        </div>
+        <div class="modal-form-group" id="grupo-tipo">
+          <label for="editar-tipo" id="label-tipo">Tipo</label>
+          <select id="editar-tipo" name="tipo" required>
+            <option value="" disabled selected>Selecciona tipo</option>
+            <option value="ticket">Ticket</option>
+            <option value="factura">Factura</option>
+          </select>
+        </div>
+        <div class="modal-form-group" id="grupo-pago">
+          <label for="editar-pago" id="label-pago">Tipo de pago</label>
+          <select id="editar-pago" name="pago" required>
+            <option value="" disabled selected>Selecciona tipo de pago</option>
+            <option value="Pagos con tarjeta facturados.">Pagos con tarjeta facturados.</option>
+            <option value="Pagos con tarjeta tickets">Pagos con tarjeta tickets</option>
+            <option value="Pagos con efectivo retiro tarjeta facturados.">Pagos con efectivo retiro tarjeta facturados.</option>
+            <option value="Pagos con efectivo retiro tarjeta  tickets.">Pagos con efectivo retiro tarjeta  tickets.</option>
+            <option value="Pagos efectivo retiro tarjeta sin comprobante">Pagos efectivo retiro tarjeta sin comprobante</option>
+            <option value="Pagos efectivo (caja) tickets">Pagos efectivo (caja) tickets</option>
+            <option value="Pago efectivo (caja) sin comprobante">Pago efectivo (caja) sin comprobante</option>
+          </select>
+        </div>
+        <div class="modal-form-group" id="grupo-folio">
+          <label for="editar-folio" id="label-folio">Folio</label>
+          <input type="text" id="editar-folio" name="folio" required>
+        </div>
+        <div class="modal-form-group" id="grupo-establecimiento">
+          <label for="editar-establecimiento" id="label-establecimiento">Establecimiento</label>
+          <input type="text" id="editar-establecimiento" name="establecimiento" required>
+        </div>
+        <div class="modal-form-group" id="grupo-importe">
+          <label for="editar-importe" id="label-importe">Importe</label>
+          <input type="text" id="editar-importe" name="importe" required pattern="^\d+([.,]\d{1,2})?$">
+        </div>
+        <div class="modal-form-group autocomplete-container" id="grupo-proyecto">
+          <label for="editar-proyecto-autocomplete" id="label-proyecto">Proyecto</label>
+          <input type="text" id="editar-proyecto-autocomplete" placeholder="Buscar proyecto..." autocomplete="off" required>
+          <div id="editar-autocomplete-list" class="autocomplete-list"></div>
+        </div>
+        <div class="modal-form-group" id="grupo-documentos">
+          <label for="editar-documentos" id="label-documentos">Documento</label>
+          <input type="file" id="editar-documentos" name="documentos" accept="image/*,.pdf,.doc,.docx">
+        </div>
       </div>
-      <div class="modal-actions" style="margin-top: 24px;">
-        <button type="button" id="cancelar-editar" class="btn">Cancelar</button>
-        <button type="submit" class="btn primary">Guardar</button>
+      <div class="modal-actions" id="editar-modal-actions">
+        <button type="submit" class="btn primary" id="btn-guardar-editar">Guardar</button>
+        <button type="button" class="btn" id="cancelar-modal-editar">Cancelar</button>
       </div>
     </form>
   </div>

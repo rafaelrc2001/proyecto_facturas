@@ -3,6 +3,10 @@ import { insertarProyecto, obtenerProyectos, eliminarProyecto, actualizarProyect
 
 let proyectosData = [];
 
+const PROYECTOS_POR_PAGINA = 7;
+let paginaActual = 1;
+let proyectosFiltrados = [];
+
 async function cargarProyectos() {
   // 1. Obtén todos los proyectos
   const { data: proyectos, error: errorProyectos } = await obtenerProyectos();
@@ -28,29 +32,7 @@ async function cargarProyectos() {
     asignacion: asignaciones?.find(a => a.id_proyecto === proyecto.id_proyecto)
   }));
 
-  proyectos.forEach((proyecto, i) => {
-    // Busca el trabajador asignado a este proyecto
-    const asignacion = asignaciones?.find(a => a.id_proyecto === proyecto.id_proyecto);
-    const responsable = asignacion?.trabajador?.nombre || 'Sin asignar';
-
-    tbody.innerHTML += `
-      <tr>
-        <td>${proyecto.cliente}</td>
-        <td>${proyecto.nombre || ''}</td>
-        <td>${proyecto.descripción || ''}</td>
-        <td>${proyecto.ubicación || ''}</td>
-        <td>${proyecto.fecha_inicio || ''}</td>
-        <td>${proyecto.fecha_final || ''}</td>
-        <td>${responsable}</td>
-        <td>
-          <div class="acciones-btns">
-            <button class="btn-accion btn-editar" title="Editar" data-index="${i}"><i class="ri-edit-2-line"></i></button>
-            <button class="btn-accion btn-eliminar" title="Eliminar" data-index="${i}"><i class="ri-delete-bin-line"></i></button>
-          </div>
-        </td>
-      </tr>
-    `;
-  });
+  mostrarProyectosPaginados(proyectosData);
 
   // Actualiza el contador de registros
   document.getElementById('contador-registros').textContent = `Registros Totales: ${proyectos.length}`;
@@ -185,6 +167,125 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
+function mostrarProyectosPaginados(proyectos) {
+  proyectosFiltrados = proyectos;
+  const totalPaginas = Math.ceil(proyectos.length / PROYECTOS_POR_PAGINA);
+  if (paginaActual > totalPaginas) paginaActual = totalPaginas || 1;
+  const inicio = (paginaActual - 1) * PROYECTOS_POR_PAGINA;
+  const fin = inicio + PROYECTOS_POR_PAGINA;
+  const proyectosPagina = proyectos.slice(inicio, fin);
+
+  const tbody = document.getElementById('table-body');
+  tbody.innerHTML = '';
+  proyectosPagina.forEach((proyecto, i) => {
+    const responsable = proyecto.asignacion?.trabajador?.nombre || 'Sin asignar';
+    tbody.innerHTML += `
+      <tr>
+        <td>${proyecto.cliente}</td>
+        <td>${proyecto.nombre || ''}</td>
+        <td>${proyecto.descripción || ''}</td>
+        <td>${proyecto.ubicación || ''}</td>
+        <td>${proyecto.fecha_inicio || ''}</td>
+        <td>${proyecto.fecha_final || ''}</td>
+        <td>${responsable}</td>
+        <td>
+          <div class="acciones-btns">
+            <button class="btn-accion btn-editar" title="Editar" data-index="${i + inicio}"><i class="ri-edit-2-line"></i></button>
+            <button class="btn-accion btn-eliminar" title="Eliminar" data-index="${i + inicio}"><i class="ri-delete-bin-line"></i></button>
+          </div>
+        </td>
+      </tr>
+    `;
+  });
+
+  document.getElementById('contador-registros').textContent = `Registros Totales: ${proyectos.length}`;
+  renderizarPaginacionProyectos(totalPaginas);
+
+  // ASIGNA LOS EVENTOS DESPUÉS DE RENDERIZAR LA TABLA
+  document.querySelectorAll('.btn-editar').forEach(btn => {
+    btn.onclick = function() {
+      const index = this.getAttribute('data-index');
+      const proyecto = proyectosData[index];
+      const modal = document.getElementById('modal-editar-proyecto');
+      const form = document.getElementById('form-editar-proyecto');
+      form.cliente.value = proyecto.cliente || '';
+      form.nombre.value = proyecto.nombre || '';
+      form.ubicacion.value = proyecto.ubicación || '';
+      form.fecha_inicio.value = proyecto.fecha_inicio || '';
+      form.fecha_final.value = proyecto.fecha_final || '';
+      modal.style.display = 'flex';
+      form.dataset.index = index;
+    };
+  });
+
+  document.querySelectorAll('.btn-eliminar').forEach(btn => {
+    btn.onclick = async function() {
+      const index = this.getAttribute('data-index');
+      const proyecto = proyectosData[index];
+      if (confirm('¿Seguro que deseas eliminar este proyecto?')) {
+        const { error } = await eliminarProyecto(proyecto.id_proyecto);
+        if (error) {
+          if (
+            error.message &&
+            error.message.includes('violates foreign key constraint')
+          ) {
+            mostrarAlertaRelacion();
+          } else {
+            alert('Error al eliminar: ' + error.message);
+          }
+        } else {
+          alert('Proyecto eliminado correctamente');
+          cargarProyectos();
+        }
+      }
+    };
+  });
+}
+
+function renderizarPaginacionProyectos(totalPaginas) {
+  const pagDiv = document.querySelector('.pagination');
+  pagDiv.innerHTML = '';
+  if (totalPaginas <= 1) return;
+
+  // Botón anterior
+  const btnPrev = document.createElement('button');
+  btnPrev.className = 'pagination-btn';
+  btnPrev.innerHTML = '<i class="ri-arrow-left-s-line"></i>';
+  btnPrev.disabled = paginaActual === 1;
+  btnPrev.onclick = () => {
+    if (paginaActual > 1) {
+      paginaActual--;
+      mostrarProyectosPaginados(proyectosFiltrados);
+    }
+  };
+  pagDiv.appendChild(btnPrev);
+
+  // Números de página
+  for (let i = 1; i <= totalPaginas; i++) {
+    const btn = document.createElement('button');
+    btn.className = 'pagination-btn' + (i === paginaActual ? ' active' : '');
+    btn.textContent = i;
+    btn.onclick = () => {
+      paginaActual = i;
+      mostrarProyectosPaginados(proyectosFiltrados);
+    };
+    pagDiv.appendChild(btn);
+  }
+
+  // Botón siguiente
+  const btnNext = document.createElement('button');
+  btnNext.className = 'pagination-btn';
+  btnNext.innerHTML = '<i class="ri-arrow-right-s-line"></i>';
+  btnNext.disabled = paginaActual === totalPaginas;
+  btnNext.onclick = () => {
+    if (paginaActual < totalPaginas) {
+      paginaActual++;
+      mostrarProyectosPaginados(proyectosFiltrados);
+    }
+  };
+  pagDiv.appendChild(btnNext);
+}
+
 // Agrega esta función para mostrar la alerta personalizada
 function mostrarAlertaRelacion() {
   // Crea el modal si no existe
@@ -255,51 +356,16 @@ function cerrarModalRelacion() {
 // Filtro por cliente, proyecto y responsable
 document.querySelector('.input-buscar').addEventListener('input', function() {
   const valor = this.value.trim().toLowerCase();
-  const tbody = document.getElementById('table-body');
-  tbody.innerHTML = '';
-
-  // Filtra los proyectosData por los campos requeridos
   const filtrados = proyectosData.filter(p =>
     (p.cliente && p.cliente.toLowerCase().includes(valor)) ||
     (p.nombre && p.nombre.toLowerCase().includes(valor)) ||
-    // Busca el responsable usando la asignación
     (() => {
       const asignacion = p.asignacion || {};
       return asignacion.trabajador?.nombre?.toLowerCase().includes(valor);
     })()
   );
-
-  // Si no hay resultados, muestra mensaje
-  if (filtrados.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="8">No hay resultados</td></tr>`;
-    document.getElementById('contador-registros').textContent = `Registros Totales: 0`;
-    return;
-  }
-
-  // Vuelve a renderizar la tabla con los filtrados
-  filtrados.forEach((proyecto, i) => {
-    const responsable = proyecto.asignacion?.trabajador?.nombre || 'Sin asignar';
-    tbody.innerHTML += `
-      <tr>
-        <td>${proyecto.cliente}</td>
-        <td>${proyecto.nombre || ''}</td>
-        <td>${proyecto.descripción || ''}</td>
-        <td>${proyecto.ubicación || ''}</td>
-        <td>${proyecto.fecha_inicio || ''}</td>
-        <td>${proyecto.fecha_final || ''}</td>
-        <td>${responsable}</td>
-        <td>
-          <div class="acciones-btns">
-            <button class="btn-accion btn-editar" title="Editar" data-index="${i}"><i class="ri-edit-2-line"></i></button>
-            <button class="btn-accion btn-eliminar" title="Eliminar" data-index="${i}"><i class="ri-delete-bin-line"></i></button>
-          </div>
-        </td>
-      </tr>
-    `;
-  });
-
-  // Actualiza el contador de registros
-  document.getElementById('contador-registros').textContent = `Registros Totales: ${filtrados.length}`;
+  paginaActual = 1;
+  mostrarProyectosPaginados(filtrados);
 });
 
 // Agrega el evento submit para el formulario de edición

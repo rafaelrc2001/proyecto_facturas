@@ -1025,3 +1025,87 @@
   gap: 16px;
   margin-top: 24px;
 }
+
+.tabla-container table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+}
+
+.tabla-container th {
+  background: #003B5C;
+  color: #fff;
+  font-weight: 700;
+  padding: 12px 8px;
+  /*border-radius: 8px 8px 0 0;*/
+}
+
+.tabla-container td {
+  padding: 10px 8px;
+  border-bottom: 1px solid #ececec;
+}
+
+.acciones-btns {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-accion {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 1.2em;
+  padding: 6px;
+  border-radius: 50%;
+  transition: background 0.15s;
+}
+
+.btn-accion.btn-editar {
+  background: #ffe082;
+  color: #003B5C;
+}
+
+.btn-accion.btn-eliminar {
+  background: #ff5252;
+  color: #fff;
+}
+
+/* Estilo para el contador */
+#contador-registros {
+  display: block;
+  margin-bottom: 14px;
+  font-weight: 600;
+  color: #003B5C;
+  font-size: 1.1rem;
+}
+
+/* Estilo para la paginación */
+.pagination {
+  display: flex;
+  gap: 6px;
+  margin-top: 12px;
+  align-items: center;
+}
+
+.pagination button {
+  padding: 6px 16px;
+  border: 1.5px solid #FF6F00;
+  background: #fff;
+  color: #003B5C;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.pagination button.active,
+.pagination button:hover:not(:disabled) {
+  background: #FF6F00;
+  color: #fff;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
