@@ -287,38 +287,71 @@
     </div>
 
     <!-- Modal Editar Gasto -->
-    <div id="modal-editar-gasto" class="modal" style="display:none;">
-      <div class="modal-content">
-        <button id="close-modal-editar" class="close-modal" title="Cerrar">&times;</button>
-        <h2>Editar gasto</h2>
-        <form id="form-editar-gasto">
-          <div class="modal-form-grid">
-            <div class="modal-form-group">
-              <label for="editar-fecha">Fecha</label>
-              <input type="date" id="editar-fecha" name="fecha" required />
-            </div>
-            <div class="modal-form-group">
-              <label for="editar-concepto">Concepto</label>
-              <input type="text" id="editar-concepto" name="concepto" required />
-            </div>
-            <div class="modal-form-group">
-              <label for="editar-monto">Monto</label>
-              <input type="number" id="editar-monto" name="monto" required />
-            </div>
-            <div class="modal-form-group">
-              <label for="editar-proyecto">Proyecto</label>
-              <input type="text" id="editar-proyecto" name="proyecto" />
-            </div>
-            <div class="modal-form-group">
-              <label for="editar-responsable">Responsable</label>
-              <input type="text" id="editar-responsable" name="responsable" />
-            </div>
-          </div>
-          <button type="submit" class="btn primary" style="width:auto; min-width:120px; padding:10px 20px;">Guardar</button>
-        </form>
+   <div id="modal-editar-gasto" class="modal" style="display:none;">
+  <div id="gasto-editar-modal-content">
+    <span class="modal-close" id="gasto-close-modal-editar">&times;</span>
+    <h2 class="modal-title" id="gasto-editar-modal-title">Editar gasto</h2>
+    <div class="modal-title-line" id="gasto-editar-modal-title-line"></div>
+    <form id="gasto-form-editar-gasto">
+      <div class="modal-form-grid" id="gasto-editar-form-grid">
+        <div class="modal-form-group" id="gasto-grupo-fecha-cargo">
+          <label for="gasto-editar-fecha_cargo" id="gasto-label-fecha-cargo">Fecha de cargo</label>
+          <input type="date" id="gasto-editar-fecha_cargo" name="fecha_cargo" required>
+        </div>
+        <div class="modal-form-group" id="gasto-grupo-fecha-facturacion">
+          <label for="gasto-editar-fecha_facturacion" id="gasto-label-fecha-facturacion">Fecha de Facturación</label>
+          <input type="date" id="gasto-editar-fecha_facturacion" name="fecha_facturacion" required>
+        </div>
+        <div class="modal-form-group" id="gasto-grupo-tipo">
+          <label for="gasto-editar-tipo" id="gasto-label-tipo">Tipo</label>
+          <select id="gasto-editar-tipo" name="tipo" required>
+            <option value="" disabled selected>Selecciona tipo</option>
+            <option value="ticket">Ticket</option>
+            <option value="factura">Factura</option>
+          </select>
+        </div>
+        <div class="modal-form-group" id="gasto-grupo-pago">
+          <label for="gasto-editar-pago" id="gasto-label-pago">Tipo de pago</label>
+          <select id="gasto-editar-pago" name="pago" required>
+            <option value="" disabled selected>Selecciona tipo de pago</option>
+            <option value="Pagos con tarjeta facturados.">Pagos con tarjeta facturados.</option>
+            <option value="Pagos con tarjeta tickets">Pagos con tarjeta tickets</option>
+            <option value="Pagos con efectivo retiro tarjeta facturados.">Pagos con efectivo retiro tarjeta facturados.</option>
+            <option value="Pagos con efectivo retiro tarjeta  tickets.">Pagos con efectivo retiro tarjeta  tickets.</option>
+            <option value="Pagos efectivo retiro tarjeta sin comprobante">Pagos efectivo retiro tarjeta sin comprobante</option>
+            <option value="Pagos efectivo (caja) tickets">Pagos efectivo (caja) tickets</option>
+            <option value="Pago efectivo (caja) sin comprobante">Pago efectivo (caja) sin comprobante</option>
+          </select>
+        </div>
+        <div class="modal-form-group" id="gasto-grupo-folio">
+          <label for="gasto-editar-folio" id="gasto-label-folio">Folio</label>
+          <input type="text" id="gasto-editar-folio" name="folio" required>
+        </div>
+        <div class="modal-form-group" id="gasto-grupo-establecimiento">
+          <label for="gasto-editar-establecimiento" id="gasto-label-establecimiento">Establecimiento</label>
+          <input type="text" id="gasto-editar-establecimiento" name="establecimiento" required>
+        </div>
+        <div class="modal-form-group" id="gasto-grupo-importe">
+          <label for="gasto-editar-importe" id="gasto-label-importe">Importe</label>
+          <input type="text" id="gasto-editar-importe" name="importe" required pattern="^\d+([.,]\d{1,2})?$">
+        </div>
+        <div class="modal-form-group autocomplete-container" id="gasto-grupo-proyecto">
+          <label for="gasto-editar-proyecto-autocomplete" id="gasto-label-proyecto">Proyecto</label>
+          <input type="text" id="gasto-editar-proyecto-autocomplete" placeholder="Buscar proyecto..." autocomplete="off" required>
+          <div id="gasto-editar-autocomplete-list" class="autocomplete-list"></div>
+        </div>
+        <div class="modal-form-group" id="gasto-grupo-documentos">
+          <label for="gasto-editar-documentos" id="gasto-label-documentos">Documento</label>
+          <input type="file" id="gasto-editar-documentos" name="documentos" accept="image/*,.pdf,.doc,.docx">
+        </div>
       </div>
-    </div>
-
+      <div class="modal-actions" id="gasto-editar-modal-actions">
+        <button type="submit" class="btn primary" id="gasto-btn-guardar-editar">Guardar</button>
+        <button type="button" class="btn" id="gasto-cancelar-modal-editar">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
     <script src="../../Js/menu.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
     <script type="module" src="../../modules/gastos/gastos.js"></script>

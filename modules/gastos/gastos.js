@@ -2,6 +2,10 @@ import { supabase } from '../../supabase/db.js';
 
 let gastosOriginales = [];
 
+const GASTOS_POR_PAGINA = 7;
+let paginaActual = 1;
+let gastosFiltrados = [];
+
 async function cargarGastos() {
   const { data, error } = await supabase
     .from('registro')
@@ -14,20 +18,29 @@ async function cargarGastos() {
   }
 
   gastosOriginales = data || [];
-  mostrarGastos(gastosOriginales);
+  paginaActual = 1;
+  mostrarGastosPaginados(gastosOriginales);
 }
 
-function mostrarGastos(gastos) {
+function mostrarGastosPaginados(gastos) {
+  gastosFiltrados = gastos;
+  const totalPaginas = Math.ceil(gastos.length / GASTOS_POR_PAGINA);
+  if (paginaActual > totalPaginas) paginaActual = totalPaginas || 1;
+  const inicio = (paginaActual - 1) * GASTOS_POR_PAGINA;
+  const fin = inicio + GASTOS_POR_PAGINA;
+  const gastosPagina = gastos.slice(inicio, fin);
+
   const tbody = document.getElementById('table-body');
   tbody.innerHTML = '';
 
-  if (!gastos.length) {
-    tbody.innerHTML = `<tr><td colspan="4">No hay gastos</td></tr>`;
+  if (!gastosPagina.length) {
+    tbody.innerHTML = `<tr><td colspan="8">No hay gastos</td></tr>`;
     document.getElementById('contador-registros').textContent = 'Registros Totales: 0';
+    renderizarPaginacionGastos(totalPaginas);
     return;
   }
 
-  gastos.forEach(gasto => {
+  gastosPagina.forEach(gasto => {
     tbody.innerHTML += `
       <tr>
         <td>${gasto.fecha_cargo || ''}</td>
@@ -48,6 +61,54 @@ function mostrarGastos(gastos) {
   });
 
   document.getElementById('contador-registros').textContent = `Registros Totales: ${gastos.length}`;
+  renderizarPaginacionGastos(totalPaginas);
+
+  // Asigna los eventos de editar/eliminar
+  asignarEventosGastos();
+}
+
+function renderizarPaginacionGastos(totalPaginas) {
+  const pagDiv = document.querySelector('.pagination');
+  pagDiv.innerHTML = '';
+  if (totalPaginas <= 1) return;
+
+  // Botón anterior
+  const btnPrev = document.createElement('button');
+  btnPrev.className = 'pagination-btn';
+  btnPrev.innerHTML = '<i class="ri-arrow-left-s-line"></i>';
+  btnPrev.disabled = paginaActual === 1;
+  btnPrev.onclick = () => {
+    if (paginaActual > 1) {
+      paginaActual--;
+      mostrarGastosPaginados(gastosFiltrados);
+    }
+  };
+  pagDiv.appendChild(btnPrev);
+
+  // Números de página
+  for (let i = 1; i <= totalPaginas; i++) {
+    const btn = document.createElement('button');
+    btn.className = 'pagination-btn' + (i === paginaActual ? ' active' : '');
+    btn.textContent = i;
+    btn.onclick = () => {
+      paginaActual = i;
+      mostrarGastosPaginados(gastosFiltrados);
+    };
+    pagDiv.appendChild(btn);
+  }
+
+  // Botón siguiente
+  const btnNext = document.createElement('button');
+  btnNext.className = 'pagination-btn';
+  btnNext.innerHTML = '<i class="ri-arrow-right-s-line"></i>';
+  btnNext.disabled = paginaActual === totalPaginas;
+  btnNext.onclick = () => {
+    if (paginaActual < totalPaginas) {
+      paginaActual++;
+      mostrarGastosPaginados(gastosFiltrados);
+    }
+  };
+  pagDiv.appendChild(btnNext);
 }
 
 // Filtro por folio y establecimiento
@@ -57,7 +118,8 @@ document.querySelector('.input-buscar').addEventListener('input', function() {
     (g.folio && g.folio.toLowerCase().includes(valor)) ||
     (g.establecimiento && g.establecimiento.toLowerCase().includes(valor))
   );
-  mostrarGastos(filtrados);
+  paginaActual = 1;
+  mostrarGastosPaginados(filtrados);
 });
 
 let proyectosInfo = []; // [{ id_proyecto, nombre }]
@@ -177,5 +239,131 @@ document.getElementById('form-nuevo-gasto').addEventListener('submit', async fun
     cargarGastos(); // Actualiza la tabla
   }
 });
+
+let gastoEditando = null;
+let gastoProyectoEditandoId = null;
+
+// Editar
+function asignarEventosGastos() {
+  const tbody = document.getElementById('table-body');
+  tbody.querySelectorAll('.btn-editar').forEach((btn, idx) => {
+    btn.onclick = function() {
+      const gasto = gastosFiltrados[(paginaActual - 1) * GASTOS_POR_PAGINA + idx];
+      gastoEditando = gasto;
+
+      // Llena el modal de edición
+      document.getElementById('gasto-editar-fecha_cargo').value = gasto.fecha_cargo || '';
+      document.getElementById('gasto-editar-fecha_facturacion').value = gasto.fecha_facturacion || '';
+      document.getElementById('gasto-editar-tipo').value = gasto.tipo || '';
+      document.getElementById('gasto-editar-pago').value = gasto.pago || '';
+      document.getElementById('gasto-editar-folio').value = gasto.folio || '';
+      document.getElementById('gasto-editar-establecimiento').value = gasto.establecimiento || '';
+      document.getElementById('gasto-editar-importe').value = gasto.importe || '';
+
+      // Proyecto autocompletado
+      const nombreProyecto = obtenerNombreProyecto(gasto.id_proyecto) || '';
+      document.getElementById('gasto-editar-proyecto-autocomplete').value = nombreProyecto;
+      gastoProyectoEditandoId = gasto.id_proyecto || null;
+
+      document.getElementById('modal-editar-gasto').style.display = 'flex';
+    };
+  });
+
+  // Eliminar
+  tbody.querySelectorAll('.btn-eliminar').forEach((btn, idx) => {
+    btn.onclick = async function() {
+      const gasto = gastosFiltrados[(paginaActual - 1) * GASTOS_POR_PAGINA + idx];
+      if (confirm('¿Seguro que deseas eliminar este gasto?')) {
+        const { error } = await supabase
+          .from('registro')
+          .delete()
+          .eq('id_registro', gasto.id_registro);
+        if (!error) {
+          cargarGastos();
+        } else {
+          alert('Error al eliminar');
+        }
+      }
+    };
+  });
+}
+
+// Autocompletado para proyectos en edición
+const gastoProyectoInput = document.getElementById('gasto-editar-proyecto-autocomplete');
+const gastoAutocompleteList = document.getElementById('gasto-editar-autocomplete-list');
+
+gastoProyectoInput.addEventListener('input', function() {
+  const valor = this.value.trim().toLowerCase();
+  gastoAutocompleteList.innerHTML = '';
+  gastoProyectoEditandoId = null;
+  if (!valor) return;
+  const sugerencias = proyectosInfo.filter(p => p.nombre.toLowerCase().includes(valor));
+  sugerencias.forEach(p => {
+    const div = document.createElement('div');
+    div.textContent = p.nombre;
+    div.onclick = function() {
+      gastoProyectoInput.value = p.nombre;
+      gastoProyectoEditandoId = p.id_proyecto;
+      gastoAutocompleteList.innerHTML = '';
+    };
+    gastoAutocompleteList.appendChild(div);
+  });
+});
+
+document.addEventListener('click', function(e) {
+  if (!gastoAutocompleteList.contains(e.target) && e.target !== gastoProyectoInput) {
+    gastoAutocompleteList.innerHTML = '';
+  }
+});
+
+// Guardar cambios al editar gasto
+document.getElementById('gasto-form-editar-gasto').onsubmit = async function(e) {
+  e.preventDefault();
+  if (!gastoEditando) return;
+
+  let documentoUrl = gastoEditando.link;
+  const fileInput = document.getElementById('gasto-editar-documentos');
+  if (fileInput.files.length > 0) {
+    documentoUrl = await subirDocumento(fileInput.files[0]);
+  }
+
+  const cambios = {
+    fecha_cargo: document.getElementById('gasto-editar-fecha_cargo').value,
+    fecha_facturacion: document.getElementById('gasto-editar-fecha_facturacion').value,
+    tipo: document.getElementById('gasto-editar-tipo').value,
+    pago: document.getElementById('gasto-editar-pago').value,
+    folio: document.getElementById('gasto-editar-folio').value,
+    establecimiento: document.getElementById('gasto-editar-establecimiento').value,
+    importe: document.getElementById('gasto-editar-importe').value,
+    id_proyecto: gastoProyectoEditandoId,
+    link: documentoUrl
+  };
+
+  const { error } = await supabase
+    .from('registro')
+    .update(cambios)
+    .eq('id_registro', gastoEditando.id_registro);
+
+  if (!error) {
+    document.getElementById('modal-editar-gasto').style.display = 'none';
+    cargarGastos();
+  } else {
+    alert('Error al guardar cambios');
+  }
+};
+
+// Cerrar el modal de edición con los nuevos IDs
+document.getElementById('gasto-close-modal-editar').onclick = function() {
+  document.getElementById('modal-editar-gasto').style.display = 'none';
+};
+document.getElementById('gasto-cancelar-modal-editar').onclick = function() {
+  document.getElementById('modal-editar-gasto').style.display = 'none';
+};
+
+// Helper para obtener nombre de proyecto por id
+function obtenerNombreProyecto(id_proyecto) {
+  const proyecto = proyectosInfo.find(p => p.id_proyecto === id_proyecto);
+  return proyecto ? proyecto.nombre : '';
+}
 
 document.addEventListener('DOMContentLoaded', cargarGastos);

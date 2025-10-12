@@ -257,42 +257,7 @@ document.addEventListener('click', function(e) {
 document.addEventListener('DOMContentLoaded', cargarRegistrosSupabase);
 
 document.getElementById('descargar-csv').addEventListener('click', function() {
-  // Usa los datos actualmente mostrados en la tabla
-  const tbody = document.getElementById('table-body');
-  const filas = Array.from(tbody.querySelectorAll('tr'));
-  if (filas.length === 0) {
-    alert('No hay datos para descargar.');
-    return;
-  }
-
-  // Obtén los datos mostrados en la tabla
-  let datos = [];
-  filas.forEach(tr => {
-    const celdas = tr.querySelectorAll('td');
-    // Solo toma filas con el número correcto de columnas (evita la fila de "No hay registros")
-    if (celdas.length >= 7) {
-      datos.push({
-        'Fecha de cargo': celdas[0].textContent,
-        'Fecha de Facturacion': celdas[1].textContent,
-        'Tipo': celdas[2].textContent,
-        'Tipo de pago': celdas[3].textContent,
-        'Folio': celdas[4].textContent,
-        'Establecimiento': celdas[5].textContent,
-        'Importe': celdas[6].textContent
-      });
-    }
-  });
-
-  if (datos.length === 0) {
-    alert('No hay datos para descargar.');
-    return;
-  }
-
-  // Genera el archivo CSV usando SheetJS
-  const ws = XLSX.utils.json_to_sheet(datos);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Registros");
-  XLSX.writeFile(wb, "registros.csv");
+  window.location.href = '/modules/Impresion/imprimir.html';
 });
 
 // Guardar cambios al editar
@@ -376,3 +341,6 @@ document.addEventListener('click', function(e) {
     editarAutocompleteList.innerHTML = '';
   }
 });
+
+
+

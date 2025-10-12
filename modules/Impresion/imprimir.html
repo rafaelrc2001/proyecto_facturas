@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scanalyze</title>
+
+    <!-- Fuentes y librerías -->
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Orbitron:wght@500;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../../CSS/imprimir.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="icon" href="../../img/inxiteblanco.png" type="image/png" />
+  </head>
+
+  <body>
+    <div class="app-container">
+      <main class="main-content">
+
+        <!-- =========================
+             ENCABEZADO PRINCIPAL
+        ========================== -->
+        <header class="main-header" id="imprimir-header">
+          <div id="imprimir-header-container">
+            <div id="imprimir-header-card">
+              <div id="imprimir-header-icon">
+                <i class="ri-file-list-2-line"></i>
+              </div>
+              <div id="imprimir-header-text">
+                <h1>Registros de Facturas y Tickets</h1>
+                <div class="header-subtitle">
+                  Sistema INXITE / Gestión de Gastos
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+
+
+        
+        <!-- =========================
+             SECCIÓN TABLA DE REGISTROS
+        ========================== -->
+        <section class="permits-table">
+
+            
+
+             <button class="btn primary" id="volver">
+              <i class="back-line"></i> Volver
+            </button>
+          <!-- Filtro y botón -->
+          <div class="table-header-flex" id="imprimir-header-flex">
+            <div id="imprimir-filtro-container">
+              <div class="autocomplete-container" id="imprimir-autocomplete-container">
+                <input type="text" id="imprimir-proyecto-autocomplete" placeholder="Filtrar por proyecto..." autocomplete="off" />
+                <div id="imprimir-autocomplete-list" class="autocomplete-list"></div>
+              </div>
+            </div>
+
+            <button class="btn primary" id="imprimir-descargar-csv">
+              <i class="ri-download-line"></i> Descargar 
+            </button>
+          </div>
+
+          <!-- Contenedor de la tabla -->
+          <div id="imprimir-tabla-container">
+                    <div class="listado-title-flex">
+           
+            <h3 class="listado-title" id="imprimir-listado-title">
+                <i class="ri-table-line"></i> Listado de Facturas y Tickets
+            </h3>
+            <div class="logo-title-right">
+                <img src="../../img/inxite.png" alt="Logo INXITE" class="logo-title">
+            </div>
+            </div>
+
+
+            <!-- ...existing code... -->
+<div id="imprimir-proyecto-info" class="proyecto-info"></div>
+<!-- ...ya tienes el filtro y la tabla debajo... -->
+
+
+            <div class="table-container" id="imprimir-table-container">
+              <table id="imprimir-facturas-table">
+                <thead>
+                  <tr>
+                    <th>Fecha de cargo</th>
+                    <th>Fecha de Facturación</th>
+                    <th>Folio</th>
+                    <th>Establecimiento</th>
+                    <th>Importe</th>
+                  </tr>
+                </thead>
+                <tbody id="imprimir-table-body">
+                  <!-- Se llenará dinámicamente con JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Paginación y contador -->
+            <div class="table-footer" id="imprimir-table-footer">
+      
+
+              <span id="imprimir-contador-registros"></span>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- =========================
+         SCRIPTS
+    ========================== -->
+    <script type="module" src="imprimir.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+  </body>
+</html>

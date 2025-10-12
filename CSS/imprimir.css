@@ -1,0 +1,402 @@
+/* Contenedor principal */
+.app-container {
+  width: 100%;
+  min-height: 100vh;
+  background: #f7f8f6;
+}
+
+/* Centra el contenido y lo hace ancho */
+.main-content {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Header */
+#imprimir-header-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 0 auto 32px auto;
+}
+
+#imprimir-header-card {
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,59,92,0.09);
+  padding: 28px 48px 18px 48px;
+  display: flex;
+  align-items: center;
+  border: 1px solid #ececec;
+  border-bottom: 7px solid #FF6F00;
+  gap: 18px;
+}
+
+#imprimir-header-icon {
+  width: 54px;
+  height: 54px;
+  border-radius: 14px;
+  background: #003B5C;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(255,111,0,0.08);
+  flex-shrink: 0;
+  margin-right: 0px;
+}
+
+#imprimir-header-icon i {
+  font-size: 2.2rem;
+  color: #f7f7f7;
+}
+
+#imprimir-header-text h1 {
+  font-size: 2.1rem;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 700;
+  color: #003B5C;
+  margin-bottom: 8px;
+  text-align: left;
+}
+
+.header-subtitle {
+  font-size: 1rem;
+  color: #276080;
+  font-weight: 600;
+  text-align: left;
+  margin-bottom: 0;
+}
+
+/* Filtro y botón */
+.table-header-flex {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto 24px auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#imprimir-filtro-container {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+}
+
+#imprimir-autocomplete-container,
+.autocomplete-container {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+#imprimir-proyecto-autocomplete {
+  width: 100%;
+  padding: 12px 18px;
+  border: 2px solid #FF6F00;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,59,92,0.04);
+  outline: none;
+  transition: border 0.2s;
+}
+
+#imprimir-proyecto-autocomplete:focus {
+  border-color: #003B5C;
+}
+
+/* Botón CSV */
+#imprimir-descargar-csv {
+  padding: 12px 28px;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  background: #FF6F00;
+  color: #fff;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(255,111,0,0.08);
+  transition: background 0.2s;
+}
+
+#imprimir-descargar-csv:hover {
+  background: #003B5C;
+}
+
+/* Tabla principal */
+#imprimir-tabla-container {
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(0,59,92,0.07);
+  padding-bottom: 24px;
+}
+
+#imprimir-listado-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #003B5C;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.listado-title-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+.logo-title-left,
+.logo-title-right {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+}
+
+.logo-title {
+  height: 120px; /* Antes era 40px, ahora es 3 veces más grande */
+  width: auto;
+  object-fit: contain;
+}
+
+.listado-title {
+  flex: 1 1 auto;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  color: #1a355e;
+  letter-spacing: 0.5px;
+  margin-left: 32px; /* Ajusta el valor según lo que necesites */
+}
+
+/* Responsive: logos más pequeños en pantallas chicas */
+@media (max-width: 600px) {
+  .logo-title {
+    height: 28px;
+  }
+  .listado-title {
+    font-size: 1.1rem;
+  }
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+}
+
+#imprimir-facturas-table {
+  width: 100%;
+  min-width: 1200px;
+  border-collapse: collapse;
+  margin-bottom: 12px;
+}
+
+#imprimir-facturas-table th {
+  background: #003B5C;
+  color: #fff;
+  font-weight: 700;
+  padding: 16px 10px;
+  border: none;
+  font-size: 1.1rem;
+}
+
+#imprimir-facturas-table td {
+  padding: 12px 10px;
+  border-bottom: 1px solid #ececec;
+  font-size: 1rem;
+  background: #fff;
+}
+
+#imprimir-facturas-table tr:nth-child(even) td {
+  background: #f7f8f6;
+}
+
+/* Paginación */
+.table-footer,
+#imprimir-table-footer {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pagination {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  align-items: center;
+}
+
+.pagination-btn {
+  padding: 8px 18px;
+  border: 1.5px solid #FF6F00;
+  background: #fff;
+  color: #003B5C;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.pagination-btn.active,
+.pagination-btn:hover:not(:disabled) {
+  background: #FF6F00;
+  color: #fff;
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Contador de registros */
+#imprimir-contador-registros {
+  display: block;
+  margin-top: 14px;
+  font-weight: 600;
+  color: #003B5C;
+  font-size: 1.1rem;
+}
+
+/* Nuevos estilos para subtítulos y subtablas */
+.imprimir-titulo-tipo {
+  margin-top: 2rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #1a355e;
+  letter-spacing: 0.5px;
+}
+
+.imprimir-subtabla {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 0.5rem;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.imprimir-subtabla th, .imprimir-subtabla td {
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  border-bottom: 1px solid #eaeaea;
+  font-size: 0.98rem;
+}
+
+.imprimir-subtabla th {
+  background: #f3f6fa;
+  color: #1a355e;
+  font-weight: 700;
+  border-bottom: 2px solid #eaeaea;
+}
+
+.imprimir-subtabla tr:last-child td {
+  border-bottom: none;
+}
+
+.imprimir-subtabla tbody tr:hover {
+  background: #f7faff;
+}
+
+.imprimir-total {
+  font-weight: 600;
+  color: #e67e22;
+  text-align: right;
+  margin-bottom: 1.5rem;
+  margin-top: 0.2rem;
+  font-size: 1rem;
+}
+
+/* Autocomplete List Styles */
+.autocomplete-list {
+  position: absolute;
+  z-index: 10;
+  width: 100%;
+  max-width: 400px;
+  background: #fff;
+  border: 1.5px solid #FF6F00;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 4px 16px rgba(0,59,92,0.09);
+  margin-top: -2px;
+  font-size: 1rem;
+  overflow: hidden;
+}
+
+.autocomplete-list div {
+  padding: 12px 18px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  border-bottom: 1px solid #f3f6fa;
+}
+
+.autocomplete-list div:last-child {
+  border-bottom: none;
+}
+
+.autocomplete-list div:hover,
+.autocomplete-list div.active {
+  background: #FF6F00;
+  color: #fff;
+}
+
+/* Fix for container positioning */
+#imprimir-autocomplete-container {
+  position: relative;
+}
+
+/* Botón Volver */
+#volver {
+  background: #fff;
+  color: #FF6F00;
+  border: 2px solid #FF6F00;
+  border-radius: 8px;
+  padding: 0.6rem 1.4rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  margin-right: 1.2rem;
+}
+
+#volver:hover {
+  background: #FF6F00;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(255,111,0,0.12);
+}
+
+/* Responsive para pantallas pequeñas */
+@media (max-width: 900px) {
+  #imprimir-header-card,
+  #imprimir-tabla-container,
+  .table-header-flex {
+    max-width: 98vw;
+    padding: 12px 6vw 12px 6vw;
+  }
+  #imprimir-facturas-table {
+    min-width: 600px;
+  }
+  .imprimir-subtabla th, .imprimir-subtabla td {
+    font-size: 0.9rem;
+    padding: 0.5rem 0.4rem;
+  }
+}
+
+.logo-title-right {
+  margin-right: 32px; /* Ajusta el valor según lo que necesites */
+}
