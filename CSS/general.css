@@ -1657,3 +1657,43 @@ h1, h2, h3, h4, h5, h6 {
 #modal-editar .modal-content.show-anim {
   animation: slideDownModal 0.78s ease;
 }
+
+.autocomplete-list {
+  max-height: 180px;
+  overflow-y: auto;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,59,92,0.08);
+}
+.autocomplete-list div {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.autocomplete-list div:hover {
+  background: #FF6F00;
+  color: #fff;
+}
+
+.autocomplete-list {
+  position: absolute;
+  top: 100%;
+  left: 0; right: 0;
+  background: #fff;
+  border: 1px solid #ececec;
+  z-index: 10;
+  max-height: 180px;
+  overflow-y: auto;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,59,92,0.08);
+}
+.autocomplete-list div {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+.autocomplete-list div:hover {
+  background: #FF6F00;
+  color: #fff;
+}
+.autocomplete-container {
+  position: relative;
+  min-width: 260px;
+}

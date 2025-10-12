@@ -66,6 +66,12 @@
       Trabajador
     </a>
   </li>
+  <li>
+  <a href="../gastos/gastos.html">
+    <i class="ri-money-dollar-circle-line"></i>
+    <span>Gastos</span>
+  </a>
+</li>
 </ul>
     </li>
           </ul>
@@ -204,6 +210,22 @@
         </tbody>
       </table>
     </div>
+     <div class="table-footer">
+  
+    <div class="pagination">
+      <button class="pagination-btn">
+        <i class="ri-arrow-left-s-line"></i>
+      </button>
+      <button class="pagination-btn active">1</button>
+      <button class="pagination-btn">2</button>
+      <button class="pagination-btn">3</button>
+      <button class="pagination-btn">
+        <i class="ri-arrow-right-s-line"></i>
+      </button>
+    </div>
+    <span id="contador-registros" style="display:block; margin-top:12px; font-weight:600; color:#003B5C;"></span>
+ 
+  </div>
 
 
 
@@ -227,9 +249,15 @@
     <h2 style="margin-bottom:18px; color:#003B5C;">Asignar proyecto</h2>
    <form id="formAsignarProyecto">
   <label>Responsable</label>
-  <select name="responsable" id="selectTrabajador" style="width:100%; margin-bottom:12px; padding:8px; border-radius:6px; border:1px solid #ececec;"></select>
+  <div class="autocomplete-container">
+    <input type="text" id="inputTrabajador" placeholder="Selecciona un encargado" autocomplete="off" />
+    <div id="listTrabajador" class="autocomplete-list"></div>
+  </div>
   <label>Proyecto</label>
-  <select name="proyecto" id="selectProyecto" style="width:100%; margin-bottom:18px; padding:8px; border-radius:6px; border:1px solid #ececec;"></select>
+  <div class="autocomplete-container">
+    <input type="text" id="inputProyecto" placeholder="Selecciona un proyecto" autocomplete="off" />
+    <div id="listProyecto" class="autocomplete-list"></div>
+  </div>
   <button type="submit" style="background:#FF6F00; color:#fff; border:none; padding:10px 18px; border-radius:6px; cursor:pointer;">Asignar</button>
 </form>
   </div>
@@ -240,7 +268,7 @@
 <div id="modalNuevoTrabajador" class="modal" style="display:none;">
   <div>
     <button id="cerrarModalNuevoTrabajador">✕</button>
-    <h2 style="margin-bottom:18px; color:#003B5C;">Nuevo Trabajador</h2>
+    <h2 style="margin-bottom:18px; color:#003B5C;">Trabajador</h2>
     <form id="formNuevoTrabajador">
       <input type="text" name="nombre" placeholder="Nombre" required />
       <input type="text" name="puesto" placeholder="Puesto" required />

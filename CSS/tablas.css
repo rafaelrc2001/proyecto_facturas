@@ -498,7 +498,7 @@
 .modal-form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px 24px;
+  gap: 18px;
 }
 
 .modal-form-group {
@@ -532,6 +532,60 @@
 #modal-editar-proyecto input[type="text"]:focus,
 #modal-editar-proyecto input[type="date"]:focus {
   border-color: #FF6F00;
+}
+
+.modal-form-group input[type="date"] {
+  padding: 10px 14px;
+  border: 1px solid #cfd8dc;
+  border-radius: 8px;
+  background: #f7f8f6;
+  color: #003B5C;
+  font-size: 1em;
+  font-family: 'Roboto', sans-serif;
+  outline: none;
+  transition: border 0.2s;
+}
+
+.modal-form-group input[type="date"]:focus {
+  border-color: #FF6F00;
+  background: #fff;
+}
+
+/* Mejora el input de importe */
+.modal-form-group input[type="number"] {
+  padding: 10px 14px;
+  border: 1px solid #cfd8dc;
+  border-radius: 8px;
+  background: #f7f8f6;
+  color: #003B5C;
+  font-size: 1em;
+  font-family: 'Roboto', sans-serif;
+  outline: none;
+  transition: border 0.2s;
+}
+
+.modal-form-group input[type="number"]:focus {
+  border-color: #FF6F00;
+  background: #fff;
+}
+
+.modal-form-group select {
+  padding: 10px 14px;
+  border: 1px solid #cfd8dc;
+  border-radius: 8px;
+  background: #f7f8f6;
+  color: #003B5C;
+  font-size: 1em;
+  font-family: 'Roboto', sans-serif;
+  outline: none;
+  transition: border 0.2s, background 0.2s;
+  width: 100%;
+  appearance: none;
+}
+
+.modal-form-group select:focus {
+  border-color: #FF6F00;
+  background: #fff;
 }
 
 #modal-editar-proyecto button[type="submit"] {
@@ -665,9 +719,9 @@
 
 #modal-nuevo-proyecto .modal-actions {
   display: flex;
+  justify-content: center;
   gap: 16px;
-  margin-top: 22px;
-  justify-content: flex-start;
+  margin-top: 24px;
 }
 
 #modal-nuevo-proyecto .btn.primary {
@@ -812,4 +866,162 @@
   border: none;
   font-size: 1em;
   cursor: pointer;
+}
+
+.table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+.gastos-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 18px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,59,92,0.07);
+  padding: 16px 24px;
+  border: 1px solid #ececec;
+}
+.btn-nuevo {
+  background: #FF6F00;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 1em;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(255,111,0,0.08);
+  transition: background 0.2s, box-shadow 0.2s;
+}
+.search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 260px;
+}
+.input-buscar {
+  width: 100%;
+  padding: 8px 38px 8px 38px;
+  border: 1px solid #cfd8dc;
+  border-radius: 8px;
+  font-size: 1em;
+  font-family: 'Roboto', sans-serif;
+  background: #f7f8f6;
+  color: #003B5C;
+  outline: none;
+  transition: border 0.2s;
+}
+.search-bar i {
+  position: absolute;
+  left: 12px;
+  font-size: 1.2em;
+  color: #276080;
+  pointer-events: none;
+}
+
+.acciones-btns {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+.btn-accion {
+  background: #FFD54F;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #003B5C;
+  font-size: 1.2em;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.btn-accion.btn-ver {
+  background: #00BCD4;
+  color: #fff;
+}
+.btn-accion.btn-editar {
+  background: #FFD54F;
+  color: #003B5C;
+}
+.btn-accion.btn-eliminar {
+  background: #F44336;
+  color: #fff;
+}
+
+#gastosTable {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+}
+
+#gastosTable th {
+  background: #003B5C;
+  color: #fff;
+  font-weight: 600;
+  padding: 12px 8px;
+  border-bottom: 2px solid #ececec;
+}
+
+#gastosTable th:first-child {
+  border-radius: 10px 0 0 0;
+}
+#gastosTable th:last-child {
+  border-radius: 0 10px 0 0;
+}
+
+#gastosTable td {
+  background: #fff;
+  color: #003B5C;
+  padding: 10px 8px;
+  border-bottom: 1px solid #ececec;
+  font-size: 1em;
+}
+
+#gastosTable tr:nth-child(even) td {
+  background: #f7f8f6;
+}
+
+/* Modal más ancho y alargado */
+.modal-content.modal-gasto {
+  min-width: 700px;
+  max-width: 900px;
+  padding: 32px 32px;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,59,92,0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Grid de campos en dos columnas */
+.modal-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px 32px;
+}
+
+/* Que los inputs ocupen todo el ancho disponible */
+.modal-form-group input,
+.modal-form-group label {
+  width: 100%;
+}
+
+/* Centrar los botones de acción */
+.modal-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 24px;
 }

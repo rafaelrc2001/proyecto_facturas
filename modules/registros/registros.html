@@ -65,6 +65,12 @@
       Trabajador
     </a>
   </li>
+  <li>
+  <a href="../gastos/gastos.html">
+    <i class="ri-money-dollar-circle-line"></i>
+    <span>Gastos</span>
+  </a>
+</li>
 </ul>
     </li>
           </ul>
@@ -190,28 +196,21 @@
            
 
              <div class="search-bar" style="min-width: 260px;">
-      <input type="text" placeholder="Buscar en el sistema..." />
+    <input type="text" id="registro-search" placeholder="Buscar en el sistema..." />
       <i class="ri-search-line"></i>
     </div>
 
     <!-- Filtro desplegable -->
-<div class="filter-dropdown">
-  <button class="filter-btn">
-    <span>Filtrar</span>
-    <i class="fa-solid fa-filter"></i>
-    
-  </button>
-  <div class="filter-menu">
-    <div class="filter-option">Todos</div>
-    <div class="filter-option">Facturas</div>
-    <div class="filter-option">Tickets</div>
-  </div>
+<!-- Autocompletado de proyectos -->
+<div class="autocomplete-container" style="position:relative; min-width:260px;">
+  <input type="text" id="proyecto-autocomplete" placeholder="Filtrar por proyecto..." autocomplete="off" />
+  <div id="autocomplete-list" class="autocomplete-list" style="position:absolute; top:100%; left:0; right:0; background:#fff; border:1px solid #ececec; z-index:10;"></div>
 </div>
 
 
-            <button class="btn primary">
-              <i class="ri-download-line"></i> Descargar CSV
-            </button>
+           <button class="btn primary" id="descargar-csv">
+  <i class="ri-download-line"></i> Descargar CSV
+</button>
            
           </div>
 
@@ -230,14 +229,13 @@
       <table id="facturasTable">
         <thead>
           <tr>
-            <th>Fecha</th>
+            <th>Fecha de cargo</th>
+            <th>Fecha de Facturacion</th>
             <th>Tipo</th>
-            <th>Pago</th>
+            <th>Tipo de pago</th>
             <th>Folio</th>
             <th>Establecimiento</th>
-            <th>Subtotal</th>
-            <th>IVA</th>
-            <th>Total</th>
+            <th>Importe</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -246,6 +244,8 @@
         </tbody>
       </table>
     </div>
+
+    
     <div class="table-footer">
       <div class="pagination">
         <button class="pagination-btn">
@@ -258,6 +258,8 @@
           <i class="ri-arrow-right-s-line"></i>
         </button>
       </div>
+      <!-- ...después de la tabla... -->
+<span id="contador-registros" style="display:block; margin-top:12px; font-weight:600; color:#003B5C;"></span>
     </div>
   </div>
         </section>

@@ -1,11 +1,20 @@
 import { insertarTrabajador, obtenerTrabajadores, eliminarTrabajador, actualizarTrabajador } from '../../supabase/trabajador.js';
 import { obtenerProyectos } from '../../supabase/proyecto.js';
+import { supabase } from '../../supabase/db.js';
 import { insertarAsignacion } from '../../supabase/asignar_proyecto.js';
 
 let trabajadorEditandoId = null;
+let trabajadoresList = [];
+let proyectosList = [];
+let trabajadorSeleccionadoId = null;
+let proyectoSeleccionadoId = null;
 
 async function cargarTrabajadores() {
-  const { data, error } = await obtenerTrabajadores();
+  const { data: trabajadores, error } = await obtenerTrabajadores();
+  const { data: asignaciones } = await supabase
+    .from('asignar_proyecto')
+    .select('id_trabajador, proyecto:proyecto(cliente)');
+
   const tbody = document.getElementById('table-body');
   tbody.innerHTML = '';
 
@@ -14,26 +23,30 @@ async function cargarTrabajadores() {
     return;
   }
 
-  if (data.length === 0) {
+  if (trabajadores.length === 0) {
     tbody.innerHTML = `<tr><td colspan="4">No hay trabajadores</td></tr>`;
     return;
   }
 
- data.forEach(trabajador => {
-  tbody.innerHTML += `
-    <tr>
-      <td>${trabajador.nombre}</td>
-      <td>${trabajador.puesto}</td>
-      <td>${trabajador.cliente || ''}</td>
-      <td>
-        <div class="acciones-btns">
-          <button class="btn-accion btn-editar" title="Editar" data-id="${trabajador.id_trabajador}"><i class="ri-edit-2-line"></i></button>
-          <button class="btn-accion btn-eliminar" title="Eliminar" data-id="${trabajador.id_trabajador}"><i class="ri-delete-bin-line"></i></button>
-        </div>
-      </td>
-    </tr>
-  `;
-});
+  trabajadores.forEach(trabajador => {
+    // Busca la asignación de proyecto para este trabajador
+    const asignacion = asignaciones?.find(a => a.id_trabajador === trabajador.id_trabajador);
+    const cliente = asignacion?.proyecto?.cliente || '';
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${trabajador.nombre}</td>
+        <td>${trabajador.puesto}</td>
+        <td>${cliente}</td>
+        <td>
+          <div class="acciones-btns">
+            <button class="btn-accion btn-editar" title="Editar" data-id="${trabajador.id_trabajador}"><i class="ri-edit-2-line"></i></button>
+            <button class="btn-accion btn-eliminar" title="Eliminar" data-id="${trabajador.id_trabajador}"><i class="ri-delete-bin-line"></i></button>
+          </div>
+        </td>
+      </tr>
+    `;
+  });
 
   // Asignar eventos a los botones de eliminar
   document.querySelectorAll('.btn-eliminar').forEach(btn => {
@@ -57,7 +70,7 @@ async function cargarTrabajadores() {
   btn.addEventListener('click', (e) => {
     const button = e.currentTarget;
     const id = button.getAttribute('data-id');
-    const trabajador = data.find(t => t.id_trabajador == id);
+    const trabajador = trabajadores.find(t => t.id_trabajador == id);
     if (trabajador) {
       trabajadorEditandoId = id;
       document.getElementById('modalNuevoTrabajador').style.display = 'flex';
@@ -146,16 +159,78 @@ document.addEventListener('DOMContentLoaded', () => {
   // Guardar asignación
   document.getElementById('formAsignarProyecto').addEventListener('submit', async function(e) {
     e.preventDefault();
-    const id_trabajador = document.getElementById('selectTrabajador').value;
-    const id_proyecto = document.getElementById('selectProyecto').value;
-
-    const { error } = await insertarAsignacion({ id_trabajador, id_proyecto });
+    if (!trabajadorSeleccionadoId || !proyectoSeleccionadoId) {
+      alert('Selecciona un encargado y un proyecto válido.');
+      return;
+    }
+    const { error } = await insertarAsignacion({ id_trabajador: trabajadorSeleccionadoId, id_proyecto: proyectoSeleccionadoId });
     if (error) {
       alert('Error al asignar: ' + error.message);
     } else {
       alert('Proyecto asignado correctamente');
       document.getElementById('modalAsignarProyecto').style.display = 'none';
       e.target.reset();
+      trabajadorSeleccionadoId = null;
+      proyectoSeleccionadoId = null;
     }
+  });
+
+  // Cargar datos para autocompletado
+  async function cargarDatosAsignar() {
+    const { data: trabajadores } = await obtenerTrabajadores();
+    trabajadoresList = trabajadores || [];
+    const { data: proyectos } = await obtenerProyectos();
+    proyectosList = proyectos || [];
+  }
+  document.querySelector('.btn-asignar').addEventListener('click', () => {
+    cargarDatosAsignar();
+  });
+
+  // Autocompletado para trabajador
+  const inputTrabajador = document.getElementById('inputTrabajador');
+  const listTrabajador = document.getElementById('listTrabajador');
+  inputTrabajador.addEventListener('input', function() {
+    const valor = this.value.trim().toLowerCase();
+    listTrabajador.innerHTML = '';
+    trabajadorSeleccionadoId = null;
+    if (!valor) return;
+    const sugerencias = trabajadoresList.filter(t => t.nombre.toLowerCase().includes(valor));
+    sugerencias.forEach(t => {
+      const div = document.createElement('div');
+      div.textContent = t.nombre;
+      div.onclick = function() {
+        inputTrabajador.value = t.nombre;
+        trabajadorSeleccionadoId = t.id_trabajador;
+        listTrabajador.innerHTML = '';
+      };
+      listTrabajador.appendChild(div);
+    });
+  });
+
+  // Autocompletado para proyecto
+  const inputProyecto = document.getElementById('inputProyecto');
+  const listProyecto = document.getElementById('listProyecto');
+  inputProyecto.addEventListener('input', function() {
+    const valor = this.value.trim().toLowerCase();
+    listProyecto.innerHTML = '';
+    proyectoSeleccionadoId = null;
+    if (!valor) return;
+    const sugerencias = proyectosList.filter(p => p.nombre.toLowerCase().includes(valor));
+    sugerencias.forEach(p => {
+      const div = document.createElement('div');
+      div.textContent = p.nombre;
+      div.onclick = function() {
+        inputProyecto.value = p.nombre;
+        proyectoSeleccionadoId = p.id_proyecto;
+        listProyecto.innerHTML = '';
+      };
+      listProyecto.appendChild(div);
+    });
+  });
+
+  // Oculta sugerencias si se hace clic fuera
+  document.addEventListener('click', function(e) {
+    if (!listTrabajador.contains(e.target) && e.target !== inputTrabajador) listTrabajador.innerHTML = '';
+    if (!listProyecto.contains(e.target) && e.target !== inputProyecto) listProyecto.innerHTML = '';
   });
 });

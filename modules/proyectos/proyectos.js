@@ -1,36 +1,51 @@
+import { supabase } from '../../supabase/db.js';
 import { insertarProyecto, obtenerProyectos, eliminarProyecto, actualizarProyecto } from '../../supabase/proyecto.js';
 
 let proyectosData = [];
 
 async function cargarProyectos() {
-  const { data, error } = await obtenerProyectos();
-  proyectosData = data || [];
+  // 1. Obtén todos los proyectos
+  const { data: proyectos, error: errorProyectos } = await obtenerProyectos();
+  // 2. Obtén todas las asignaciones y trabajadores
+  const { data: asignaciones, error: errorAsignaciones } = await supabase
+    .from('asignar_proyecto')
+    .select('id_proyecto, trabajador:trabajador(id_trabajador, nombre)');
+
   const tbody = document.getElementById('table-body');
   tbody.innerHTML = '';
 
-  if (error) {
-    tbody.innerHTML = `<tr><td colspan="6">Error al cargar proyectos</td></tr>`;
+  if (errorProyectos) {
+    tbody.innerHTML = `<tr><td colspan="7">Error al cargar proyectos</td></tr>`;
+    return;
+  }
+  if (!proyectos || proyectos.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7">No hay proyectos</td></tr>`;
     return;
   }
 
-  if (data.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6">No hay proyectos</td></tr>`;
-    return;
-  }
+  proyectosData = proyectos.map(proyecto => ({
+    ...proyecto,
+    asignacion: asignaciones?.find(a => a.id_proyecto === proyecto.id_proyecto)
+  }));
 
-  data.forEach((proyecto, index) => {
+  proyectos.forEach((proyecto, i) => {
+    // Busca el trabajador asignado a este proyecto
+    const asignacion = asignaciones?.find(a => a.id_proyecto === proyecto.id_proyecto);
+    const responsable = asignacion?.trabajador?.nombre || 'Sin asignar';
+
     tbody.innerHTML += `
       <tr>
         <td>${proyecto.cliente}</td>
         <td>${proyecto.nombre || ''}</td>
+        <td>${proyecto.descripción || ''}</td>
         <td>${proyecto.ubicación || ''}</td>
         <td>${proyecto.fecha_inicio || ''}</td>
         <td>${proyecto.fecha_final || ''}</td>
-        <td>${proyecto.responsable || ''}</td>
+        <td>${responsable}</td>
         <td>
           <div class="acciones-btns">
-            <button class="btn-accion btn-editar" title="Editar" data-index="${index}"><i class="ri-edit-2-line"></i></button>
-            <button class="btn-accion btn-eliminar" title="Eliminar"><i class="ri-delete-bin-line"></i></button>
+            <button class="btn-accion btn-editar" title="Editar" data-index="${i}"><i class="ri-edit-2-line"></i></button>
+            <button class="btn-accion btn-eliminar" title="Eliminar" data-index="${i}"><i class="ri-delete-bin-line"></i></button>
           </div>
         </td>
       </tr>
@@ -38,13 +53,13 @@ async function cargarProyectos() {
   });
 
   // Actualiza el contador de registros
-  document.getElementById('contador-registros').textContent = data.length;
+  document.getElementById('contador-registros').textContent = `Registros Totales: ${proyectos.length}`;
 
   // Asigna eventos a los botones editar DESPUÉS de crear las filas
   document.querySelectorAll('.btn-editar').forEach(btn => {
     btn.addEventListener('click', function() {
       const index = this.getAttribute('data-index');
-      const proyecto = data[index];
+      const proyecto = proyectos[index];
       const modal = document.getElementById('modal-editar-proyecto');
       const form = document.getElementById('form-editar-proyecto');
       form.cliente.value = proyecto.cliente || '';
@@ -62,7 +77,7 @@ async function cargarProyectos() {
   document.querySelectorAll('.btn-eliminar').forEach(btn => {
     btn.addEventListener('click', async function() {
       const index = this.parentElement.querySelector('.btn-editar').getAttribute('data-index');
-      const proyecto = data[index];
+      const proyecto = proyectos[index];
       if (confirm('¿Seguro que deseas eliminar este proyecto?')) {
         const { error } = await eliminarProyecto(proyecto.id_proyecto);
         if (error) {
@@ -133,7 +148,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.btn-editar').forEach(btn => {
     btn.addEventListener('click', function() {
       const index = this.getAttribute('data-index');
-      const proyecto = data[index];
+      const proyecto = proyectos[index];
       const modal = document.getElementById('modal-editar-proyecto');
       const form = document.getElementById('form-editar-proyecto');
       // Rellena el formulario con los datos del proyecto
@@ -236,6 +251,56 @@ function cerrarModalRelacion() {
   const modal = document.getElementById('modal-relacion');
   if (modal) modal.style.display = 'none';
 }
+
+// Filtro por cliente, proyecto y responsable
+document.querySelector('.input-buscar').addEventListener('input', function() {
+  const valor = this.value.trim().toLowerCase();
+  const tbody = document.getElementById('table-body');
+  tbody.innerHTML = '';
+
+  // Filtra los proyectosData por los campos requeridos
+  const filtrados = proyectosData.filter(p =>
+    (p.cliente && p.cliente.toLowerCase().includes(valor)) ||
+    (p.nombre && p.nombre.toLowerCase().includes(valor)) ||
+    // Busca el responsable usando la asignación
+    (() => {
+      const asignacion = p.asignacion || {};
+      return asignacion.trabajador?.nombre?.toLowerCase().includes(valor);
+    })()
+  );
+
+  // Si no hay resultados, muestra mensaje
+  if (filtrados.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8">No hay resultados</td></tr>`;
+    document.getElementById('contador-registros').textContent = `Registros Totales: 0`;
+    return;
+  }
+
+  // Vuelve a renderizar la tabla con los filtrados
+  filtrados.forEach((proyecto, i) => {
+    const responsable = proyecto.asignacion?.trabajador?.nombre || 'Sin asignar';
+    tbody.innerHTML += `
+      <tr>
+        <td>${proyecto.cliente}</td>
+        <td>${proyecto.nombre || ''}</td>
+        <td>${proyecto.descripción || ''}</td>
+        <td>${proyecto.ubicación || ''}</td>
+        <td>${proyecto.fecha_inicio || ''}</td>
+        <td>${proyecto.fecha_final || ''}</td>
+        <td>${responsable}</td>
+        <td>
+          <div class="acciones-btns">
+            <button class="btn-accion btn-editar" title="Editar" data-index="${i}"><i class="ri-edit-2-line"></i></button>
+            <button class="btn-accion btn-eliminar" title="Eliminar" data-index="${i}"><i class="ri-delete-bin-line"></i></button>
+          </div>
+        </td>
+      </tr>
+    `;
+  });
+
+  // Actualiza el contador de registros
+  document.getElementById('contador-registros').textContent = `Registros Totales: ${filtrados.length}`;
+});
 
 // Agrega el evento submit para el formulario de edición
 document.getElementById('form-editar-proyecto').addEventListener('submit', async function(e) {

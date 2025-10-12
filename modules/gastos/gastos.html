@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scanalyze</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Orbitron:wght@500;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../../CSS/general.css" />
+    <link rel="stylesheet" href="../../CSS/menu.css" />
+    <link rel="stylesheet" href="../../CSS/tablas.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="icon" href="../../img/inxiteblanco.png" type="image/png" />
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Sidebar -->
+            <aside class="sidebar" id="sidebar">
+              <div class="sidebar-header">
+                <h2 class="logo-container">
+                  <i class="ri-line-chart-line logo-icon" style="color:#FF6F00; font-size:1em;"></i>
+                  <span class="logo-text">Scanalyze</span>
+                </h2>
+                <button class="collapse-btn" id="sidebarToggle">
+                  <i class="ri-menu-line menu-icon"></i>
+                  <i class="ri-arrow-right-s-line collapse-icon"></i>
+                </button>
+              </div>
+              
+                    <nav class="sidebar-nav">
+                      <ul>
+                        <li >
+                          <a href="../Dashboard/dashboard.html">
+                            <i class="ri-pie-chart-2-line"></i>
+                            <span>Dashboard</span>
+                          </a>
+                        </li>
+                        <li>
+                          <a href="../registros/registros.html">
+                            <i class="ri-archive-line"></i>
+                            <span>Tickets y Facturas</span>
+                          </a>
+                        </li>
+                        <li class="has-submenu ">
+                  <a href="#" class="submenu-toggle">
+                    <i class="ri-add-line"></i>
+                    <span>Registrar</span>
+                    <i class="ri-arrow-down-s-line submenu-icon"></i>
+                  </a>
+                  <ul class="submenu">
+              <li>
+                <a href="../proyectos/proyectos.html" class="submenu-link">
+                  <i class="ri-folder-2-line"></i>
+                  Proyecto
+                </a>
+              </li>
+              <li>
+                <a href="../trabajador/trabajador.html" class="submenu-link">
+                  <i class="ri-user-3-line"></i>
+                  Trabajador
+                </a>
+              </li>
+              <li>
+              <a href="../gastos/gastos.html">
+                <i class="ri-money-dollar-circle-line"></i>
+                <span>Gastos</span>
+              </a>
+            </li>
+            </ul>
+                </li>
+                      </ul>
+                    </nav>
+
+              <div class="sidebar-footer">
+                <div class="user-profile">
+                  <div class="avatar">Ad</div>
+                  <div class="user-info">
+                    <span class="name">Admin</span>
+                    <span class="role">Administrador</span>
+                  </div>
+                </div>
+                <button class="logout-btn">
+                  <i class="ri-logout-box-r-line"></i>
+                </button>
+              </div>
+            </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <header class="main-header" style="background: #f7f8f6; box-shadow: none; padding: 0px 0 0px 0;"></header> 
+
+        <div style="width: 100%; display: flex; justify-content: flex-start; margin: 0;">
+          <div style="
+            background: #fff;
+            border-radius: 3;
+            box-shadow: 0 2px 12px rgba(0,59,92,0.07);
+            padding: 18px 32px 12px 32px;
+            width: 100%;
+            margin-left: 0;
+            display: flex;
+            align-items: center;
+            border: 1px solid #ececec;
+            border-bottom: 7px solid #003B5C;
+            gap: 12px;
+          ">
+            <div style="
+              width: 40px;
+              height: 40px;
+              border-radius: 12px;
+              background: #003B5C;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              box-shadow: 0 2px 8px rgba(255,111,0,0.08);
+              flex-shrink: 0;
+              margin-left: 0;
+              margin-right: 0px;
+            ">
+              <i class="ri-money-dollar-circle-line" style="font-size: 1.5rem; color:#f7f7f7"></i>
+            </div>
+            <div style="display: flex; flex-direction: column; align-items: flex-start; margin-left: 0;">
+              <h1 style="
+                font-size: 1.5rem;
+                font-family: 'Montserrat', sans-serif;
+                font-weight: 700;
+                color: #003B5C;
+                margin-bottom: 5px;
+                text-align: left;
+              ">
+                Registros de Gastos
+              </h1>
+              <div class="header-subtitle" style="
+                font-size: 0.8rem;
+                color: #276080;
+                font-weight: 600;
+                text-align: left;
+                margin-bottom: 0;
+              ">
+                Sistema INXITE / Gestión de Gastos
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="gastos-toolbar">
+            <button class="btn-nuevo">
+              <i class="ri-add-line"></i>
+              Nuevo gasto
+            </button>
+            <div class="search-bar">
+              <input type="text" class="input-buscar" placeholder="Buscar...">
+              <i class="ri-search-line"></i>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gastos Table -->
+        <!-- Registros Table -->
+        <section class="permits-table">
+          <div class="table-header-flex">
+           
+
+         
+
+    <!-- Filtro desplegable -->
+
+
+
+
+<div class="tabla-container" style="border-top: 5px solid #FF6F00; border-radius: 2px;">
+
+          <h3 class="listado-title">
+  <i class="ri-table-line" style="color:#FF6F00; margin-right:1px; font-size:1.2em;"></i>
+  Listado de Gastos
+</h3>
+
+
+ <div class="table-container">
+      <table id="gastosTable">
+          <thead>
+          <tr>
+            <th>Fecha de cargo</th>
+            <th>Fecha de Facturacion</th>
+            <th>Tipo</th>
+            <th>Tipo de pago</th>
+            <th>Folio</th>
+            <th>Establecimiento</th>
+            <th>Importe</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="table-body">
+          <!-- Se llena con JS -->
+        </tbody>
+      </table>
+    </div>
+     <div class="table-footer">
+  
+    <div class="pagination">
+      <button class="pagination-btn">
+        <i class="ri-arrow-left-s-line"></i>
+      </button>
+      <button class="pagination-btn active">1</button>
+      <button class="pagination-btn">2</button>
+      <button class="pagination-btn">3</button>
+      <button class="pagination-btn">
+        <i class="ri-arrow-right-s-line"></i>
+      </button>
+    </div>
+    <span id="contador-registros" style="display:block; margin-top:12px; font-weight:600; color:#003B5C;"></span>
+ 
+  </div>
+
+
+
+  </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Modal Nuevo Gasto -->
+    <div id="modal-nuevo-gasto" class="modal" style="display: none;">
+      <div class="modal-content modal-gasto">
+        <span class="modal-close" id="close-modal-nuevo">&times;</span>
+        <h2 class="modal-title">Nuevo gasto</h2>
+        <div class="modal-title-line"></div>
+        <form id="form-nuevo-gasto">
+          <div class="modal-form-grid">
+            <div class="modal-form-group">
+              <label for="fecha_cargo">Fecha de cargo</label>
+              <input type="date" id="fecha_cargo" name="fecha_cargo" required>
+            </div>
+            <div class="modal-form-group">
+              <label for="fecha_facturacion">Fecha de Facturación</label>
+              <input type="date" id="fecha_facturacion" name="fecha_facturacion" required>
+            </div>
+            <div class="modal-form-group">
+              <label for="tipo">Tipo</label>
+              <select id="tipo" name="tipo" required>
+                <option value="" disabled selected>Selecciona tipo</option>
+                <option value="ticket">Ticket</option>
+                <option value="factura">Factura</option>
+              </select>
+            </div>
+            <div class="modal-form-group">
+              <label for="pago">Tipo de pago</label>
+              <select id="pago" name="pago" required>
+                <option value="" disabled selected>Selecciona tipo de pago</option>
+                <option value="Pagos con tarjeta facturados.">Pagos con tarjeta facturados.</option>
+                <option value="Pagos con tarjeta tickets">Pagos con tarjeta tickets</option>
+                <option value="Pagos con efectivo retiro tarjeta facturados.">Pagos con efectivo retiro tarjeta facturados.</option>
+                <option value="Pagos con efectivo retiro tarjeta  tickets.">Pagos con efectivo retiro tarjeta  tickets.</option>
+                <option value="Pagos efectivo retiro tarjeta sin comprobante">Pagos efectivo retiro tarjeta sin comprobante</option>
+                <option value="Pagos efectivo (caja) tickets">Pagos efectivo (caja) tickets</option>
+                <option value="Pago efectivo (caja) sin comprobante">Pago efectivo (caja) sin comprobante</option>
+              </select>
+            </div>
+            <div class="modal-form-group">
+              <label for="folio">Folio</label>
+              <input type="text" id="folio" name="folio" required>
+            </div>
+            <div class="modal-form-group">
+              <label for="establecimiento">Establecimiento</label>
+              <input type="text" id="establecimiento" name="establecimiento" required>
+            </div>
+            <div class="modal-form-group">
+              <label for="importe">Importe</label>
+              <input type="number" id="importe" name="importe" required>
+            </div>
+            <div class="modal-form-group autocomplete-container">
+              <label for="proyecto-autocomplete">Proyecto</label>
+              <input type="text" id="proyecto-autocomplete" placeholder="Buscar proyecto..." autocomplete="off" required>
+              <div id="autocomplete-list" class="autocomplete-list"></div>
+            </div>
+            <div class="modal-form-group">
+              <label for="documentos">Documento</label>
+              <input type="file" id="documentos" name="documentos" accept="image/*,.pdf,.doc,.docx">
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button type="submit" class="btn primary">Guardar</button>
+            <button type="button" class="btn" id="cancelar-modal-nuevo">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal Editar Gasto -->
+    <div id="modal-editar-gasto" class="modal" style="display:none;">
+      <div class="modal-content">
+        <button id="close-modal-editar" class="close-modal" title="Cerrar">&times;</button>
+        <h2>Editar gasto</h2>
+        <form id="form-editar-gasto">
+          <div class="modal-form-grid">
+            <div class="modal-form-group">
+              <label for="editar-fecha">Fecha</label>
+              <input type="date" id="editar-fecha" name="fecha" required />
+            </div>
+            <div class="modal-form-group">
+              <label for="editar-concepto">Concepto</label>
+              <input type="text" id="editar-concepto" name="concepto" required />
+            </div>
+            <div class="modal-form-group">
+              <label for="editar-monto">Monto</label>
+              <input type="number" id="editar-monto" name="monto" required />
+            </div>
+            <div class="modal-form-group">
+              <label for="editar-proyecto">Proyecto</label>
+              <input type="text" id="editar-proyecto" name="proyecto" />
+            </div>
+            <div class="modal-form-group">
+              <label for="editar-responsable">Responsable</label>
+              <input type="text" id="editar-responsable" name="responsable" />
+            </div>
+          </div>
+          <button type="submit" class="btn primary" style="width:auto; min-width:120px; padding:10px 20px;">Guardar</button>
+        </form>
+      </div>
+    </div>
+
+    <script src="../../Js/menu.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+    <script type="module" src="../../modules/gastos/gastos.js"></script>
+  </body>
+</html>
+
+

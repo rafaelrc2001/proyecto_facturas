@@ -66,6 +66,12 @@
       Trabajador
     </a>
   </li>
+  <li>
+  <a href="../gastos/gastos.html">
+    <i class="ri-money-dollar-circle-line"></i>
+    <span>Gastos</span>
+  </a>
+</li>
 </ul>
     </li>
           </ul>
@@ -182,7 +188,8 @@
       <thead>
         <tr>
           <th>Cliente</th>
-          <th>Nombre</th>
+          <th>Proyecto</th>
+          <th>Descripción</th>
           <th>Ubicación</th>
           <th>Fecha inicio</th>
           <th>Fecha fin</th>
@@ -195,7 +202,9 @@
       </tbody>
     </table>
   </div>
-  <div class="table-footer">
+  <!-- Coloca el contador aquí, debajo de la tabla -->
+ <div class="table-footer">
+  
     <div class="pagination">
       <button class="pagination-btn">
         <i class="ri-arrow-left-s-line"></i>
@@ -207,6 +216,8 @@
         <i class="ri-arrow-right-s-line"></i>
       </button>
     </div>
+    <span id="contador-registros" style="display:block; margin-top:12px; font-weight:600; color:#003B5C;"></span>
+ 
   </div>
 </div>
         </section>
@@ -219,6 +230,7 @@
     <script src="../../Js/menu.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
     <script type="module" src="../../modules/proyectos/proyectos.js"></script>
+
   </body>
 </html>
 
@@ -295,9 +307,7 @@
           <input type="text" id="editar-responsable" name="responsable" required />
         </div>-->
       </div>
-      <button type="submit" class="btn primary">Guardar cambios</button>
+      <button type="submit" class="btn primary" style="width:auto; min-width:120px; padding:10px 20px;">Guardar</button>
     </form>
   </div>
 </div>
-
-<span id="contador-registros"></span>
