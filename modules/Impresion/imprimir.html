@@ -46,22 +46,29 @@
 
             
 
-             <button class="btn primary" id="volver">
-              <i class="back-line"></i> Volver
-            </button>
+            
           <!-- Filtro y botón -->
-          <div class="table-header-flex" id="imprimir-header-flex">
-            <div id="imprimir-filtro-container">
-              <div class="autocomplete-container" id="imprimir-autocomplete-container">
-                <input type="text" id="imprimir-proyecto-autocomplete" placeholder="Filtrar por proyecto..." autocomplete="off" />
-                <div id="imprimir-autocomplete-list" class="autocomplete-list"></div>
-              </div>
-            </div>
+         <div class="table-header-flex" id="imprimir-header-flex">
+  <button class="btn primary" id="volver">
+    <i class="back-line"></i> Volver
+  </button>
+  <div class="filtro-boton-flex">
+    <div id="imprimir-filtro-container">
+      <div class="autocomplete-container" id="imprimir-autocomplete-container">
+        <input type="text" id="imprimir-proyecto-autocomplete" placeholder="Filtrar por proyecto..." autocomplete="off" />
+        <div id="imprimir-autocomplete-list" class="autocomplete-list"></div>
+      </div>
+    </div>
+    <button class="btn primary" id="imprimir-descargar-csv">
+      <i class="ri-download-line"></i> Descargar
+    </button>
+  </div>
+</div>
 
-            <button class="btn primary" id="imprimir-descargar-csv">
-              <i class="ri-download-line"></i> Descargar 
-            </button>
-          </div>
+          <div id="imprimir-area"></div>
+
+
+
 
           <!-- Contenedor de la tabla -->
           <div id="imprimir-tabla-container">
@@ -109,6 +116,7 @@
       </main>
     </div>
 
+    </div>
     <!-- =========================
          SCRIPTS
     ========================== -->

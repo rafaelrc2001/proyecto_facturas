@@ -183,32 +183,13 @@ function formatearFecha(fecha) {
 
 // Botón descargar CSV (descarga todos los registros mostrados)
 document.getElementById('imprimir-descargar-csv').addEventListener('click', function() {
-  const tablas = document.querySelectorAll('.imprimir-subtabla');
-  let datos = [];
-  tablas.forEach(tabla => {
-    const tipoPago = tabla.previousElementSibling.textContent;
-    const filas = tabla.querySelectorAll('tbody tr');
-    filas.forEach(tr => {
-      const celdas = tr.querySelectorAll('td');
-      datos.push({
-        'Tipo de pago': tipoPago,
-        'Fecha de cargo': celdas[0].textContent,
-        'Fecha de Facturación': celdas[1].textContent,
-        'Tipo': celdas[2].textContent,
-        'Folio': celdas[3].textContent,
-        'Establecimiento': celdas[4].textContent,
-        'Importe': celdas[5].textContent
-      });
-    });
-  });
-  if (datos.length === 0) {
-    alert('No hay datos para descargar.');
-    return;
-  }
-  const ws = XLSX.utils.json_to_sheet(datos);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Registros");
-  XLSX.writeFile(wb, "registros_separados.csv");
+  const printContents = document.getElementById('imprimir-tabla-container').innerHTML;
+  const originalContents = document.body.innerHTML;
+
+  document.body.innerHTML = printContents;
+  window.print();
+  document.body.innerHTML = originalContents;
+  location.reload();
 });
 
 document.getElementById('volver').addEventListener('click', function() {
