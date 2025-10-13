@@ -193,5 +193,5 @@ document.getElementById('imprimir-descargar-csv').addEventListener('click', func
 });
 
 document.getElementById('volver').addEventListener('click', function() {
-  window.location.href = '/modules/registros/registros.html';
+  window.location.href = '/proyecto_facturas/modules/registros/registros.html';
 });
