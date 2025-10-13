@@ -257,9 +257,8 @@ document.addEventListener('click', function(e) {
 document.addEventListener('DOMContentLoaded', cargarRegistrosSupabase);
 
 document.getElementById('descargar-csv').addEventListener('click', function() {
-  window.location.href = '/modules/Impresion/imprimir.html';
+  window.location.href = '/imprimir.html';
 });
-
 // Guardar cambios al editar
 document.getElementById('form-editar-gasto').onsubmit = async function(e) {
   e.preventDefault();
