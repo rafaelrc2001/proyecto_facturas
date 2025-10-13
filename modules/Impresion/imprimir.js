@@ -122,8 +122,10 @@ function mostrarTablasPorProyecto(nombreProyecto) {
   let totalRegistros = 0;
 
   tiposPago.forEach(tipo => {
-    // Filtra por tipo de pago
-    const registrosPorTipo = registrosFiltrados.filter(r => r.pago === tipo);
+    const tipoNormalizado = tipo.replace(/\s+/g, ' ').trim().toLowerCase();
+    const registrosPorTipo = registrosFiltrados.filter(r =>
+      r.pago && r.pago.replace(/\s+/g, ' ').trim().toLowerCase() === tipoNormalizado
+    );
     if (registrosPorTipo.length > 0) {
       totalRegistros += registrosPorTipo.length;
       let tablaHTML = `

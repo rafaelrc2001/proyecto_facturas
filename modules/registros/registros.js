@@ -345,5 +345,201 @@ document.addEventListener('click', function(e) {
   }
 });
 
+function normalizarPago(str) {
+  return (str || '')
+    .replace(/[\s\r\n\t]+/g, ' ') // reemplaza espacios, saltos de línea, tabulaciones por un solo espacio
+    .trim()
+    .replace(/\.$/, '')           // elimina punto final si existe
+    .toLowerCase();
+}
+
+const tiposPago = [
+  "Pagos con tarjeta facturados.",
+  "Pagos con tarjeta tickets",
+  "Pagos con efectivo retiro tarjeta facturados.",
+  "Pagos con efectivo retiro tarjeta tickets.",
+  "Pagos efectivo retiro tarjeta sin comprobante",
+  "Pagos efectivo (caja) tickets",
+  "Pago efectivo (caja) sin comprobante"
+];
+
+// Formatea fecha igual que imprimir.js
+function formatearFecha(fecha) {
+  if (!fecha) return '';
+  const d = new Date(fecha);
+  if (isNaN(d)) return fecha;
+  const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+  const dia = String(d.getDate()).padStart(2, '0');
+  const mes = meses[d.getMonth()];
+  const año = String(d.getFullYear()).slice(-2);
+  return `${dia}-${mes}-${año}`;
+}
+
+// Genera el HTML de impresión
+function generarHTMLImpresion(registros, proyecto) {
+  let html = `
+    <div style="font-family:Montserrat,Roboto,sans-serif; color:#003B5C; padding:24px;">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:24px;">
+
+      <div>
+          <h2 style="margin:0; font-size:1.5em;">Registros de Facturas y Tickets</h2>
+          <div style="font-size:1em; color:#276080;">Sistema INXITE / Gestión de Gastos</div>
+        </div>
+      </div>
+      ${proyecto ? `
+        <table style="margin-bottom:24px; border-collapse:collapse;">
+          <tr><td><strong>PROYECTO:</strong></td><td>${proyecto.nombre || ''}</td></tr>
+          <tr><td><strong>CLIENTE:</strong></td><td>${proyecto.cliente || ''}</td></tr>
+          <tr><td><strong>UBICACIÓN:</strong></td><td>${proyecto.ubicación || ''}</td></tr>
+          <tr><td><strong>INICIO:</strong></td><td>${formatearFecha(proyecto.fecha_inicio)}</td></tr>
+          <tr><td><strong>TERMINACIÓN:</strong></td><td>${formatearFecha(proyecto.fecha_final)}</td></tr>
+        </table>
+      ` : ''}
+  `;
+
+  let totalRegistros = 0;
+  const tiposPagoNormalizados = tiposPago.map(normalizarPago);
+
+  tiposPago.forEach(tipo => {
+    const tipoNormalizado = normalizarPago(tipo);
+    const registrosPorTipo = registros.filter(r =>
+      normalizarPago(r.pago) === tipoNormalizado
+    );
+    if (registrosPorTipo.length > 0) {
+      totalRegistros += registrosPorTipo.length;
+      let totalImporte = 0;
+      html += `
+        <h3 style="margin-top:24px; color:#FF6F00;">${tipo}</h3>
+        <table style="width:100%; border-collapse:collapse; margin-bottom:8px;">
+          <thead>
+            <tr style="background:#ececec;">
+              <th style="padding:6px; border:1px solid #ececec;">Fecha de cargo</th>
+              <th style="padding:6px; border:1px solid #ececec;">Fecha de Facturación</th>
+              <th style="padding:6px; border:1px solid #ececec;">Tipo</th>
+              <th style="padding:6px; border:1px solid #ececec;">Folio</th>
+              <th style="padding:6px; border:1px solid #ececec;">Establecimiento</th>
+              <th style="padding:6px; border:1px solid #ececec;">Importe</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      registrosPorTipo.forEach(reg => {
+        html += `
+          <tr>
+            <td style="padding:6px; border:1px solid #ececec;">${formatearFecha(reg.fecha_cargo)}</td>
+            <td style="padding:6px; border:1px solid #ececec;">${formatearFecha(reg.fecha_facturacion)}</td>
+            <td style="padding:6px; border:1px solid #ececec;">${reg.tipo || ''}</td>
+            <td style="padding:6px; border:1px solid #ececec;">${reg.folio || ''}</td>
+            <td style="padding:6px; border:1px solid #ececec;">${reg.establecimiento || ''}</td>
+            <td style="padding:6px; border:1px solid #ececec;">${reg.importe || ''}</td>
+          </tr>
+        `;
+        totalImporte += Number(reg.importe) || 0;
+      });
+      html += `
+          </tbody>
+        </table>
+        <div style="font-weight:bold; color:#003B5C; margin-bottom:16px;">Total: ${totalImporte.toFixed(2)}</div>
+      `;
+    }
+  });
+
+  // Sección "Otros"
+  const otrosRegistros = registros.filter(r =>
+    !tiposPagoNormalizados.includes(
+      normalizarPago(r.pago)
+    )
+  );
+  if (otrosRegistros.length > 0) {
+    totalRegistros += otrosRegistros.length;
+    let totalImporteOtros = 0;
+    html += `
+      <h3 style="margin-top:24px; color:#FF6F00;">Otros</h3>
+      <table style="width:100%; border-collapse:collapse; margin-bottom:8px;">
+        <thead>
+          <tr style="background:#ececec;">
+            <th style="padding:6px; border:1px solid #ececec;">Fecha de cargo</th>
+            <th style="padding:6px; border:1px solid #ececec;">Fecha de Facturación</th>
+            <th style="padding:6px; border:1px solid #ececec;">Tipo</th>
+            <th style="padding:6px; border:1px solid #ececec;">Tipo de pago</th>
+            <th style="padding:6px; border:1px solid #ececec;">Folio</th>
+            <th style="padding:6px; border:1px solid #ececec;">Establecimiento</th>
+            <th style="padding:6px; border:1px solid #ececec;">Importe</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
+    otrosRegistros.forEach(reg => {
+      html += `
+        <tr>
+          <td style="padding:6px; border:1px solid #ececec;">${formatearFecha(reg.fecha_cargo)}</td>
+          <td style="padding:6px; border:1px solid #ececec;">${formatearFecha(reg.fecha_facturacion)}</td>
+          <td style="padding:6px; border:1px solid #ececec;">${reg.tipo || ''}</td>
+          <td style="padding:6px; border:1px solid #ececec;">${reg.pago || ''}</td>
+          <td style="padding:6px; border:1px solid #ececec;">${reg.folio || ''}</td>
+          <td style="padding:6px; border:1px solid #ececec;">${reg.establecimiento || ''}</td>
+          <td style="padding:6px; border:1px solid #ececec;">${reg.importe || ''}</td>
+        </tr>
+      `;
+      totalImporteOtros += Number(reg.importe) || 0;
+    });
+    html += `
+        </tbody>
+      </table>
+      <div style="font-weight:bold; color:#003B5C; margin-bottom:16px;">Total: ${totalImporteOtros.toFixed(2)}</div>
+    `;
+  }
+
+  html += `<div style="margin-top:24px; font-weight:bold;">Registros mostrados: ${totalRegistros}</div>`;
+  html += `</div>`;
+  return html;
+}
+
+// Evento para el botón de imprimir (flecha)
+document.querySelector('.table-footer .btn').addEventListener('click', async function() {
+  // Usa los registros filtrados actualmente
+  let registros = registrosFiltrados.length ? registrosFiltrados : registrosOriginales;
+
+  // Si hay filtro de proyecto, busca el proyecto
+  let nombreProyecto = document.getElementById('proyecto-autocomplete').value.trim();
+  let proyecto = null;
+  if (nombreProyecto) {
+    proyecto = proyectosInfo.find(p => p.nombre === nombreProyecto);
+    registros = registros.filter(r => proyecto && r.id_proyecto === proyecto.id_proyecto);
+  }
+
+  // Genera el HTML de impresión
+  const htmlImpresion = generarHTMLImpresion(registros, proyecto);
+
+  // Inserta en el área oculta
+  const printArea = document.getElementById('print-area');
+  printArea.innerHTML = htmlImpresion;
+
+  // Imprime solo el área generada
+  const ventana = window.open('', '', 'width=900,height=700');
+  ventana.document.write(`
+    <html>
+      <head>
+        <title>Imprimir Registros</title>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
+        <style>
+          body { font-family:Montserrat,Roboto,sans-serif; color:#003B5C; }
+          table { border-collapse:collapse; width:100%; }
+          th, td { border:1px solid #ececec; padding:6px; }
+          th { background:#ececec; }
+          h2, h3 { color:#003B5C; }
+        </style>
+      </head>
+      <body>
+        ${htmlImpresion}
+      </body>
+    </html>
+  `);
+  ventana.document.close();
+  ventana.focus();
+  ventana.print();
+  ventana.close();
+});
+
 
 
