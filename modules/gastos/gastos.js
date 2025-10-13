@@ -54,6 +54,7 @@ function mostrarGastosPaginados(gastos) {
           <div class="acciones-btns">
             <button class="btn-accion btn-editar" title="Editar"><i class="ri-edit-2-line"></i></button>
             <button class="btn-accion btn-eliminar" title="Eliminar"><i class="ri-delete-bin-line"></i></button>
+            <button class="btn-accion btn-ver" title="Ver Documento"><i class="ri-eye-line"></i></button>
           </div>
         </td>
       </tr>
@@ -246,6 +247,19 @@ let gastoProyectoEditandoId = null;
 // Editar
 function asignarEventosGastos() {
   const tbody = document.getElementById('table-body');
+  // Ver documento
+  tbody.querySelectorAll('.btn-ver').forEach((btn, idx) => {
+    btn.onclick = function() {
+      const gasto = gastosFiltrados[(paginaActual - 1) * GASTOS_POR_PAGINA + idx];
+      if (gasto.link) {
+        window.open(gasto.link, '_blank');
+      } else {
+        alert('No hay enlace disponible para este gasto.');
+      }
+    };
+  });
+
+  // Editar
   tbody.querySelectorAll('.btn-editar').forEach((btn, idx) => {
     btn.onclick = function() {
       const gasto = gastosFiltrados[(paginaActual - 1) * GASTOS_POR_PAGINA + idx];
