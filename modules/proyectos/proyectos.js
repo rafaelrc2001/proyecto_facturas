@@ -1,5 +1,7 @@
 import { supabase } from '../../supabase/db.js';
 import { insertarProyecto, obtenerProyectos, eliminarProyecto, actualizarProyecto } from '../../supabase/proyecto.js';
+import { obtenerTrabajadores } from '../../supabase/trabajador.js';
+import { insertarAsignacion } from '../../supabase/asignar_proyecto.js';
 
 let proyectosData = [];
 
@@ -390,4 +392,122 @@ document.getElementById('form-editar-proyecto').addEventListener('submit', async
     document.getElementById('modal-editar-proyecto').style.display = 'none';
     cargarProyectos();
   }
+});
+
+let trabajadoresList = [];
+let proyectosList = [];
+let trabajadorSeleccionadoId = null;
+let proyectoSeleccionadoId = null;
+
+// Mostrar el modal al hacer clic en el botón "Asignar proyecto"
+document.addEventListener('DOMContentLoaded', () => {
+  const btnAsignar = document.querySelector('.btn-asignar');
+  const modalAsignar = document.getElementById('modalAsignarProyecto');
+  const cerrarModal = document.getElementById('cerrarModalAsignarProyecto');
+  const inputTrabajador = document.getElementById('inputTrabajador');
+  const listTrabajador = document.getElementById('listTrabajador');
+  const inputProyecto = document.getElementById('inputProyecto');
+  const listProyecto = document.getElementById('listProyecto');
+  const formAsignar = document.getElementById('formAsignarProyecto');
+
+  btnAsignar.addEventListener('click', async () => {
+    modalAsignar.style.display = 'flex';
+    await cargarDatosAsignar();
+  });
+
+  cerrarModal.addEventListener('click', () => {
+    modalAsignar.style.display = 'none';
+    formAsignar.reset();
+    trabajadorSeleccionadoId = null;
+    proyectoSeleccionadoId = null;
+    listTrabajador.innerHTML = '';
+    listProyecto.innerHTML = '';
+  });
+
+  // Opcional: cerrar el modal si se hace clic fuera del contenido
+  modalAsignar.addEventListener('click', function(e) {
+    if (e.target === modalAsignar) {
+      modalAsignar.style.display = 'none';
+      formAsignar.reset();
+      trabajadorSeleccionadoId = null;
+      proyectoSeleccionadoId = null;
+      listTrabajador.innerHTML = '';
+      listProyecto.innerHTML = '';
+    }
+  });
+
+  async function cargarDatosAsignar() {
+    // Cargar trabajadores
+    const { data: trabajadores } = await obtenerTrabajadores();
+    trabajadoresList = trabajadores || [];
+    // Cargar proyectos
+    const { data: proyectos } = await obtenerProyectos();
+    proyectosList = proyectos || [];
+  }
+
+  // Autocompletado para trabajador
+  inputTrabajador.addEventListener('input', function() {
+    const valor = this.value.trim().toLowerCase();
+    listTrabajador.innerHTML = '';
+    trabajadorSeleccionadoId = null;
+    if (!valor) return;
+    const sugerencias = trabajadoresList.filter(t => t.nombre.toLowerCase().includes(valor));
+    sugerencias.forEach(t => {
+      const div = document.createElement('div');
+      div.textContent = t.nombre;
+      div.onclick = function() {
+        inputTrabajador.value = t.nombre;
+        trabajadorSeleccionadoId = t.id_trabajador;
+        listTrabajador.innerHTML = '';
+      };
+      listTrabajador.appendChild(div);
+    });
+  });
+
+  // Autocompletado para proyecto
+  inputProyecto.addEventListener('input', function() {
+    const valor = this.value.trim().toLowerCase();
+    listProyecto.innerHTML = '';
+    proyectoSeleccionadoId = null;
+    if (!valor) return;
+    const sugerencias = proyectosList.filter(p => p.nombre.toLowerCase().includes(valor));
+    sugerencias.forEach(p => {
+      const div = document.createElement('div');
+      div.textContent = p.nombre;
+      div.onclick = function() {
+        inputProyecto.value = p.nombre;
+        proyectoSeleccionadoId = p.id_proyecto;
+        listProyecto.innerHTML = '';
+      };
+      listProyecto.appendChild(div);
+    });
+  });
+
+  // Oculta sugerencias si se hace clic fuera
+  document.addEventListener('click', function(e) {
+    if (!listTrabajador.contains(e.target) && e.target !== inputTrabajador) listTrabajador.innerHTML = '';
+    if (!listProyecto.contains(e.target) && e.target !== inputProyecto) listProyecto.innerHTML = '';
+  });
+
+  // Guardar asignación
+  formAsignar.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    if (!trabajadorSeleccionadoId || !proyectoSeleccionadoId) {
+      alert('Selecciona un encargado y un proyecto válido.');
+      return;
+    }
+    const { error } = await insertarAsignacion({ id_trabajador: trabajadorSeleccionadoId, id_proyecto: proyectoSeleccionadoId });
+    if (error) {
+      alert('Error al asignar: ' + error.message);
+    } else {
+      alert('Proyecto asignado correctamente');
+      modalAsignar.style.display = 'none';
+      formAsignar.reset();
+      trabajadorSeleccionadoId = null;
+      proyectoSeleccionadoId = null;
+      listTrabajador.innerHTML = '';
+      listProyecto.innerHTML = '';
+      cargarProyectos(); // Actualiza la tabla
+    }
+  });
 });

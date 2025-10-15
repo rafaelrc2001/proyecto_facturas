@@ -14,6 +14,8 @@
     />
     <link rel="stylesheet" href="../../CSS/general.css" />
     <link rel="stylesheet" href="../../CSS/menu.css" />
+    <link rel="stylesheet" href="../../CSS/imprimir.css" />
+ 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="icon" href="../../img/inxiteblanco.png" type="image/png" />
   </head>
@@ -151,62 +153,25 @@
 </header>
 
         <!-- Cards Section -->
-        
-        <section class="cards-section">
-          <div class="card">
-            <div class="card-icon" style="background-color: #eceff1">
-              <i class="ri-file-list-2-line" style="color: #455a64"></i>
-            </div>
-            <div class="card-content">
-              <h3>Total de Registros</h3>
-              <p class="count" id="total-count">-</p>
-            </div>
-          </div>
 
-          <div class="card">
-            <div class="card-icon"style="background-color: #eceff1">
-              <i class="ri-ticket-line" style="color: #455a64"></i>
-            </div>
-            <div class="card-content">
-              <h3>Tickets</h3>
-              <p class="count" id="tickets-count">-</p>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-icon" style="background-color: #eceff1">
-              <i class="ri-file-text-line" style="color: #455a64"></i>
-            </div>
-            <div class="card-content">
-              <h3>Facturas</h3>
-              <p class="count" id="facturas-count">-</p>
-            </div>
-          </div>
-        </section>
 
         <!-- Registros Table -->
         <section class="permits-table">
-          <div class="table-header-flex">
-           
+         
 
-             <div class="search-bar" style="min-width: 260px;">
-    <input type="text" id="registro-search" placeholder="Buscar en el sistema..." />
-      <i class="ri-search-line"></i>
-    </div>
-
-    <!-- Filtro desplegable -->
-<!-- Autocompletado de proyectos -->
-<div class="autocomplete-container" style="position:relative; min-width:260px;">
-  <input type="text" id="proyecto-autocomplete" placeholder="Filtrar por proyecto..." autocomplete="off" />
-  <div id="autocomplete-list" class="autocomplete-list" style="position:absolute; top:100%; left:0; right:0; background:#fff; border:1px solid #ececec; z-index:10;"></div>
-</div>
-
-
-           <button class="btn primary" id="descargar-csv">
-  <i class="ri-download-line"></i> Generar Reporte
-</button>
-           
-          </div>
+              <div class="table-header-flex" id="imprimir-header-flex">
+                <div class="filtro-boton-flex">
+                  <div id="imprimir-filtro-container">
+                    <div class="autocomplete-container" id="imprimir-autocomplete-container">
+                      <input type="text" id="imprimir-proyecto-autocomplete" placeholder="Filtrar por proyecto..." autocomplete="off" />
+                      <div id="imprimir-autocomplete-list" class="autocomplete-list"></div>
+                    </div>
+                  </div>
+                  <button class="btn primary" id="imprimir-descargar-csv">
+                    <i class="ri-download-line"></i> Descargar
+                  </button>
+                </div>
+              </div>
 
 
 
@@ -219,47 +184,37 @@
 
 
 
-    <div class="table-container">
-      <table id="facturasTable">
-        <thead>
-          <tr>
-            <th>Fecha de cargo</th>
-            <th>Fecha de Facturacion</th>
-            <th>Tipo</th>
-            <th>Tipo de pago</th>
-            <th>Folio</th>
-            <th>Establecimiento</th>
-            <th>Importe</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="table-body">
-          <!-- Aquí se llenarán los datos con JS -->
-        </tbody>
-      </table>
-    </div>
+      <div id="imprimir-proyecto-info" class="proyecto-info"></div>
+               <!-- ...ya tienes el filtro y la tabla debajo... -->
 
-    
-    <div class="table-footer">
-      <div class="pagination">
-        <button class="pagination-btn">
-          <i class="ri-arrow-left-s-line"></i>
-        </button>
-        <button class="pagination-btn active">1</button>
-        <button class="pagination-btn">2</button>
-        <button class="pagination-btn">3</button>
-        <button class="pagination-btn">
-          <i class="ri-arrow-right-s-line"></i>
-        </button>
-      </div>
-      <!-- ...después de la tabla... -->
-<span id="contador-registros" style="display:block; margin-top:12px; font-weight:600; color:#003B5C;"></span>
-     <button class="btn">
-          <i class="ri-arrow-right-s-line"></i>
-        </button>
 
-</div>
-  </div>
+            <div class="table-container" id="imprimir-table-container">
+              <table id="imprimir-facturas-table">
+                <thead>
+                  <tr>
+                    <th>Fecha de cargo</th>
+                    <th>Fecha de Facturación</th>
+                    <th>Folio</th>
+                    <th>Establecimiento</th>
+                    <th>Importe</th>
+                  </tr>
+                </thead>
+                <tbody id="imprimir-table-body">
+                  <!-- Se llenará dinámicamente con JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Paginación y contador -->
+            <div class="table-footer" id="imprimir-table-footer">
+      
+
+              <span id="imprimir-contador-registros"></span>
+            </div>
+          </div>
+
+        
+          </div>
         </section>
       </main>
     </div>
@@ -320,7 +275,7 @@
         </div>
         <div class="modal-form-group" id="grupo-folio">
           <label for="editar-folio" id="label-folio">Folio</label>
-          <input type="text" id="editar-folio" name="folio" required>
+          <input type="text" id="editar-folio" name="folio" >
         </div>
         <div class="modal-form-group" id="grupo-establecimiento">
           <label for="editar-establecimiento" id="label-establecimiento">Establecimiento</label>
@@ -348,7 +303,8 @@
     
   </div>
 </div>
-  <script type="module" src="registros.js"></script>
+    <script type="module" src="registros.js"></script>
+    <script type="module" src="imprimir.js"></script>
     <script src="../../Js/menu.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
 

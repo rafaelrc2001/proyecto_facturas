@@ -1,9 +1,9 @@
 import { supabase } from './db.js';
 
-export async function insertarTrabajador({ nombre, puesto, idEmpleado }) {
+export async function insertarTrabajador({ nombre, puesto, idEmpleado, correo, usuario, contrasena }) {
   return await supabase
     .from('trabajador')
-    .insert([{ nombre, puesto, id_empleado: idEmpleado }]);
+    .insert([{ nombre, puesto, id_empleado: idEmpleado, correo, usuario, contrasena }]);
 }
 
 export async function obtenerTrabajadores() {
@@ -19,9 +19,9 @@ export async function eliminarTrabajador(id) {
     .eq('id_trabajador', id);
 }
 
-export async function actualizarTrabajador(id_trabajador, { nombre, puesto, idEmpleado }) {
+export async function actualizarTrabajador(id_trabajador, { nombre, puesto, idEmpleado, correo, usuario, contrasena }) {
   return await supabase
     .from('trabajador')
-    .update({ nombre, puesto, id_empleado: idEmpleado })
+    .update({ nombre, puesto, id_empleado: idEmpleado, correo, usuario, contrasena })
     .eq('id_trabajador', id_trabajador); // usa id_trabajador
 }

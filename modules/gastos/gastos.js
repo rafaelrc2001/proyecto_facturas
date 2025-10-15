@@ -116,8 +116,10 @@ function renderizarPaginacionGastos(totalPaginas) {
 document.querySelector('.input-buscar').addEventListener('input', function() {
   const valor = this.value.trim().toLowerCase();
   const filtrados = gastosOriginales.filter(g =>
-    (g.folio && g.folio.toLowerCase().includes(valor)) ||
-    (g.establecimiento && g.establecimiento.toLowerCase().includes(valor))
+    (g.pago && g.pago.toLowerCase().includes(valor)) || // Tipo de pago
+    (g.establecimiento && g.establecimiento.toLowerCase().includes(valor)) || // Establecimiento
+    (g.folio && g.folio.toLowerCase().includes(valor)) || // Folio
+    (proyectosInfo.find(p => p.id_proyecto === g.id_proyecto && p.nombre.toLowerCase().includes(valor))) // Proyecto
   );
   paginaActual = 1;
   mostrarGastosPaginados(filtrados);

@@ -205,9 +205,10 @@ function renderizarPaginacion(totalPaginas) {
 document.getElementById('registro-search').addEventListener('input', function() {
   const valor = this.value.trim().toLowerCase();
   const filtrados = registrosOriginales.filter(r =>
-    (r.folio && r.folio.toLowerCase().includes(valor)) ||
-    (r.establecimiento && r.establecimiento.toLowerCase().includes(valor)) ||
-    (r.importe && r.importe.toString().toLowerCase().includes(valor))
+    (r.pago && r.pago.toLowerCase().includes(valor)) || // Tipo de pago
+    (r.establecimiento && r.establecimiento.toLowerCase().includes(valor)) || // Establecimiento
+    (r.folio && r.folio.toLowerCase().includes(valor)) || // Folio
+    (proyectosInfo.find(p => p.id_proyecto === r.id_proyecto && p.nombre.toLowerCase().includes(valor))) // Proyecto
   );
   paginaActual = 1;
   mostrarRegistrosPaginados(filtrados);
