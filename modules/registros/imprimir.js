@@ -88,29 +88,39 @@ function mostrarTablasPorProyecto(nombreProyecto) {
 
       // Mostrar datos del proyecto
       infoContainer.innerHTML = `
-        <table class="proyecto-info-table">
-          <tr>
-            <td><strong>NOMBRE DEL PROYECTO:</strong></td>
-            <td>${proyecto.nombre || ''}</td>
-          </tr>
-          <tr>
-            <td><strong>CLIENTE:</strong></td>
-            <td>${proyecto.cliente || ''}</td>
-          </tr>
-          <tr>
-            <td><strong>UBICACIÓN DE LA OBRA:</strong></td>
-            <td>${proyecto.ubicación || ''}</td>
-          </tr>
-          <tr>
-            <td><strong>FECHA DE INICIO:</strong></td>
-            <td>${formatearFecha(proyecto.fecha_inicio)}</td>
-          </tr>
-          <tr>
-            <td><strong>FECHA DE TERMINACIÓN:</strong></td>
-            <td>${formatearFecha(proyecto.fecha_final)}</td>
-          </tr>
-        </table>
-      `;
+  <h2 style="text-align:center; color:#FF6F00; margin-bottom:18px;">Listado de Facturas y Tickets</h2>
+  <hr style="border:1px solid #FF6F00; margin-bottom:18px;">
+ 
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
+    <div style="flex:1;">
+      <table style="font-size:1em;">
+        <tr>
+          <td><strong>NOMBRE DEL PROYECTO:</strong></td>
+          <td>${proyecto.nombre || ''}</td>
+        </tr>
+        <tr>
+          <td><strong>CLIENTE:</strong></td>
+          <td>${proyecto.cliente || ''}</td>
+        </tr>
+        <tr>
+          <td><strong>UBICACIÓN DE LA OBRA:</strong></td>
+          <td>${proyecto.ubicación || ''}</td>
+        </tr>
+        <tr>
+          <td><strong>FECHA DE INICIO:</strong></td>
+          <td>${formatearFecha(proyecto.fecha_inicio)}</td>
+        </tr>
+        <tr>
+          <td><strong>FECHA DE TERMINACIÓN:</strong></td>
+          <td>${formatearFecha(proyecto.fecha_final)}</td>
+        </tr>
+      </table>
+    </div>
+    <div style="flex:0 0 180px; text-align:right;">
+      <img src="../../img/inxite.png" alt="Logo Inxite" style="max-width:160px;">
+    </div>
+  </div>
+       `;
     } else {
       registrosFiltrados = [];
       infoContainer.innerHTML = '';
@@ -152,7 +162,7 @@ function mostrarTablasPorProyecto(nombreProyecto) {
             <td>${reg.tipo || ''}</td>
             <td>${reg.folio || ''}</td>
             <td>${reg.establecimiento || ''}</td>
-            <td>${reg.importe || ''}</td>
+            <td>${formatoMoneda(reg.importe) || ''}</td>
           </tr>
         `;
         totalImporte += Number(reg.importe) || 0;
@@ -160,11 +170,21 @@ function mostrarTablasPorProyecto(nombreProyecto) {
       tablaHTML += `
     </tbody>
   </table>
-  <div class="imprimir-total">Total: ${totalImporte.toFixed(2)}</div>
+  <div class="imprimir-total">Total: ${formatoMoneda(totalImporte)}</div>
       `;
       container.innerHTML += tablaHTML;
     }
   });
+
+  // Suma total de todos los importes mostrados
+  const totalGeneral = registrosFiltrados.reduce((acc, reg) => acc + (Number(reg.importe) || 0), 0);
+
+  // Muestra el total general debajo de todas las tablas
+  container.innerHTML += `
+    <div class="imprimir-total-general" style="font-weight:bold; color:#FF6F00; margin-top:24px; font-size:1.2em;">
+      Total general de importes: ${formatoMoneda(totalGeneral)}
+    </div>
+  `;
 
   // Actualiza el contador de registros
   document.getElementById('imprimir-contador-registros').textContent = `Registros mostrados: ${totalRegistros}`;
@@ -183,9 +203,16 @@ function formatearFecha(fecha) {
   return `${dia}-${mes}-${año}`;
 }
 
+// Función para formatear importe a moneda
+function formatoMoneda(valor) {
+  return '$' + Number(valor).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 // Botón descargar CSV (descarga todos los registros mostrados)
 document.getElementById('imprimir-descargar-csv').addEventListener('click', function() {
-  const printContents = document.getElementById('imprimir-table-container').innerHTML;
+  const infoContents = document.getElementById('imprimir-proyecto-info').innerHTML;
+  const tableContents = document.getElementById('imprimir-table-container').innerHTML;
+  const printContents = infoContents + tableContents;
   const originalContents = document.body.innerHTML;
 
   document.body.innerHTML = printContents;
