@@ -108,8 +108,9 @@ function renderizarPaginacionTrabajadores(totalPaginas) {
   if (totalPaginas <= 1) return;
 
   // Botón anterior
-  const btnPrev = document.createElement('button');
-  btnPrev.textContent = 'Anterior';
+    const btnPrev = document.createElement('button');
+  btnPrev.className = 'pagination-btn';
+  btnPrev.innerHTML = '<i class="ri-arrow-left-s-line"></i>';
   btnPrev.disabled = paginaActual === 1;
   btnPrev.onclick = () => {
     if (paginaActual > 1) {
@@ -133,7 +134,8 @@ function renderizarPaginacionTrabajadores(totalPaginas) {
 
   // Botón siguiente
   const btnNext = document.createElement('button');
-  btnNext.textContent = 'Siguiente';
+  btnNext.className = 'pagination-btn';
+  btnNext.innerHTML = '<i class="ri-arrow-right-s-line"></i>';
   btnNext.disabled = paginaActual === totalPaginas;
   btnNext.onclick = () => {
     if (paginaActual < totalPaginas) {
