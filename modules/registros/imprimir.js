@@ -126,7 +126,18 @@ function mostrarTablasPorProyecto(nombreProyecto) {
       infoContainer.innerHTML = '';
     }
   } else {
-    infoContainer.innerHTML = '';
+    infoContainer.innerHTML = `
+      <h2 style="text-align:center; color:#FF6F00; margin-bottom:18px;">Listado de Facturas y Tickets</h2>
+      <hr style="border:1px solid #FF6F00; margin-bottom:18px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
+        <div style="flex:1;">
+          <span style="font-size:1.1em;">Mostrando todos los proyectos</span>
+        </div>
+        <div style="flex:0 0 180px; text-align:right;">
+          <img src="../../img/inxite.png" alt="Logo Inxite" style="max-width:160px;">
+        </div>
+      </div>
+    `;
   }
 
   let totalRegistros = 0;
@@ -251,5 +262,13 @@ document.getElementById('formPreguntas').addEventListener('submit', function(e) 
   document.body.innerHTML = originalContents;
   location.reload();
 });
+
+document.getElementById('cerrarModalPreguntas').onclick = function() {
+  document.getElementById('modalPreguntas').style.display = 'none';
+};
+document.getElementById('cancelarModalPreguntas').onclick = function() {
+  document.getElementById('modalPreguntas').style.display = 'none';
+  window.location.reload(); // O redirige a la página principal si lo prefieres
+};
 
 

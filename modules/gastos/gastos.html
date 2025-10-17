@@ -248,7 +248,7 @@
             </div>
             <div class="modal-form-group">
               <label for="pago">Tipo de pago</label>
-              <select id="pago" name="pago" required>
+              <select id="pago" name="pago" >
                 <option value="" disabled selected>Selecciona tipo de pago</option>
                 <option value="Pagos con tarjeta facturados.">Pagos con tarjeta facturados.</option>
                 <option value="Pagos con tarjeta tickets">Pagos con tarjeta tickets</option>
@@ -261,11 +261,11 @@
             </div>
             <div class="modal-form-group">
               <label for="folio">Folio</label>
-              <input type="text" id="folio" name="folio" required>
+              <input type="text" id="folio" name="folio">
             </div>
             <div class="modal-form-group">
               <label for="establecimiento">Establecimiento</label>
-              <input type="text" id="establecimiento" name="establecimiento" required>
+              <input type="text" id="establecimiento" name="establecimiento" >
             </div>
             <div class="modal-form-group">
               <label for="importe">Importe</label>
@@ -349,7 +349,7 @@
           <input type="text" id="gasto-editar-proyecto-autocomplete" placeholder="Buscar proyecto..." autocomplete="off" required>
           <div id="gasto-editar-autocomplete-list" class="autocomplete-list"></div>
         </div>
-        <div class="modal-form-group" id="gasto-grupo-documentos">
+        <div class="modal-form-group" id="gasto-documentos-container">
           <label for="gasto-editar-documentos" id="gasto-label-documentos">Documento</label>
           <input type="file" id="gasto-editar-documentos" name="documentos" accept="image/*,.pdf,.doc,.docx">
         </div>

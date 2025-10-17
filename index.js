@@ -2,25 +2,31 @@
 document.addEventListener('DOMContentLoaded', function() {
     const loginForm = document.querySelector('.login-form');
     if (loginForm) {
-        loginForm.addEventListener('submit', function(e) {
+        loginForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value.trim();
-            const emailError = document.getElementById('email-error');
+            const usuario = document.getElementById('email').value.trim();
+            const contrasena = document.getElementById('password').value.trim();
             const passwordError = document.getElementById('password-error');
-            if (emailError) emailError.textContent = '';
             if (passwordError) passwordError.textContent = '';
-            if (email === 'admin' && password === 'admin123') {
-                window.location.href = 'modules/Dashboard/dashboard.html';
-            } else {
-                if (email !== 'admin' && emailError) {
-                    emailError.textContent = 'Usuario incorrecto';
-                    setTimeout(() => { emailError.textContent = ''; }, 1500);
+
+            try {
+                const res = await fetch('http://localhost:3000/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ usuario, contrasena })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    // Guardar datos en localStorage
+                    localStorage.setItem('user', JSON.stringify(data));
+                    window.location.href = 'modules/Dashboard/dashboard.html';
+                } else {
+                    passwordError.textContent = data.error || 'Usuario o contraseña incorrecta';
+                    setTimeout(() => { passwordError.textContent = ''; }, 2000);
                 }
-                if (password !== 'admin123' && passwordError) {
-                    passwordError.textContent = 'Contraseña incorrecta';
-                    setTimeout(() => { passwordError.textContent = ''; }, 1500);
-                }
+            } catch (err) {
+                passwordError.textContent = 'Error de conexión';
+                setTimeout(() => { passwordError.textContent = ''; }, 2000);
             }
         });
     }

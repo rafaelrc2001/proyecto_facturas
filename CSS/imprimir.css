@@ -480,3 +480,13 @@
   border-bottom: none !important;
   box-shadow: none !important;
 }
+
+
+#modalPreguntas .modal-close i {
+  color: #003B5C;
+  transition: color 0.2s;
+}
+
+#modalPreguntas .modal-close:hover i {
+  color: #FF6F00;
+}

@@ -548,5 +548,15 @@ document.querySelector('.table-footer .btn').addEventListener('click', async fun
   ventana.close();
 });
 
+// Ejemplo para dashboard.js
+const user = JSON.parse(localStorage.getItem('user'));
+if (user) {
+    // Iniciales
+    const initials = user.nombre.split(' ').map(n => n[0]).join('').toUpperCase();
+    document.querySelector('.avatar').textContent = initials;
+    document.querySelector('.name').textContent = user.nombre;
+    document.querySelector('.role').textContent = user.puesto;
+}
+
 
 

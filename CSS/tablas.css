@@ -1233,3 +1233,12 @@
 #modal-nuevo-gasto .modal-close:hover i {
   color: #FF6F00;
 }
+
+#modal-editar-gasto .modal-close i {
+  color: #003B5C;
+  transition: color 0.2s;
+}
+
+#modal-editar-gasto .modal-close:hover i {
+  color: #FF6F00;
+}
