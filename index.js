@@ -1,4 +1,5 @@
-// Lógica básica de login para usuario admin
+import { supabase } from './supabase/db.js';
+
 document.addEventListener('DOMContentLoaded', function() {
     const loginForm = document.querySelector('.login-form');
     if (loginForm) {
@@ -9,24 +10,20 @@ document.addEventListener('DOMContentLoaded', function() {
             const passwordError = document.getElementById('password-error');
             if (passwordError) passwordError.textContent = '';
 
-            try {
-                const res = await fetch('http://localhost:3000/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ usuario, contrasena })
-                });
-                const data = await res.json();
-                if (res.ok) {
-                    // Guardar datos en localStorage
-                    localStorage.setItem('user', JSON.stringify(data));
-                    window.location.href = 'modules/Dashboard/dashboard.html';
-                } else {
-                    passwordError.textContent = data.error || 'Usuario o contraseña incorrecta';
-                    setTimeout(() => { passwordError.textContent = ''; }, 2000);
-                }
-            } catch (err) {
-                passwordError.textContent = 'Error de conexión';
+            // Consulta a Supabase
+            const { data, error } = await supabase
+                .from('trabajador')
+                .select('id_trabajador, nombre, puesto')
+                .eq('usuario', usuario)
+                .eq('contrasena', contrasena)
+                .single();
+
+            if (error || !data) {
+                passwordError.textContent = 'Usuario o contraseña incorrecta';
                 setTimeout(() => { passwordError.textContent = ''; }, 2000);
+            } else {
+                localStorage.setItem('user', JSON.stringify(data));
+                window.location.href = 'modules/Dashboard/dashboard.html';
             }
         });
     }

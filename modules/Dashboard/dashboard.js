@@ -412,3 +412,8 @@ window.totalIndex = getColIndex("Total", filas);
 
 // En el filtro del buscador
 actualizarTarjetasDashboard(filtrados, window.totalIndex);
+
+const idTrabajador = localStorage.getItem('id_trabajador');
+if (idTrabajador) {
+  console.log(`Ingresaste con el id_trabajador: ${idTrabajador}`);
+}
