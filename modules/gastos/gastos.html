@@ -222,7 +222,9 @@
     <!-- Modal Nuevo Gasto -->
     <div id="modal-nuevo-gasto" class="modal" style="display: none;">
       <div class="modal-content modal-gasto">
-        <span class="modal-close" id="close-modal-nuevo">&times;</span>
+        <button id="close-modal-nuevo" class="modal-close" type="button" style="position:absolute; top:18px; right:18px; background:none; border:none; font-size:1.5em; cursor:pointer;">
+          <i class="ri-close-line"></i>
+        </button>
         <h2 class="modal-title">Nuevo gasto</h2>
         <div class="modal-title-line"></div>
         <form id="form-nuevo-gasto">
@@ -269,15 +271,15 @@
               <label for="importe">Importe</label>
               <input type="text" id="importe" name="importe" required pattern="^\d*([.,]\d{1,2})?$">
             </div>
-            <div class="modal-form-group autocomplete-container">
-              <label for="proyecto-autocomplete">Proyecto</label>
-              <input type="text" id="proyecto-autocomplete" placeholder="Buscar proyecto..." autocomplete="off" required>
-              <div id="autocomplete-list" class="autocomplete-list"></div>
-            </div>
-            <div class="modal-form-group">
-              <label for="documentos">Documento</label>
-              <input type="file" id="documentos" name="documentos" accept="image/*,.pdf,.doc,.docx">
-            </div>
+           <div class="modal-form-group autocomplete-container" id="gasto-proyecto-autocomplete-container">
+          <label for="proyecto-autocomplete">Proyecto</label>
+          <input type="text" id="proyecto-autocomplete" placeholder="Buscar proyecto..." autocomplete="off" required>
+          <div id="autocomplete-list" class="autocomplete-list"></div>
+        </div>
+            <div class="modal-form-group" id="gasto-documentos-container">
+            <label for="documentos">Documento</label>
+            <input type="file" id="documentos" name="documentos" accept="image/*,.pdf,.doc,.docx">
+          </div>
           </div>
           <div class="modal-actions">
             <button type="submit" class="btn primary">Guardar</button>
@@ -287,10 +289,15 @@
       </div>
     </div>
 
+    
+   
+
     <!-- Modal Editar Gasto -->
-   <div id="modal-editar-gasto" class="modal" style="display:none;">
-  <div id="gasto-editar-modal-content">
-    <span class="modal-close" id="gasto-close-modal-editar">&times;</span>
+<div id="modal-editar-gasto" class="modal" style="display:none;">
+  <div class="modal-content modal-gasto">
+    <button id="gasto-close-modal-editar" class="modal-close" type="button" style="position:absolute; top:18px; right:18px; background:none; border:none; font-size:1.5em; cursor:pointer;">
+      <i class="ri-close-line"></i>
+    </button>
     <h2 class="modal-title" id="gasto-editar-modal-title">Editar gasto</h2>
     <div class="modal-title-line" id="gasto-editar-modal-title-line"></div>
     <form id="gasto-form-editar-gasto">
@@ -309,6 +316,7 @@
             <option value="" disabled selected>Selecciona tipo</option>
             <option value="ticket">Ticket</option>
             <option value="factura">Factura</option>
+            <option value="no comprobable">No comprobable</option>
           </select>
         </div>
         <div class="modal-form-group" id="gasto-grupo-pago">
@@ -353,6 +361,8 @@
     </form>
   </div>
 </div>
+
+
     <script src="../../Js/menu.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
     <script type="module" src="../../modules/gastos/gastos.js"></script>

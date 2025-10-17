@@ -8,6 +8,8 @@ let proyectosInfo = []; // [{ id_proyecto, nombre }]
 const REGISTROS_POR_PAGINA = 7;
 let paginaActual = 1;
 let registrosFiltrados = []; // Para guardar el resultado del filtro
+let respuestasPreguntas = {};
+
 
 // Obtén los nombres de proyectos al cargar la página
 async function cargarProyectosNombres() {
@@ -201,6 +203,8 @@ function renderizarPaginacion(totalPaginas) {
 
 
 
+
+
 // Filtro por folio, establecimiento e importe
 document.getElementById('registro-search').addEventListener('input', function() {
   const valor = this.value.trim().toLowerCase();
@@ -262,7 +266,9 @@ document.getElementById('descargar-csv').addEventListener('click', function() {
   window.location.href = '../impresion/imprimir.html';
 });
 
-
+document.getElementById('descargar-btn').addEventListener('click', function() {
+  document.getElementById('modalPreguntas').style.display = 'flex';
+});
 
 // Guardar cambios al editar
 document.getElementById('form-editar-gasto').onsubmit = async function(e) {

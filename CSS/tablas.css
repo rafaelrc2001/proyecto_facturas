@@ -1109,3 +1109,127 @@
   cursor: default;
 }
 
+
+
+.autocomplete-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1001;
+  background: #fff;
+  border: 1.5px solid #ececec;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 4px 16px rgba(0,59,92,0.08);
+  width: 100%;
+  max-height: 220px;
+  overflow-y: auto;
+  font-size: 1em;
+}
+
+.modal-form-group {
+  position: relative;
+}
+
+.autocomplete-list div {
+  padding: 10px 14px;
+  cursor: pointer;
+  color: #444; /* Letras grises */
+  background: #fff;
+  transition: background 0.15s, color 0.15s;
+}
+
+.autocomplete-list div:hover,
+.autocomplete-list div.active {
+  background: #FF6F00;
+  color: #fff;
+}
+
+/* Estilo para el botón de cerrar en el modal de asignar proyecto */
+#modalAsignarProyecto .modal-close {
+  position: absolute;
+  top: 18px;
+  right: 22px;
+  font-size: 1.5em;
+  color: #003B5C;      /* Gris/azul oscuro por defecto */
+  cursor: pointer;
+  transition: color 0.2s;
+  font-weight: bold;
+  background: none;
+  border: none;
+}
+
+#modalAsignarProyecto .modal-close:hover {
+  color: #FF6F00;      /* Naranja al pasar el cursor */
+}
+
+#modalNuevoTrabajador .modal-close i {
+  color: #003B5C;
+  transition: color 0.2s;
+}
+
+#modalNuevoTrabajador .modal-close:hover i {
+  color: #FF6F00;
+}
+
+#modal-nuevo-gasto .autocomplete-container {
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+
+#modal-nuevo-gasto .autocomplete-container::after,
+#modal-nuevo-gasto .autocomplete-container::before {
+  display: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+
+
+#gasto-proyecto-autocomplete-container {
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+#gasto-proyecto-autocomplete-container::after,
+#gasto-proyecto-autocomplete-container::before {
+  display: none !important;
+}
+
+
+#gasto-documentos-container label {
+  display: block;
+  font-weight: 600;
+  color: #276080;
+  margin-bottom: 8px;
+  font-family: Montserrat, sans-serif;
+}
+
+#gasto-documentos-container input[type="file"] {
+  width: 320px; /* Ajusta el ancho según lo que necesites */
+  min-width: 220px;
+  max-width: 100%;
+  padding: 10px 18px;
+  border-radius: 8px;
+  background: #f7f8f6;
+  color: #003B5C;
+  font-size: 1em;
+  font-family: Roboto, sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border 0.2s, background 0.2s;
+}
+
+
+#modal-nuevo-gasto .modal-close {
+  color: #003B5C;
+  transition: color 0.2s;
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: none;
+  border: none;
+  font-size: 1.5em;
+  cursor: pointer;
+}
+
+#modal-nuevo-gasto .modal-close:hover i {
+  color: #FF6F00;
+}

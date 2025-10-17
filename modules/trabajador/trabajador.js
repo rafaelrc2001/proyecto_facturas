@@ -47,8 +47,8 @@ function mostrarTrabajadoresPaginados(trabajadores) {
   trabajadoresPagina.forEach(trabajador => {
     tbody.innerHTML += `
       <tr>
+       <td>${trabajador.id_empleado}</td>
         <td>${trabajador.nombre}</td>
-        <td>${trabajador.id_empleado}</td>
         <td>${trabajador.puesto}</td>
         <td>${trabajador.correo}</td>
         <td>${trabajador.usuario}</td>

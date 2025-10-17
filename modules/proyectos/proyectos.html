@@ -232,30 +232,38 @@
 
     
 
-    <div id="modalAsignarProyecto" class="modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.3); justify-content:center; align-items:center; z-index:1000;">
-  <div style="background:#fff; padding:32px 24px; border-radius:16px; min-width:320px; box-shadow:0 4px 24px rgba(0,59,92,0.12); position:relative;">
-    <button id="cerrarModalAsignarProyecto" style="position:absolute; top:12px; right:12px; background:none; border:none; font-size:1.2em; cursor:pointer;">
+  <!-- Modal Asignar Proyecto Mejorado -->
+<div id="modalAsignarProyecto" class="modal" style="display:none;">
+  <div class="modal-content modal-proyecto" style="max-width:600px; min-width:550px; padding:32px 32px 24px 32px; border-radius:18px; box-shadow:0 4px 24px rgba(0,59,92,0.12); position:relative;">
+    <button id="cerrarModalAsignarProyecto" class="modal-close" style="position:absolute; top:18px; right:18px; background:none; border:none; font-size:1.5em; cursor:pointer;">
       <i class="ri-close-line"></i>
     </button>
-    <h2 style="margin-bottom:18px; color:#003B5C;">Asignar proyecto</h2>
-   <form id="formAsignarProyecto">
-  <label>Responsable</label>
-  <div class="autocomplete-container">
-    <input type="text" id="inputTrabajador" placeholder="Selecciona un encargado" autocomplete="off" />
-    <div id="listTrabajador" class="autocomplete-list"></div>
-  </div>
-  <label>Proyecto</label>
-  <div class="autocomplete-container">
-    <input type="text" id="inputProyecto" placeholder="Selecciona un proyecto" autocomplete="off" />
-    <div id="listProyecto" class="autocomplete-list"></div>
-  </div>
-  <button type="submit" style="background:#FF6F00; color:#fff; border:none; padding:10px 18px; border-radius:6px; cursor:pointer; margin-top:18px;">Asignar</button>
-</form>
+    <h2 class="modal-title" style="font-family:Montserrat,sans-serif; font-size:2rem; color:#003B5C; margin-bottom:8px;">Asignar proyecto</h2>
+    <div class="modal-title-line" style="height:4px; background:#FF6F00; border-radius:2px; margin-bottom:24px;"></div>
+    <form id="formAsignarProyecto">
+      <div class="modal-form-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:24px 32px; margin-bottom:24px;">
+        <div class="modal-form-group" style="display:flex; flex-direction:column;">
+          <label for="inputTrabajador" style="font-weight:600; color:#276080; margin-bottom:6px;">Responsable</label>
+          <input type="text" id="inputTrabajador" placeholder="Selecciona un encargado" autocomplete="off"
+            style="padding:10px 12px; border:1.5px solid #ececec; border-radius:8px; background:#f7f8f6; font-size:1em; outline:none; transition:border 0.2s;">
+          <div id="listTrabajador" class="autocomplete-list"></div>
+        </div>
+        <div class="modal-form-group" style="display:flex; flex-direction:column;">
+          <label for="inputProyecto" style="font-weight:600; color:#276080; margin-bottom:6px;">Proyecto</label>
+          <input type="text" id="inputProyecto" placeholder="Selecciona un proyecto" autocomplete="off"
+            style="padding:10px 12px; border:1.5px solid #ececec; border-radius:8px; background:#f7f8f6; font-size:1em; outline:none; transition:border 0.2s;">
+          <div id="listProyecto" class="autocomplete-list"></div>
+        </div>
+      </div>
+      <div class="modal-actions" style="display:flex; justify-content:flex-end; gap:16px;">
+        <button type="submit" class="btn primary" style="background:#FF6F00; color:#fff; border:none; padding:12px 32px; border-radius:8px; font-size:1.1em; font-weight:700; cursor:pointer; box-shadow:0 2px 8px rgba(255,111,0,0.08); transition:background 0.2s;">Asignar</button>
+          </div>
+    </form>
   </div>
 </div>
 
-
     <script src="../../Js/menu.js"></script>
+   <script type="module" src="../../Js/correo.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
     <script type="module" src="../../modules/proyectos/proyectos.js"></script>
 
@@ -343,3 +351,4 @@
     </form>
   </div>
 </div>
+

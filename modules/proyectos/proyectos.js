@@ -2,6 +2,8 @@ import { supabase } from '../../supabase/db.js';
 import { insertarProyecto, obtenerProyectos, eliminarProyecto, actualizarProyecto } from '../../supabase/proyecto.js';
 import { obtenerTrabajadores } from '../../supabase/trabajador.js';
 import { insertarAsignacion } from '../../supabase/asignar_proyecto.js';
+import { enviarDatosAsignacion } from '../../Js/correo.js';
+
 
 let proyectosData = [];
 
@@ -361,6 +363,8 @@ document.querySelector('.input-buscar').addEventListener('input', function() {
   const filtrados = proyectosData.filter(p =>
     (p.cliente && p.cliente.toLowerCase().includes(valor)) ||
     (p.nombre && p.nombre.toLowerCase().includes(valor)) ||
+   (p.descripción && p.descripción.toLowerCase().includes(valor)) || // <-- agrega esta línea
+ 
     (() => {
       const asignacion = p.asignacion || {};
       return asignacion.trabajador?.nombre?.toLowerCase().includes(valor);
@@ -500,6 +504,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (error) {
       alert('Error al asignar: ' + error.message);
     } else {
+      // Enviar datos a n8n
+      enviarDatosAsignacion(trabajadorSeleccionadoId, proyectoSeleccionadoId);
+
       alert('Proyecto asignado correctamente');
       modalAsignar.style.display = 'none';
       formAsignar.reset();

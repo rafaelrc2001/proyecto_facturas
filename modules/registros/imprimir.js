@@ -186,6 +186,11 @@ function mostrarTablasPorProyecto(nombreProyecto) {
     </div>
   `;
 
+  
+
+
+container.innerHTML += respuestasHTML;
+
   // Actualiza el contador de registros
   document.getElementById('imprimir-contador-registros').textContent = `Registros mostrados: ${totalRegistros}`;
 }
@@ -209,10 +214,36 @@ function formatoMoneda(valor) {
 }
 
 // Botón descargar CSV (descarga todos los registros mostrados)
-document.getElementById('imprimir-descargar-csv').addEventListener('click', function() {
+document.getElementById('imprimir-descargar-csv').addEventListener('click', function(e) {
+  e.preventDefault();
+  document.getElementById('modalPreguntas').style.display = 'flex';
+});
+
+let respuestasPreguntas = {};
+
+// Al hacer clic en el botón de imprimir/descargar, muestra el modal
+document.getElementById('imprimir-descargar-csv').addEventListener('click', function(e) {
+  e.preventDefault();
+  document.getElementById('modalPreguntas').style.display = 'flex';
+});
+
+// Cuando se envía el formulario del modal, guarda las respuestas y genera el documento
+document.getElementById('formPreguntas').addEventListener('submit', function(e) {
+  e.preventDefault();
+  respuestasPreguntas.respuesta1 = e.target.respuesta1.value;
+  respuestasPreguntas.respuesta2 = e.target.respuesta2.value;
+  document.getElementById('modalPreguntas').style.display = 'none';
+
+  // Genera el documento de impresión incluyendo las respuestas al final
   const infoContents = document.getElementById('imprimir-proyecto-info').innerHTML;
   const tableContents = document.getElementById('imprimir-table-container').innerHTML;
-  const printContents = infoContents + tableContents;
+  const respuestasHTML = `
+    <div style="margin-top:32px; font-size:1.1em;">
+      <strong>Vehiculo Utilizado:</strong> ${respuestasPreguntas.respuesta1}<br>
+      <strong>Personal que viaticó:</strong> ${respuestasPreguntas.respuesta2}
+    </div>
+  `;
+  const printContents = infoContents + tableContents + respuestasHTML;
   const originalContents = document.body.innerHTML;
 
   document.body.innerHTML = printContents;
@@ -221,6 +252,4 @@ document.getElementById('imprimir-descargar-csv').addEventListener('click', func
   location.reload();
 });
 
-document.getElementById('volver').addEventListener('click', function() {
-  window.location.href = '/proyecto_facturas/modules/registros/registros.html';
-});
+

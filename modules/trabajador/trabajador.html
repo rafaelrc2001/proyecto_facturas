@@ -196,8 +196,8 @@
       <table id="trabajadorTable">
         <thead>
           <tr>
-            <th style="text-align:center; border-radius:10px 0 0 0;">Trabajador</th>
-            <th style="text-align:center;">ID Empleado</th>
+            <th style="text-align:center; border-radius:10px 0 0 0;">ID</th>
+            <th style="text-align:center;">Trabajador</th>
             <th style="text-align:center;">Puesto</th>
             <th style="text-align:center;">Correo</th>
             <th style="text-align:center;">Usuario</th>
@@ -240,25 +240,56 @@
 
 
 
-<!-- Modal Nuevo Trabajador -->
+<!-- Modal Nuevo Trabajador Mejorado -->
 <div id="modalNuevoTrabajador" class="modal" style="display:none;">
-  <div>
-    <button id="cerrarModalNuevoTrabajador">✕</button>
-    <h2 style="margin-bottom:18px; color:#003B5C;">Trabajador</h2>
-   <form id="formNuevoTrabajador">
-     <input type="text" name="nombre" placeholder="Nombre" required />
-    <input type="text" name="puesto" placeholder="Puesto" required />
-    <input type="text" name="idEmpleado" placeholder="ID Empleado" required />
-    <input type="email" name="correo" placeholder="Correo" required />
-    <input type="text" name="usuario" placeholder="Usuario" required />
-    <input type="password" name="contrasena" placeholder="Contraseña" required />
-      <button type="submit">Guardar</button>
+  <div class="modal-content modal-proyecto" style="max-width:600px; min-width:550px; padding:32px 32px 24px 32px; border-radius:18px; box-shadow:0 4px 24px rgba(0,59,92,0.12); position:relative;">
+    <button id="cerrarModalNuevoTrabajador" class="modal-close" style="position:absolute; top:18px; right:18px; background:none; border:none; font-size:1.5em; cursor:pointer;">
+  <i class="ri-close-line"></i>
+</button>
+    <h2 class="modal-title" style="font-family:Montserrat,sans-serif; font-size:2rem; color:#003B5C; margin-bottom:8px;">Trabajador</h2>
+    <div class="modal-title-line" style="height:4px; background:#FF6F00; border-radius:2px; margin-bottom:24px;"></div>
+    <form id="formNuevoTrabajador">
+      <div class="modal-form-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:24px 32px; margin-bottom:24px;">
+        <div class="modal-form-group" style="display:flex; flex-direction:column;">
+          <label for="nombre" style="font-weight:600; color:#276080; margin-bottom:6px;">Nombre</label>
+          <input type="text" name="nombre" id="nombre" placeholder="Nombre" required
+            style="padding:10px 12px; border:1.5px solid #ececec; border-radius:8px; background:#f7f8f6; font-size:1em; outline:none; transition:border 0.2s;">
+        </div>
+        <div class="modal-form-group" style="display:flex; flex-direction:column;">
+          <label for="puesto" style="font-weight:600; color:#276080; margin-bottom:6px;">Puesto</label>
+          <input type="text" name="puesto" id="puesto" placeholder="Puesto" required
+            style="padding:10px 12px; border:1.5px solid #ececec; border-radius:8px; background:#f7f8f6; font-size:1em; outline:none; transition:border 0.2s;">
+        </div>
+        <div class="modal-form-group" style="display:flex; flex-direction:column;">
+          <label for="idEmpleado" style="font-weight:600; color:#276080; margin-bottom:6px;">ID Empleado</label>
+          <input type="text" name="idEmpleado" id="idEmpleado" placeholder="ID Empleado" required
+            style="padding:10px 12px; border:1.5px solid #ececec; border-radius:8px; background:#f7f8f6; font-size:1em; outline:none; transition:border 0.2s;">
+        </div>
+        <div class="modal-form-group" style="display:flex; flex-direction:column;">
+          <label for="correo" style="font-weight:600; color:#276080; margin-bottom:6px;">Correo</label>
+          <input type="email" name="correo" id="correo" placeholder="Correo" required
+            style="padding:10px 12px; border:1.5px solid #ececec; border-radius:8px; background:#f7f8f6; font-size:1em; outline:none; transition:border 0.2s;">
+        </div>
+        <div class="modal-form-group" style="display:flex; flex-direction:column;">
+          <label for="usuario" style="font-weight:600; color:#276080; margin-bottom:6px;">Usuario</label>
+          <input type="text" name="usuario" id="usuario" placeholder="Usuario" required
+            style="padding:10px 12px; border:1.5px solid #ececec; border-radius:8px; background:#f7f8f6; font-size:1em; outline:none; transition:border 0.2s;">
+        </div>
+        <div class="modal-form-group" style="display:flex; flex-direction:column;">
+          <label for="contrasena" style="font-weight:600; color:#276080; margin-bottom:6px;">Contraseña</label>
+          <input type="password" name="contrasena" id="contrasena" placeholder="Contraseña" required
+            style="padding:10px 12px; border:1.5px solid #ececec; border-radius:8px; background:#f7f8f6; font-size:1em; outline:none; transition:border 0.2s;">
+        </div>
+      </div>
+      <div class="modal-actions" style="display:flex; justify-content:flex-end; gap:16px;">
+        <button type="submit" class="btn primary" style="background:#FF6F00; color:#fff; border:none; padding:12px 32px; border-radius:8px; font-size:1.1em; font-weight:700; cursor:pointer; box-shadow:0 2px 8px rgba(255,111,0,0.08); transition:background 0.2s;">Guardar</button>
+      </div>
     </form>
   </div>
 </div>
-
 <script type="module" src="../../modules/trabajador/trabajador.js"></script>
     <script src="../../Js/menu.js"></script>
+  
     <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
 
   </body>

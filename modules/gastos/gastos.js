@@ -263,9 +263,12 @@ function asignarEventosGastos() {
 
   // Editar
   tbody.querySelectorAll('.btn-editar').forEach((btn, idx) => {
-    btn.onclick = function() {
+    btn.onclick = async function() {
       const gasto = gastosFiltrados[(paginaActual - 1) * GASTOS_POR_PAGINA + idx];
       gastoEditando = gasto;
+
+      // <--- AGREGA ESTO
+      await cargarProyectosInfo();
 
       // Llena el modal de edición
       document.getElementById('gasto-editar-fecha_cargo').value = gasto.fecha_cargo || '';
