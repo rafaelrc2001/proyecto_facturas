@@ -9,13 +9,14 @@ export async function insertarProyecto({ cliente, nombre, descripci√≥n, ubicaci√
 export async function obtenerProyectos() {
   return await supabase
     .from('proyecto')
-    .select('*');
+    .select('*')
+    .eq('visibilidad', true); // Solo los visibles
 }
 
 export async function eliminarProyecto(id) {
   return await supabase
     .from('proyecto')
-    .delete()
+    .update({ visibilidad: false }) // Oculta el proyecto
     .eq('id_proyecto', id);
 }
 

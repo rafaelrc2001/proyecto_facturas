@@ -9,13 +9,14 @@ export async function insertarTrabajador({ nombre, puesto, idEmpleado, correo, u
 export async function obtenerTrabajadores() {
   return await supabase
     .from('trabajador')
-    .select('*');
+    .select('*')
+    .eq('visibilidad', true); // Solo los visibles
 }
 
 export async function eliminarTrabajador(id) {
   return await supabase
     .from('trabajador')
-    .delete()
+    .update({ visibilidad: false }) // Oculta el trabajador
     .eq('id_trabajador', id);
 }
 

@@ -1,7 +1,7 @@
 import { supabase } from '../../supabase/db.js';
 import { insertarProyecto, obtenerProyectos, eliminarProyecto, actualizarProyecto } from '../../supabase/proyecto.js';
 import { obtenerTrabajadores } from '../../supabase/trabajador.js';
-import { insertarAsignacion } from '../../supabase/asignar_proyecto.js';
+import { asignarProyectoATrabajador } from '../../supabase/asignar_proyecto.js';
 import { enviarDatosAsignacion } from '../../Js/correo.js';
 
 
@@ -500,13 +500,12 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('Selecciona un encargado y un proyecto válido.');
       return;
     }
-    const { error } = await insertarAsignacion({ id_trabajador: trabajadorSeleccionadoId, id_proyecto: proyectoSeleccionadoId });
+    // Usa la nueva función
+    const { error } = await asignarProyectoATrabajador(proyectoSeleccionadoId, trabajadorSeleccionadoId);
     if (error) {
       alert('Error al asignar: ' + error.message);
     } else {
-      // Enviar datos a n8n
       enviarDatosAsignacion(trabajadorSeleccionadoId, proyectoSeleccionadoId);
-
       alert('Proyecto asignado correctamente');
       modalAsignar.style.display = 'none';
       formAsignar.reset();

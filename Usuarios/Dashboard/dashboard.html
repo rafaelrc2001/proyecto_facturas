@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scanalyze - Dashboard</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Orbitron:wght@500;700&family=Roboto:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <link rel="stylesheet" href="../../CSS/dash.css" />
+    <link rel="stylesheet" href="../../CSS/menu.css" />
+    <link rel="icon" href="../../img/inxiteblanco.png" type="image/png" />
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+      <h2 class="logo-container">
+  <i class="ri-line-chart-line logo-icon" style="color:#FF6F00; font-size:1em;"></i>
+
+          <span class="logo-text">Scanalyze</span>
+ </h2>
+     
+    <button class="collapse-btn" id="sidebarToggle">
+      <i class="ri-menu-line menu-icon"></i>
+      <i class="ri-arrow-right-s-line collapse-icon"></i>
+    </button>
+  </div>
+       
+  
+  <nav class="sidebar-nav">
+          <ul>
+            <li class="active">
+              <a href="#">
+                <i class="ri-pie-chart-2-line"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="../registros/registros.html">
+                <i class="ri-archive-line"></i>
+                <span>Reportes</span>
+              </a>
+            </li>
+             <li>
+                <a href="../gastos/gastos.html">
+                  <i class="ri-money-dollar-circle-line"></i>
+                  <span>Gastos</span>
+                </a>
+            </li>
+          </ul>
+        </nav>
+
+
+
+
+        <div class="sidebar-footer">
+          <div class="user-profile">
+            <div class="avatar">Us</div>
+            <div class="user-info">
+              <span class="name">Usuario</span>
+              <span class="role">Usuario</span>
+            </div>
+          </div>
+          <button class="logout-btn">
+            <i class="ri-logout-box-r-line"></i>
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <!-- Header -->
+
+    <!-- Ejemplo para dashboard.html -->
+<header class="main-header">
+  <div style="
+    background: #fff;
+    border-radius: 3px;
+    box-shadow: 0 2px 12px rgba(0,59,92,0.07);
+    padding: 18px 32px 12px 32px;
+    width: 100%;
+    margin-left: 0;
+    display: flex;
+    align-items: center;
+    border: 1px solid #ececec;
+    border-bottom: 7px solid #003B5C;
+    gap: 12px;
+  ">
+    <div style="
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: #003B5C;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(255,111,0,0.08);
+      flex-shrink: 0;
+      margin-left: 0;
+      margin-right: 0px;
+    ">
+      <i class="ri-bar-chart-2-line" style="font-size: 1.5rem; color:#f7f7f7"></i>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: flex-start; margin-left: 0;">
+      <h1 style="
+        font-size: 1.5rem;
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 700;
+        color: #003B5C;
+        margin-bottom: 5px;
+        text-align: left;
+      ">
+        Dashboard
+      </h1>
+      <div class="header-subtitle" style="
+        font-size: 0.8rem;
+        color: #276080;
+        font-weight: 600;
+        text-align: left;
+        margin-bottom: 0;
+      ">
+        Bienvenido al Sistema.
+      </div>
+    </div>
+  </div>
+</header>
+     
+    
+        
+        <!-- KPIs + Filtros y tarjetas resumen en una sola zona -->
+<div class="dashboard-top-grid">
+  
+  
+  <section class="kpi-cards">
+    <div class="kpi-card border-right">
+      <div class="kpi-title">Total de Gastos</div>
+      <div class="kpi-number" id="total-gastos">-</div>
+    </div>
+    <div class="kpi-card border-right">
+      <div class="kpi-title">Facturas</div>
+      <div class="kpi-number" id="facturas-gastos">-</div>
+    </div>
+    <div class="kpi-card border-right">
+      <div class="kpi-title">Tickets</div>
+      <div class="kpi-number" id="tickets-gastos">-</div>
+    </div>
+  </section>
+
+
+
+<div class="dashboard-summary-row">
+  <div class="dashboard-summary-left">
+    <input type="text" class="dashboard-search" placeholder="Buscar por Folio o Tienda..." />
+    
+    
+    <div class="filter-dropdown" style="display:none;">
+  <button class="filter-btn">
+    <i class="ri-store-2-line"></i>
+    <span>Tienda</span>
+    <i class="ri-arrow-down-s-line"></i>
+  </button>
+  <div class="filter-menu">
+    <!-- Opciones de tiendas aquí -->
+  </div>
+</div>
+
+
+    
+  </div>
+
+  <div class="summary-cards">
+    <div class="summary-card border-right">
+      <div class="summary-value" id="total-count">-</div>
+      <div class="summary-label">Total registros</div>
+    </div>
+    <div class="summary-card border-right">
+      <div class="summary-value" id="facturas-count">-</div>
+      <div class="summary-label">Total facturas</div>
+    </div>
+    <div class="summary-card border-right">
+      <div class="summary-value" id="tickets-count">-</div>
+      <div class="summary-label">Total tickets</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- Dashboard Grid (Gráficas y actividades) -->
+<div class="dashboard-section dashboard-grid">
+<!-- dashboard.html -->
+<div class="chart-card">
+  <div class="chart-title" style="display: flex; align-items: center; gap: 8px;">
+    <i class="ri-store-2-line" style="font-size: 1.5rem; color: #FF6F00;"></i>
+    <span>Desglose por establecimientos</span>
+  </div>
+  <div id="establecimientos-chart" style="width:100%;height:320px;"></div>
+</div>
+<!--Aca va la grafica de pastel -->
+ <div class="chart-card">
+<!-- Ejemplo de tu título -->
+<div class="chart-title" style="display: flex; align-items: center; gap: 8px;">
+  <i class="ri-file-list-3-line" style="font-size: 1.5rem; color: #FF6F00;"></i>
+  <span>Distribución Tickets/Facturas</span>
+</div>
+  <div id="distribution-chart" style="width:100%;height:300px;"></div>
+</div>
+</div>
+      </main>
+    </div>
+    <script src="../../Js/menu.js"></script>
+    <script src="dashboard.js"></script>
+    <script src="../../modules/Dashboard/graficas/grafica-pastel.js"></script>
+  <script src="../../modules/Dashboard/graficas/grafica-barra.js"></script>
+
+  <!-- Modal de edición -->
+<div id="modal-editar" class="modal" style="display: none;">
+  <div class="modal-content executive-view">
+    <div class="modal-header">
+      <h2>Editar Registro</h2>
+      <span class="close-modal" id="close-modal-editar">&times;</span>
+    </div>
+    <div class="modal-body">
+      <form id="form-editar">
+        <div class="executive-grid">
+          <div class="executive-item">
+            <label>Fecha:</label>
+            <input type="date" id="edit-fecha" required />
+          </div>
+          <div class="executive-item">
+            <label>Tipo:</label>
+            <input type="text" id="edit-tipo" required />
+          </div>
+          <div class="executive-item">
+            <label>Factura:</label>
+            <input type="text" id="edit-factura" required />
+          </div>
+          <div class="executive-item">
+            <label>Establecimiento:</label>
+            <input type="text" id="edit-establecimiento" required />
+          </div>
+          <div class="executive-item">
+            <label>Subtotal:</label>
+            <input type="number" id="edit-subtotal" step="0.01" required />
+          </div>
+          <div class="executive-item">
+            <label>IVA:</label>
+            <input type="number" id="edit-iva" step="0.01" required />
+          </div>
+          <div class="executive-item">
+            <label>Total:</label>
+            <input type="number" id="edit-total" step="0.01" required />
+          </div>
+        </div>
+        <div style="margin-top: 20px; display: flex; gap: 12px;">
+          <button type="button" class="btn" id="cancelar-edicion">Cancelar</button>
+          <button type="submit" class="btn primary" id="guardar-edicion">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+  </body>
+</html>
