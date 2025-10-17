@@ -207,4 +207,9 @@ document.addEventListener('DOMContentLoaded', () => {
     paginaActual = 1;
     mostrarTrabajadoresPaginados(filtrados);
   });
+
+  const idTrabajador = localStorage.getItem('id_trabajador');
+  if (idTrabajador) {
+    console.log(`ID del trabajador autenticado: ${idTrabajador}`);
+  }
 });

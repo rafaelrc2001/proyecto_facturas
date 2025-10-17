@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 setTimeout(() => { passwordError.textContent = ''; }, 2000);
             } else {
                 localStorage.setItem('user', JSON.stringify(data));
+                localStorage.setItem('id_trabajador', data.id_trabajador); // <-- Agrega esta línea
                 window.location.href = 'modules/Dashboard/dashboard.html';
             }
         });

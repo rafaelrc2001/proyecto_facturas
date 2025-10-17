@@ -518,3 +518,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+const idTrabajador = localStorage.getItem('id_trabajador');
+if (idTrabajador) {
+  console.log(`ID del trabajador autenticado: ${idTrabajador}`);
+}

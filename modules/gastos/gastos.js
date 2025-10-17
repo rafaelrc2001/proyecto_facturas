@@ -387,3 +387,8 @@ function obtenerNombreProyecto(id_proyecto) {
 }
 
 document.addEventListener('DOMContentLoaded', cargarGastos);
+
+const idTrabajador = localStorage.getItem('id_trabajador');
+if (idTrabajador) {
+  console.log(`ID del trabajador autenticado: ${idTrabajador}`);
+}
