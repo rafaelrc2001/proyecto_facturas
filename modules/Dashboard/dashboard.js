@@ -331,7 +331,6 @@ async function cargarKPIsSupabase(projectId = null) {
     }
 
     let query = supabase.from('registro').select('importe, tipo');
-
     if (projectId) query = query.eq('id_proyecto', projectId);
 
     const { data, error, status } = await query;
@@ -353,25 +352,24 @@ async function cargarKPIsSupabase(projectId = null) {
       return;
     }
 
+    // Nueva lógica: "Sin facturar" = suma de todo lo que NO sea factura
     let total = 0;
     let totalFacturas = 0;
-    let totalSinFacturar = 0;
 
     data.forEach(r => {
       const importe = Number(String(r.importe).replace(',', '.')) || 0;
       total += importe;
       const tipo = (r.tipo || '').toString().toLowerCase();
-      if (tipo.includes('factura')) totalFacturas += importe;
-      else if (tipo.includes('ticket') || tipo.includes('no comprob') || tipo.includes('sin comprob') || tipo.includes('no comprobable')) totalSinFacturar += importe;
+      if (tipo.includes('factura')) {
+        totalFacturas += importe;
+      }
     });
 
-    const elTotal = document.getElementById('total-gastos');
-    const elFacturas = document.getElementById('facturas-gastos');
-    const elTickets = document.getElementById('tickets-gastos');
+    const totalSinFacturar = total - totalFacturas;
 
-    if (elTotal) elTotal.textContent = formatCurrency(total);
-    if (elFacturas) elFacturas.textContent = formatCurrency(totalFacturas);
-    if (elTickets) elTickets.textContent = formatCurrency(totalSinFacturar);
+    setTextById('total-gastos', formatCurrency(total));
+    setTextById('facturas-gastos', formatCurrency(totalFacturas));
+    setTextById('tickets-gastos', formatCurrency(totalSinFacturar));
 
     console.log('[KPIs] actualizados:', { total, totalFacturas, totalSinFacturar });
 
@@ -515,14 +513,16 @@ document.addEventListener('DOMContentLoaded', async () => {
   await cargarProyectosSupabase();
 
   const input = document.getElementById('dashboard-search');
+  const suggestionsBox = document.getElementById('project-suggestions');
+
   if (input) {
-    // mostrar sugerencias al tipear
+    // Solo mostrar sugerencias al tipear (NO llamar al filtro aquí)
     input.addEventListener('input', (e) => {
       showProjectSuggestions(e.target.value);
-      debouncedFilterByProject(e.target.value); // <-- usa la nueva función debounced
+      // retirado: debouncedFilterByProject(e.target.value);
     });
 
-    // Enter selecciona / aplica filtro
+    // Enter aplica el filtro (busca proyecto y carga)
     input.addEventListener('keydown', async (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -530,16 +530,27 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
 
-    // click en sugerencia delegada (ya tienes este listener; lo deja llamar onSuggestionSelect)
-    document.getElementById('project-suggestions')?.addEventListener('click', (e) => {
+    // Selección con mouse: usar mousedown para que ocurra antes del blur/hide
+    suggestionsBox?.addEventListener('mousedown', (e) => {
       const item = e.target.closest('.suggest-item');
       if (!item) return;
+      e.preventDefault(); // evitar que el input pierda foco antes de esta acción
       const name = item.dataset.name;
-      onSuggestionSelect(name); // onSuggestionSelect ya recarga vistas
+      onSuggestionSelect(name);
     });
+
+    // (Opcional) permitir selección con teclado: flechas + Enter — implementar si lo deseas
   }
 
-  // carga inicial sin filtro
+  // click fuera: oculta sugerencias (se mantiene)
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#project-suggestions') && !e.target.closest('#dashboard-search')) {
+      suggestionsBox.style.display = 'none';
+      suggestionsBox.innerHTML = '';
+    }
+  });
+
+  // cargas iniciales sin filtro
   await cargarTablaSupabase({ limit: 300, projectId: null });
   if (typeof cargarPagoChartDesdeSupabase === 'function') await cargarPagoChartDesdeSupabase(null);
   if (typeof cargarPastelDesdeSupabase === 'function') await cargarPastelDesdeSupabase(null);
