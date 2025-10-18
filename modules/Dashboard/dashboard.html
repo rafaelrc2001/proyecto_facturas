@@ -157,89 +157,79 @@
     
         
         <!-- KPIs + Filtros y tarjetas resumen en una sola zona -->
-<div class="dashboard-top-grid">
-  
-  
-  <section class="kpi-cards">
-    <div class="kpi-card border-right">
-      <div class="kpi-title">Total de Gastos</div>
-      <div class="kpi-number" id="total-gastos">-</div>
+<div class="dashboard-container">
+
+  <!-- Columna izquierda: KPIs (1/3) -->
+  <aside class="kpi-column">
+    <section class="kpi-cards">
+      <div class="kpi-card border-right">
+        <div class="kpi-title">Total de Gastos</div>
+        <div class="kpi-number" id="total-gastos">-</div>
+      </div>
+      <div class="kpi-card border-right">
+        <div class="kpi-title">Total Facturado</div>
+        <div class="kpi-number" id="facturas-gastos">-</div>
+      </div>
+      <div class="kpi-card border-right">
+        <div class="kpi-title">Total sin Facturar</div>
+        <div class="kpi-number" id="tickets-gastos">-</div>
+      </div>
+    </section>
+  </aside>
+
+  <!-- Columna derecha: buscador, tabla resumen y gráficas (2/3) -->
+  <section class="main-right">
+    <div class="search-row" style="position:relative;">
+  <input type="text" class="dashboard-search" id="dashboard-search" placeholder="Buscar por Folio o Tienda..." autocomplete="off" />
+  <!-- contenedor para sugerencias -->
+  <div id="project-suggestions" style="position:absolute; top:46px; left:0; right:0; z-index:50; display:none; background:#fff; border:1px solid #e6e6e6; border-radius:6px; box-shadow:0 6px 18px rgba(0,0,0,0.06); max-height:260px; overflow:auto;"></div>
+</div>
+
+    <div class="table-card">
+      <div class="table-headers">
+        <div>Establecimiento</div>
+        <div>Tipo de pago</div>
+        <div>Importe</div>
+      </div>
+      <div class="table-body" id="tabla-resumen">
+        <!-- filas resumen renderizadas por JS -->
+      </div>
     </div>
-    <div class="kpi-card border-right">
-      <div class="kpi-title">Facturas</div>
-      <div class="kpi-number" id="facturas-gastos">-</div>
-    </div>
-    <div class="kpi-card border-right">
-      <div class="kpi-title">Tickets</div>
-      <div class="kpi-number" id="tickets-gastos">-</div>
+
+    <div class="chart-row">
+      <div class="chart-card">
+        <div class="chart-title" style="display:flex;align-items:center;gap:8px;">
+        <i class="ri-file-list-3-line" style="font-size:1.5rem;color:#FF6F00;"></i>   
+      <span>Tipos de Pago</span>  
+      </div>
+        <div id="establecimientos-chart" style="width:100%;height:320px;"></div>
+      </div>
+
+      <div class="chart-card">
+        <div class="chart-title" style="display:flex;align-items:center;gap:8px;">
+          <i class="ri-file-list-3-line" style="font-size:1.5rem;color:#FF6F00;"></i>
+          <span>Tipos de Gasto</span>
+        </div>
+        <div id="distribution-chart" style="width:100%;height:320px;"></div>
+      </div>
     </div>
   </section>
 
-
-
-<div class="dashboard-summary-row">
-  <div class="dashboard-summary-left">
-    <input type="text" class="dashboard-search" placeholder="Buscar por Folio o Tienda..." />
-    
-    
-    <div class="filter-dropdown" style="display:none;">
-  <button class="filter-btn">
-    <i class="ri-store-2-line"></i>
-    <span>Tienda</span>
-    <i class="ri-arrow-down-s-line"></i>
-  </button>
-  <div class="filter-menu">
-    <!-- Opciones de tiendas aquí -->
-  </div>
 </div>
-
-
-    
-  </div>
-
-  <div class="summary-cards">
-    <div class="summary-card border-right">
-      <div class="summary-value" id="total-count">-</div>
-      <div class="summary-label">Total registros</div>
-    </div>
-    <div class="summary-card border-right">
-      <div class="summary-value" id="facturas-count">-</div>
-      <div class="summary-label">Total facturas</div>
-    </div>
-    <div class="summary-card border-right">
-      <div class="summary-value" id="tickets-count">-</div>
-      <div class="summary-label">Total tickets</div>
-    </div>
-  </div>
-</div>
-</div>
-
+<!-- Reemplazar aquí: fin del bloque superior -->
 <!-- Dashboard Grid (Gráficas y actividades) -->
-<div class="dashboard-section dashboard-grid">
-<!-- dashboard.html -->
-<div class="chart-card">
-  <div class="chart-title" style="display: flex; align-items: center; gap: 8px;">
-    <i class="ri-store-2-line" style="font-size: 1.5rem; color: #FF6F00;"></i>
-    <span>Desglose por establecimientos</span>
-  </div>
-  <div id="establecimientos-chart" style="width:100%;height:320px;"></div>
-</div>
-<!--Aca va la grafica de pastel -->
- <div class="chart-card">
-<!-- Ejemplo de tu título -->
-<div class="chart-title" style="display: flex; align-items: center; gap: 8px;">
-  <i class="ri-file-list-3-line" style="font-size: 1.5rem; color: #FF6F00;"></i>
-  <span>Distribución Tickets/Facturas</span>
-</div>
-  <div id="distribution-chart" style="width:100%;height:300px;"></div>
-</div>
-</div>
+
       </main>
     </div>
     <script src="../../Js/menu.js"></script>
-    <script src="dashboard.js"></script>
-    <script src="../../modules/Dashboard/graficas/grafica-pastel.js"></script>
-  <script src="../../modules/Dashboard/graficas/grafica-barra.js"></script>
+    <script type="module" src="dashboard.js"></script>
+<!-- ...existing code... -->
+   <!-- ...existing code... -->
+
+  <script type="module" src="../../modules/Dashboard/graficas/grafica-pastel.js"></script>
+<!-- ...existing code... -->
+  <script type="module" src="../../modules/Dashboard/graficas/grafica-barra.js"></script>
+  <script type="module" src="../../modules/Dashboard/graficas/tabla.js"></script>
 
   <!-- Modal de edición -->
 <div id="modal-editar" class="modal" style="display: none;">

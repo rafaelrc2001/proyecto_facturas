@@ -920,8 +920,11 @@ td {
    POWER BI DASHBOARD
    =============================== */
 .dashboard-container {
-  display: flex;
-  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 33% 67%;
+  gap: 18px;
+  padding: 18px 12px;
+  align-items: start;
 }
 
 .dashboard-frame {
@@ -1352,3 +1355,62 @@ td {
   width: 100%;
   margin-bottom: 12px;
 }
+
+/* agrega o reemplaza estas reglas para la nueva estructura */
+.dashboard-container{
+  display: grid;
+  grid-template-columns: 25% 75%; /* <-- cambiado a 1/4 y 3/4 */
+  gap: 18px;
+  padding: 18px 12px;
+  align-items: start;
+}
+
+/* KPIs columna izquierda */
+.kpi-column{ grid-column: 1 / 2; }
+.kpi-cards{ display:flex; flex-direction:column; gap:14px; }
+/* Reducir un poco el padding/alto de las tarjetas para que ocupen menos espacio */
+.kpi-card{
+  background:#fff;
+  border-radius:10px;
+  padding:12px; /* antes 16px */
+  box-shadow:0 6px 18px rgba(0,0,0,0.06);
+}
+.kpi-card .kpi-title{ color:#FF6F00; font-weight:700; margin-bottom:6px; font-size:0.95rem; }
+.kpi-card .kpi-number{ font-size:1.25rem; color:#08384b; font-weight:800; }
+
+/* Contenido derecho */
+.main-right{ grid-column: 2 / 3;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  padding-right: 28px; /* espacio extra a la derecha para separar tabla/ gráficas del borde */
+}
+
+/* margen pequeño para evitar que las tarjetas queden pegadas al borde */
+.table-card,
+.chart-card{
+  margin-right: 8px;
+  box-sizing: border-box;
+}
+
+/* Ajustes menores para tabla y gráficas */
+.table-card{ background:#fff; border-radius:10px; padding:12px; box-shadow:0 6px 18px rgba(0,0,0,0.06); }
+.table-headers{ display:grid; grid-template-columns: 1fr 220px 140px; gap:12px; font-weight:700; color:#276080; border-bottom:1px dashed #f0f0f0; padding-bottom:8px; margin-bottom:8px; }
+.table-body{ max-height:220px; overflow:auto; }
+
+/* Gráficas fila */
+.chart-row{ display:grid; grid-template-columns: 1fr 1fr; gap:18px; margin-top:6px; }
+.chart-card{ background:#fff; border-radius:10px; padding:12px; box-shadow:0 6px 18px rgba(0,0,0,0.06); }
+
+/* Responsive: pasar a una sola columna en pantallas pequeñas */
+@media (max-width: 1000px) {
+  .dashboard-container{ grid-template-columns: 1fr; }
+  .kpi-cards{ flex-direction:row; gap:12px; overflow:auto; }
+  .dashboard-search{ width:90%; }
+  .chart-row{ grid-template-columns: 1fr; }
+}
+
+
+
+
+

@@ -14,6 +14,7 @@ const tiposPago = [
 let proyectosInfo = [];
 let proyectosNombres = [];
 let registrosOriginales = [];
+let respuestasHTML = '';
 
 // Cargar proyectos y registros al iniciar
 document.addEventListener('DOMContentLoaded', async () => {
@@ -23,10 +24,37 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Cargar nombres de proyectos
 async function cargarProyectosNombres() {
-  const { data } = await supabase
+  // Traer proyectos visibles (sin el campo responsable en la tabla proyecto)
+  const { data: proyectosData } = await supabase
     .from('proyecto')
-    .select('id_proyecto, nombre, cliente, ubicación, fecha_inicio, fecha_final');
-  proyectosInfo = data || [];
+    .select('id_proyecto, nombre, cliente, ubicación, fecha_inicio, fecha_final')
+    .eq('visibilidad', true);
+  const proyectos = proyectosData || [];
+
+  // Traer asignaciones (id_proyecto -> id_trabajador)
+  const { data: asignacionesData } = await supabase
+    .from('asignar_proyecto')
+    .select('id_proyecto, id_trabajador');
+  const asignaciones = asignacionesData || [];
+
+  // Traer trabajadores visibles para resolver el nombre del responsable
+  const { data: trabajadoresData } = await supabase
+    .from('trabajador')
+    .select('id_trabajador, nombre')
+    .eq('visibilidad', true);
+  const trabajadores = trabajadoresData || [];
+
+  // Mapa id_trabajador -> nombre
+  const trabajadorMap = {};
+  trabajadores.forEach(t => { trabajadorMap[String(t.id_trabajador)] = t.nombre || ''; });
+
+  // Construir proyectosInfo incluyendo responsable (nombre del trabajador asignado)
+  proyectosInfo = proyectos.map(p => {
+    const asign = asignaciones.find(a => String(a.id_proyecto) === String(p.id_proyecto));
+    const responsableNombre = asign ? (trabajadorMap[String(asign.id_trabajador)] || '') : '';
+    return { ...p, responsable: responsableNombre };
+  });
+
   proyectosNombres = proyectosInfo.map(p => p.nombre);
 }
 
@@ -114,6 +142,10 @@ function mostrarTablasPorProyecto(nombreProyecto) {
           <td><strong>FECHA DE TERMINACIÓN:</strong></td>
           <td>${formatearFecha(proyecto.fecha_final)}</td>
         </tr>
+         <tr>
+          <td><strong>RESPONSABLE DEL PROYECTO:</strong></td>
+          <td>${proyecto.responsable || ''}</td>
+        </tr>
       </table>
     </div>
     <div style="flex:0 0 180px; text-align:right;">
@@ -131,8 +163,7 @@ function mostrarTablasPorProyecto(nombreProyecto) {
       <hr style="border:1px solid #FF6F00; margin-bottom:18px;">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
         <div style="flex:1;">
-          <span style="font-size:1.1em;">Mostrando todos los proyectos</span>
-        </div>
+             </div>
         <div style="flex:0 0 180px; text-align:right;">
           <img src="../../img/inxite.png" alt="Logo Inxite" style="max-width:160px;">
         </div>

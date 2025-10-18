@@ -1,3 +1,5 @@
+import { supabase } from '../../../supabase/db.js';
+
 // Gráfica de Permisos por Estatus - Gráfica de Pastel
 // grafica-estatus.js
 
@@ -474,3 +476,100 @@ function createSoftTexture() {
   img.src = 'data:image/svg+xml;base64,' + btoa(svg);
   return img;
 }
+
+// Esta versión obtiene los tipos desde la tabla "registro" y dibuja el pastel en #distribution-chart
+
+async function cargarPastelDesdeSupabase(projectId = null) {
+  try {
+    let query = supabase.from('registro').select('tipo');
+    if (projectId) query = query.eq('id_proyecto', projectId);
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('Error cargando tipos desde Supabase:', error);
+      return;
+    }
+    if (!data || data.length === 0) {
+      console.warn('No hay datos en registro.tipo');
+      return;
+    }
+
+    // Conteo por tipo (normaliza texto)
+    const conteo = {};
+    data.forEach(r => {
+      const raw = (r.tipo || 'Desconocido').toString().trim();
+      const key = raw === '' ? 'Desconocido' : raw;
+      conteo[key] = (conteo[key] || 0) + 1;
+    });
+
+    // Construir array para la gráfica (ordena por valor descendente)
+    const entries = Object.entries(conteo).sort((a, b) => b[1] - a[1]);
+    const pieData = entries.map(([name, value]) => ({ name, value, itemStyle: {} }));
+
+    // Asignar colores
+    const palette = ['#003B5C', '#FF6F00', '#77ABB7', '#D9A400', '#1D3E53', '#FFC107'];
+    pieData.forEach((d, i) => { d.itemStyle = { color: palette[i % palette.length] }; });
+
+    // Total y graphic central (misma lógica que tenías)
+    const total = pieData.reduce((s, p) => s + p.value, 0);
+    function getCentralGraphic(value, label, color) {
+      return [
+        {
+          type: 'group',
+          left: 'center',
+          top: 'center',
+          children: [
+            { type: 'text', style: { text: value.toString(), font: '700 24px Montserrat, Roboto, Arial', fill: color, textAlign: 'center' }, left: 'center', top: -8 },
+            { type: 'text', style: { text: label, font: '400 12px Montserrat, Roboto, Arial', fill: '#4A4A4A', textAlign: 'center' }, left: 'center', top: 16 }
+          ]
+        }
+      ];
+    }
+    const centralGroup = getCentralGraphic(total, 'Total registros', '#003B5C');
+
+    // Inicializar/actualizar chart
+    const chartDom = document.getElementById('distribution-chart');
+    if (!chartDom) { console.warn('Contenedor distribution-chart no encontrado.'); return; }
+    const chart = echarts.init(chartDom);
+
+    const option = {
+      backgroundColor: 'transparent',
+      tooltip: { trigger: 'item', formatter: params => `<strong style="color:#003B5C">${params.name}</strong><br/>Cantidad: <strong>${params.value}</strong><br/><span style="color:#FF6F00">${params.percent}%</span>`, backgroundColor: 'rgba(255,255,255,0.95)' },
+      legend: { orient: 'horizontal', bottom: 8, left: 'center', itemGap: 14, itemHeight: 10, itemWidth: 12, textStyle: { color: '#276080', fontSize: 12 } },
+      series: [{
+        name: 'Tipos',
+        type: 'pie',
+        radius: ['50%', '70%'],
+        center: ['50%', '44%'],
+        avoidLabelOverlap: true,
+        label: { show: true, position: 'outside', formatter: '{b}\n{d}%', color: '#003B5C', fontSize: 12 },
+        labelLine: { length: 20, length2: 12, smooth: false },
+        itemStyle: { borderColor: '#fff', borderWidth: 2, borderRadius: 8 },
+        data: pieData
+      }],
+      graphic: centralGroup
+    };
+
+    chart.setOption(option);
+    chart.on('mouseover', params => {
+      if (params && params.seriesType === 'pie') {
+        chart.setOption({ graphic: getCentralGraphic(`${params.value}`, params.name, params.data.itemStyle.color || '#003B5C') });
+      }
+    });
+    chart.on('mouseout', () => chart.setOption({ graphic: centralGroup }));
+
+    window.distributionChartInstance = chart;
+    window.addEventListener('resize', () => chart.resize());
+  } catch (err) {
+    console.error('Error al cargar gráfico pastel desde Supabase:', err);
+  }
+}
+
+// Auto-inicia cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', () => {
+  cargarPastelDesdeSupabase();
+});
+
+// Export por si se desea llamar manualmente
+export { cargarPastelDesdeSupabase };

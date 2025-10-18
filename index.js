@@ -10,22 +10,36 @@ document.addEventListener('DOMContentLoaded', function() {
             const passwordError = document.getElementById('password-error');
             if (passwordError) passwordError.textContent = '';
 
-            // Consulta a Supabase
-            const { data, error } = await supabase
+            // Consulta en trabajador
+            const { data: trabajador, error: errorTrabajador } = await supabase
                 .from('trabajador')
                 .select('id_trabajador, nombre, puesto')
                 .eq('usuario', usuario)
-                .eq('contrasena', contrasena)
-                .single();
+                .eq('contrasena', contrasena);
 
-            if (error || !data) {
-                passwordError.textContent = 'Usuario o contraseña incorrecta';
-                setTimeout(() => { passwordError.textContent = ''; }, 2000);
-            } else {
-                localStorage.setItem('user', JSON.stringify(data));
-                localStorage.setItem('id_trabajador', data.id_trabajador); // <-- Agrega esta línea
-                window.location.href = 'modules/Dashboard/dashboard.html';
+            if (trabajador && trabajador.length > 0) {
+                localStorage.setItem('user', JSON.stringify(trabajador[0]));
+                localStorage.setItem('id_trabajador', trabajador[0].id_trabajador);
+                window.location.href = '/usuarios/dashboard/dashboard.html';
+                return;
             }
+
+            // Consulta en login
+            const { data: loginUser, error: errorLogin } = await supabase
+                .from('login')
+                .select('*')
+                .eq('usuario', usuario)
+                .eq('password', contrasena);
+
+            if (loginUser && loginUser.length > 0) {
+                localStorage.setItem('user', JSON.stringify(loginUser[0]));
+                window.location.href = '/modules/dashboard/dashboard.html';
+                return;
+            }
+
+            // Si no existe en ninguna tabla
+            passwordError.textContent = 'Usuario o contraseña incorrecta';
+            setTimeout(() => { passwordError.textContent = ''; }, 2000);
         });
     }
 });
