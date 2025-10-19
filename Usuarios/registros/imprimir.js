@@ -23,10 +23,38 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 // Cargar nombres de proyectos
 async function cargarProyectosNombres() {
-  const { data } = await supabase
-    .from('proyecto')
-    .select('id_proyecto, nombre, cliente, ubicación, fecha_inicio, fecha_final');
-  proyectosInfo = data || [];
+  const idTrabajador = localStorage.getItem('id_trabajador');
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  try {
+    if (idTrabajador && user.role === 'trabajador') {
+      const { data: asigns, error: asignErr } = await supabase
+        .from('asignar_proyecto')
+        .select('id_proyecto')
+        .eq('id_trabajador', Number(idTrabajador));
+      if (asignErr) throw asignErr;
+      const ids = (asigns || []).map(a => a.id_proyecto);
+      if (ids.length === 0) {
+        proyectosInfo = [];
+        proyectosNombres = [];
+        return;
+      }
+      const { data } = await supabase
+        .from('proyecto')
+        .select('id_proyecto, nombre, cliente, ubicación, fecha_inicio, fecha_final')
+        .in('id_proyecto', ids)
+        .eq('visibilidad', true);
+      proyectosInfo = data || [];
+    } else {
+      const { data } = await supabase
+        .from('proyecto')
+        .select('id_proyecto, nombre, cliente, ubicación, fecha_inicio, fecha_final')
+        .eq('visibilidad', true);
+      proyectosInfo = data || [];
+    }
+  } catch (err) {
+    console.error('Error cargando proyectos (imprimir):', err);
+    proyectosInfo = [];
+  }
   proyectosNombres = proyectosInfo.map(p => p.nombre);
 }
 
@@ -197,10 +225,9 @@ function mostrarTablasPorProyecto(nombreProyecto) {
     </div>
   `;
 
-  
+  const respuestasHTML = buildRespuestasHTML();
 
-
-container.innerHTML += respuestasHTML;
+  container.innerHTML += respuestasHTML;
 
   // Actualiza el contador de registros
   document.getElementById('imprimir-contador-registros').textContent = `Registros mostrados: ${totalRegistros}`;
@@ -230,7 +257,13 @@ document.getElementById('imprimir-descargar-csv').addEventListener('click', func
   document.getElementById('modalPreguntas').style.display = 'flex';
 });
 
-let respuestasPreguntas = {};
+let respuestasPreguntas = respuestasPreguntas || {}; // ya existía, reafirmamos
+function buildRespuestasHTML() {
+  if (!respuestasPreguntas || Object.keys(respuestasPreguntas).length === 0) return '';
+  return Object.entries(respuestasPreguntas)
+    .map(([k, v]) => `<div class="pregunta-respuesta"><strong>${escapeHtml(k)}:</strong> ${escapeHtml(String(v))}</div>`)
+    .join('');
+}
 
 // Al hacer clic en el botón de imprimir/descargar, muestra el modal
 document.getElementById('imprimir-descargar-csv').addEventListener('click', function(e) {

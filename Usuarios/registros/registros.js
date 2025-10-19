@@ -14,8 +14,39 @@ let respuestasPreguntas = {};
 
 // Obtén los nombres de proyectos al cargar la página
 async function cargarProyectosNombres() {
-  const { data } = await supabase.from('proyecto').select('id_proyecto, nombre');
-  proyectosInfo = data || [];
+  // usa helper auth importado arriba
+  const idTrabajador = getIdTrabajador();
+  try {
+    if (idTrabajador && !isAdmin()) {
+      // obtiene proyectos asignados a este trabajador
+      const { data: asigns, error: asignErr } = await supabase
+        .from('asignar_proyecto')
+        .select('id_proyecto')
+        .eq('id_trabajador', Number(idTrabajador));
+      if (asignErr) throw asignErr;
+      const ids = (asigns || []).map(a => a.id_proyecto);
+      if (ids.length === 0) {
+        proyectosInfo = [];
+        proyectosNombres = [];
+        return;
+      }
+      const { data } = await supabase
+        .from('proyecto')
+        .select('id_proyecto, nombre, cliente, ubicación, fecha_inicio, fecha_final')
+        .in('id_proyecto', ids)
+        .eq('visibilidad', true);
+      proyectosInfo = data || [];
+    } else {
+      const { data } = await supabase
+        .from('proyecto')
+        .select('id_proyecto, nombre, cliente, ubicación, fecha_inicio, fecha_final')
+        .eq('visibilidad', true);
+      proyectosInfo = data || [];
+    }
+  } catch (err) {
+    console.error('Error cargando proyectos:', err);
+    proyectosInfo = [];
+  }
   proyectosNombres = proyectosInfo.map(p => p.nombre);
 }
 document.addEventListener('DOMContentLoaded', cargarProyectosNombres);
@@ -43,6 +74,74 @@ async function cargarRegistros() {
   registrosOriginales = data || [];
   paginaActual = 1;
   mostrarRegistrosPaginados(registrosOriginales);
+}
+
+async function cargarRegistrosSupabase() {
+  console.log('[registros] iniciar cargarRegistrosSupabase');
+  const idRaw = localStorage.getItem('id_trabajador');
+  const idTrabajador = idRaw ? Number(idRaw) : null;
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const isTrabajador = !!(idTrabajador && user && user.role === 'trabajador');
+
+  console.log('[registros] localStorage id_trabajador:', idRaw, '=> Number:', idTrabajador, 'user:', user, 'isTrabajador:', isTrabajador);
+
+  try {
+    // Si es trabajador: obtener proyectos asignados y luego registros solo para esos proyectos
+    if (isTrabajador) {
+      const { data: asigns, error: asignErr } = await supabase
+        .from('asignar_proyecto')
+        .select('id_proyecto')
+        .eq('id_trabajador', idTrabajador);
+
+      if (asignErr) {
+        console.error('[registros] error al consultar asignar_proyecto:', asignErr);
+        throw asignErr;
+      }
+
+      const ids = (asigns || []).map(a => a.id_proyecto);
+      console.log('[registros] proyectos asignados (ids):', ids);
+
+      if (!ids || ids.length === 0) {
+        console.log('[registros] no hay proyectos asignados -> mostrar nada');
+        registrosOriginales = [];
+        mostrarRegistrosPaginados(registrosOriginales);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('registro')
+        .select('*')
+        .in('id_proyecto', ids)
+        .order('fecha_cargo', { ascending: false });
+
+      if (error) {
+        console.error('[registros] error al consultar registro filtrado:', error);
+        throw error;
+      }
+
+      console.log('[registros] registros filtrados por proyectos asignados, total:', (data || []).length);
+      registrosOriginales = data || [];
+      mostrarRegistrosPaginados(registrosOriginales);
+      return;
+    }
+
+    // Fallback / admin: traer todos los registros
+    const { data, error } = await supabase
+      .from('registro')
+      .select('*')
+      .order('fecha_cargo', { ascending: false });
+
+    if (error) {
+      console.error('[registros] error fallback todos los registros:', error);
+      throw error;
+    }
+
+    console.log('[registros] fallback: total registros (todos):', (data || []).length);
+    registrosOriginales = data || [];
+    mostrarRegistrosPaginados(registrosOriginales);
+  } catch (err) {
+    console.error('[registros] excepción cargarRegistrosSupabase:', err);
+  }
 }
 
 function mostrarRegistros(data) {
@@ -276,7 +375,7 @@ document.addEventListener('click', function(e) {
   }
 });
 
-document.addEventListener('DOMContentLoaded', cargarRegistros);
+document.addEventListener('DOMContentLoaded', cargarRegistrosSupabase);
 
 // document.getElementById('descargar-csv').addEventListener('click', function() {
 //   //window.location.href = '/proyecto_facturas/modules/impresion/imprimir.html';

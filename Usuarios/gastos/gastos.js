@@ -8,37 +8,110 @@ let paginaActual = 1;
 let gastosFiltrados = [];
 
 async function cargarGastos() {
-  const idTrabajador = getIdTrabajador();
+  console.log('[gastos] iniciar cargarGastos', { href: window.location.href });
+  const idRaw = getIdTrabajador();
+  const idTrabajador = idRaw ? Number(idRaw) : null;
+  const admin = typeof isAdmin === 'function' ? isAdmin() : false;
+  console.log('[gastos] idTrabajadorRaw:', idRaw, '=> Number:', idTrabajador, 'isAdmin:', admin);
 
-  // Base query
-  let query = supabase.from('gastos').select('*'); // ajusta nombre/columnas reales
+  try {
+    if (idTrabajador && !admin) {
+      // 1) obtener proyectos asignados
+      const { data: asigns, error: asignErr } = await supabase
+        .from('asignar_proyecto')
+        .select('id_proyecto')
+        .eq('id_trabajador', idTrabajador);
 
-  // Si es trabajador, limitar por id_trabajador
-  if (idTrabajador) {
-      query = query.eq('id_trabajador', idTrabajador);
-  }
+      if (asignErr) {
+        console.error('[gastos] error al consultar asignar_proyecto:', asignErr);
+        throw asignErr;
+      }
 
-  const { data, error } = await query;
-  if (error) {
-      console.error('Error cargando gastos:', error);
+      const ids = (asigns || []).map(a => Number(a.id_proyecto));
+      console.log('[gastos] proyectos asignados ids (raw):', ids);
+
+      // --- NUEVO: limitar a proyectos visibles ---
+      const { data: visibleProjs, error: visErr } = await supabase
+        .from('proyecto')
+        .select('id_proyecto')
+        .in('id_proyecto', ids)
+        .eq('visibilidad', true);
+
+      if (visErr) {
+        console.error('[gastos] error al consultar proyectos visibles:', visErr);
+        throw visErr;
+      }
+
+      const visibleIds = (visibleProjs || []).map(p => Number(p.id_proyecto));
+      console.log('[gastos] proyectos visibles asignados ids:', visibleIds);
+
+      if (!visibleIds.length) {
+        console.log('[gastos] no hay proyectos asignados y visibles -> no mostrar gastos');
+        gastosOriginales = [];
+        paginaActual = 1;
+        mostrarGastosPaginados(gastosOriginales);
+        return;
+      }
+
+      // usa visibleIds para la consulta a registro
+      const { data, error } = await supabase
+        .from('registro')
+        .select('*')
+        .in('id_proyecto', visibleIds)
+        .order('fecha_cargo', { ascending: false });
+
+      console.log('[gastos] registro query result:', { error, totalReturned: (data||[]).length, sample: (data||[]).slice(0,5) });
+      if (error) throw error;
+
+      // doble comprobación cliente: eliminar registros sin id_proyecto o fuera de la lista
+      gastosOriginales = (data || []).filter(r => {
+        // log si no tiene id_proyecto para detectar datos sucios
+        if (r.id_proyecto === null || r.id_proyecto === undefined) {
+          console.warn('[gastos] registro sin id_proyecto detectado:', r);
+          return false;
+        }
+        return ids.includes(Number(r.id_proyecto));
+      });
+
+      console.log('[gastos] despues filtro cliente total:', gastosOriginales.length, 'unique proyectos in results:', Array.from(new Set(gastosOriginales.map(x=>Number(x.id_proyecto)))));
+
+      paginaActual = 1;
+      mostrarGastosPaginados(gastosOriginales);
+
+      // marca que ya cargó (debug para detectar sobreescrituras posteriores)
+      window.__gastos_last_loaded_at = Date.now();
       return;
-  }
+    }
 
-  gastosOriginales = data || [];
-  paginaActual = 1;
-  mostrarGastosPaginados(gastosOriginales);
+    // admin / fallback: traer todos
+    const { data, error } = await supabase
+      .from('registro')
+      .select('*')
+      .order('fecha_cargo', { ascending: false });
+
+    if (error) throw error;
+    console.log('[gastos] fallback: total registros (todos):', (data||[]).length);
+    gastosOriginales = data || [];
+    paginaActual = 1;
+    mostrarGastosPaginados(gastosOriginales);
+    window.__gastos_last_loaded_at = Date.now();
+  } catch (err) {
+    console.error('[gastos] excepción cargarGastos:', err);
+  }
 }
 
+// Añade logs en mostrarGastosPaginados
 function mostrarGastosPaginados(gastos) {
   gastosFiltrados = gastos;
+  console.log('[gastos] mostrando pagina, registros en esta llamada:', gastos.length, 'primeros 5 id_proyecto:', gastos.slice(0,5).map(g=>g.id_proyecto));
   const totalPaginas = Math.ceil(gastos.length / GASTOS_POR_PAGINA);
-  if (paginaActual > totalPaginas) paginaActual = totalPaginas || 1;
+  if (paginaActual > totalPaginas) paginaActual = 1;
   const inicio = (paginaActual - 1) * GASTOS_POR_PAGINA;
   const fin = inicio + GASTOS_POR_PAGINA;
   const gastosPagina = gastos.slice(inicio, fin);
 
   const tbody = document.getElementById('table-body');
-  tbody.innerHTML = '';
+  if (tbody) tbody.innerHTML = '';
 
   if (!gastosPagina.length) {
     tbody.innerHTML = `<tr><td colspan="8">No hay gastos</td></tr>`;
@@ -68,10 +141,10 @@ function mostrarGastosPaginados(gastos) {
     `;
   });
 
-  document.getElementById('contador-registros').textContent = `Registros Totales: ${gastos.length}`;
-  renderizarPaginacionGastos(totalPaginas);
+  const contador = document.getElementById('contador-registros');
+  if (contador) contador.textContent = `Registros Totales: ${gastos.length}`;
 
-  // Asigna los eventos de editar/eliminar
+  renderizarPaginacionGastos(totalPaginas);
   asignarEventosGastos();
 }
 
@@ -138,8 +211,33 @@ let proyectoSeleccionadoId = null;
 
 // Cargar proyectos al abrir el modal
 async function cargarProyectosInfo() {
-  const { data } = await supabase.from('proyecto').select('id_proyecto, nombre');
-  proyectosInfo = data || [];
+  try {
+    const idTrabajador = getIdTrabajador();
+    if (idTrabajador && !isAdmin()) {
+      const { data: asigns, error: asignErr } = await supabase
+        .from('asignar_proyecto')
+        .select('id_proyecto')
+        .eq('id_trabajador', Number(idTrabajador));
+      if (asignErr) throw asignErr;
+      const ids = (asigns || []).map(a => a.id_proyecto);
+      if (ids.length === 0) {
+        proyectosInfo = [];
+        return;
+      }
+      const { data } = await supabase
+        .from('proyecto')
+        .select('id_proyecto, nombre')
+        .in('id_proyecto', ids)
+        .eq('visibilidad', true);
+      proyectosInfo = data || [];
+    } else {
+      const { data } = await supabase.from('proyecto').select('id_proyecto, nombre').eq('visibilidad', true);
+      proyectosInfo = data || [];
+    }
+  } catch (err) {
+    console.error('Error cargando proyectos (gastos):', err);
+    proyectosInfo = [];
+  }
 }
 
 document.querySelector('.btn-nuevo').addEventListener('click', async () => {
@@ -399,3 +497,5 @@ const idTrabajador = localStorage.getItem('id_trabajador');
 if (idTrabajador) {
   console.log(`ID del trabajador autenticado: ${idTrabajador}`);
 }
+
+console.log('[gastos.js] archivo cargado', { location: window.location.href, now: new Date().toISOString() });

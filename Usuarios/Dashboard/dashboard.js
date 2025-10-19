@@ -389,16 +389,36 @@ function formatCurrency(n) {
 // Carga proyectos en memoria (no renderiza select)
 async function cargarProyectosSupabase() {
   try {
-    const { data, error } = await supabase
-      .from('proyecto')
-      .select('id_proyecto, nombre')
-      .eq('visibilidad', true);
-
-    if (error) {
-      console.error('Error cargando proyectos:', error);
-      return;
+    const idTrabajador = getIdTrabajador();
+    let proyectos = [];
+    if (idTrabajador && !isAdmin()) {
+      const { data: asigns, error: asignErr } = await supabase
+        .from('asignar_proyecto')
+        .select('id_proyecto')
+        .eq('id_trabajador', Number(idTrabajador));
+      if (asignErr) throw asignErr;
+      const ids = (asigns || []).map(a => a.id_proyecto);
+      if (ids.length === 0) {
+        projectsMap = {};
+        projectsList = [];
+        return;
+      }
+      const { data, error } = await supabase
+        .from('proyecto')
+        .select('id_proyecto, nombre')
+        .in('id_proyecto', ids)
+        .eq('visibilidad', true);
+      if (error) { console.error('Error cargando proyectos:', error); return; }
+      proyectos = data || [];
+    } else {
+      const { data, error } = await supabase
+        .from('proyecto')
+        .select('id_proyecto, nombre')
+        .eq('visibilidad', true);
+      if (error) { console.error('Error cargando proyectos:', error); return; }
+      proyectos = data || [];
     }
-    const proyectos = data || [];
+
     projectsMap = {};
     projectsList = proyectos.map(p => {
       const name = (p.nombre || '').toString().trim();
