@@ -1,4 +1,5 @@
 import { supabase } from '../../supabase/db.js';
+import { getIdTrabajador, isAdmin } from '../../supabase/auth.js';
 
 let gastosOriginales = [];
 
@@ -7,14 +8,20 @@ let paginaActual = 1;
 let gastosFiltrados = [];
 
 async function cargarGastos() {
-  const { data, error } = await supabase
-    .from('registro')
-    .select('*')
-    .order('fecha_facturacion', { ascending: false });
+  const idTrabajador = getIdTrabajador();
 
+  // Base query
+  let query = supabase.from('gastos').select('*'); // ajusta nombre/columnas reales
+
+  // Si es trabajador, limitar por id_trabajador
+  if (idTrabajador) {
+      query = query.eq('id_trabajador', idTrabajador);
+  }
+
+  const { data, error } = await query;
   if (error) {
-    alert('Error al cargar gastos');
-    return;
+      console.error('Error cargando gastos:', error);
+      return;
   }
 
   gastosOriginales = data || [];

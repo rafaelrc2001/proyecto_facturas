@@ -1,4 +1,5 @@
 import { supabase } from '../../supabase/db.js';
+import { getIdTrabajador, isAdmin } from '../../supabase/auth.js';
 
 let registroEditando = null;
 let proyectosNombres = [];
@@ -19,10 +20,26 @@ async function cargarProyectosNombres() {
 }
 document.addEventListener('DOMContentLoaded', cargarProyectosNombres);
 
-async function cargarRegistrosSupabase() {
-  const { data, error } = await supabase
+async function cargarRegistros() {
+  const idTrabajador = getIdTrabajador();
+
+  // Consulta base (ajusta nombre de tabla y columnas según tu modelo)
+  let query = supabase
     .from('registro')
-    .select('*');
+    .select('*')
+    .order('fecha', { ascending: false });
+
+  // Si es trabajador, limitar por id_trabajador
+  if (idTrabajador && !isAdmin()) {
+    query = query.eq('id_trabajador', idTrabajador);
+  }
+
+  const { data, error } = await query;
+  if (error) {
+    console.error('Error cargando registros:', error);
+    return;
+  }
+
   registrosOriginales = data || [];
   paginaActual = 1;
   mostrarRegistrosPaginados(registrosOriginales);
@@ -259,12 +276,12 @@ document.addEventListener('click', function(e) {
   }
 });
 
-document.addEventListener('DOMContentLoaded', cargarRegistrosSupabase);
+document.addEventListener('DOMContentLoaded', cargarRegistros);
 
-document.getElementById('descargar-csv').addEventListener('click', function() {
-  //window.location.href = '/proyecto_facturas/modules/impresion/imprimir.html';
-  window.location.href = '../impresion/imprimir.html';
-});
+// document.getElementById('descargar-csv').addEventListener('click', function() {
+//   //window.location.href = '/proyecto_facturas/modules/impresion/imprimir.html';
+//   window.location.href = '../impresion/imprimir.html';
+// });
 
 document.getElementById('descargar-btn').addEventListener('click', function() {
   document.getElementById('modalPreguntas').style.display = 'flex';

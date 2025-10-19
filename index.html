@@ -30,13 +30,13 @@
         aria-label="Formulario de inicio de sesión"
       >
         <div class="input-group">
-          <input type="email" id="email" name="email" required />
+          <input type="email" id="email" name="email" required placeholder="Correo electrónico" />
           <label for="email"></label>
           <i class="ri-user-line"></i>
         </div>
 
         <div class="input-group">
-          <input type="password" id="password" name="password" required />
+          <input type="password" id="password" name="password" required placeholder="Contraseña" />
           <label for="password"></label>
           <i class="ri-lock-line"></i>
           <button
@@ -44,7 +44,7 @@
             class="toggle-password"
             aria-label="Mostrar u ocultar contraseña"
           ></button>
-          <div id="password-error" class="input-error"></div> <!-- Aquí debe ir -->
+          <div id="password-error" class="input-error" aria-live="polite"></div>
         </div>
 
         <button type="submit" class="login-btn" id="login-btn">

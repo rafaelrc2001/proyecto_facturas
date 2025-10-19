@@ -1,4 +1,6 @@
 import { supabase } from '../../supabase/db.js';
+import { getIdTrabajador, isAdmin } from '../../supabase/auth.js';
+
 import { cargarTablaSupabase } from './graficas/tabla.js';
 import { cargarPagoChartDesdeSupabase } from './graficas/grafica-barra.js';
 import { cargarPastelDesdeSupabase } from './graficas/grafica-pastel.js';
@@ -17,29 +19,27 @@ function getColIndex(nombreColumna, filas) {
 
 // Ejemplo de uso en cargarDatosDashboard:
 async function cargarDatosDashboard() {
-  const response = await fetch(SHEET_URL);
-  const data = await response.text();
-  const filas = data.split("\n").map((row) => row.split(","));
-  const registros = filas.slice(1); // omite encabezado
+  const idTrabajador = getIdTrabajador();
 
-  // Obtén el índice de la columna "Total"
-  window.totalIndex = getColIndex("Total", filas);
-  console.log("Índice de columna 'Total':", window.totalIndex);
+  // Consulta de ejemplo: traer registros para KPIs/gráficas
+  let query = supabase
+    .from('registro')
+    .select('id_registro, importe, fecha_facturacion', { count: 'exact' });
 
-  registrosOriginales = registros;
+  if (idTrabajador && !isAdmin()) {
+    query = query.eq('id_trabajador', idTrabajador);
+  }
 
-  // Cargar KPIs (Supabase) después de tener registros cargados
-  // (esto evita errores por llamadas fuera de scope)
-  cargarKPIsSupabase();
+  const { data, error, count } = await query;
+  if (error) {
+    console.error('Error cargando datos dashboard:', error);
+    return;
+  }
 
-  // Si quieres actualizar gráficas al cargar, descomenta y deja las llamadas aquí,
-  // usando la variable `registros` (que sí existe en este scope):
-  // actualizarGraficaEstablecimientos(registros);
-  // actualizarGraficaEstablecimientosTipo(registros);
-  // actualizarGraficaTipos(registros);
-  // actualizarGraficaEstatus(registros);
-  // actualizarGraficaTicketsPorDia(registros);
+  // ...existing code para usar data / count en KPIs y gráficas...
 }
+
+document.addEventListener('DOMContentLoaded', cargarDatosDashboard);
 
 // Procesa y actualiza la gráfica de tipos
 function actualizarGraficaTipos(registros) {
