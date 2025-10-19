@@ -125,18 +125,35 @@ async function cargarRegistrosSupabase() {
       return;
     }
 
-    // Fallback / admin: traer todos los registros
+    // Fallback / admin: traer sólo registros de proyectos con visibilidad = true
+    const { data: proyectosVisibles, error: proyectosErr } = await supabase
+      .from('proyecto')
+      .select('id_proyecto')
+      .eq('visibilidad', true);
+
+    if (proyectosErr) {
+      console.error('[registros] error cargando proyectos visibles:', proyectosErr);
+      throw proyectosErr;
+    }
+
+    const proyectosVisiblesIds = (proyectosVisibles || []).map(p => p.id_proyecto);
+    if (!proyectosVisiblesIds.length) {
+      registrosOriginales = [];
+      mostrarRegistrosPaginados(registrosOriginales);
+      return;
+    }
+
     const { data, error } = await supabase
       .from('registro')
       .select('*')
+      .in('id_proyecto', proyectosVisiblesIds)
       .order('fecha_cargo', { ascending: false });
 
     if (error) {
-      console.error('[registros] error fallback todos los registros:', error);
+      console.error('[registros] error fallback todos los registros filtrados:', error);
       throw error;
     }
 
-    console.log('[registros] fallback: total registros (todos):', (data || []).length);
     registrosOriginales = data || [];
     mostrarRegistrosPaginados(registrosOriginales);
   } catch (err) {
@@ -322,69 +339,82 @@ function renderizarPaginacion(totalPaginas) {
 
 
 // Filtro por folio, establecimiento e importe
-document.getElementById('registro-search').addEventListener('input', function() {
-  const valor = this.value.trim().toLowerCase();
-  const filtrados = registrosOriginales.filter(r =>
-    (r.pago && r.pago.toLowerCase().includes(valor)) || // Tipo de pago
-    (r.establecimiento && r.establecimiento.toLowerCase().includes(valor)) || // Establecimiento
-    (r.folio && r.folio.toLowerCase().includes(valor)) || // Folio
-    (proyectosInfo.find(p => p.id_proyecto === r.id_proyecto && p.nombre.toLowerCase().includes(valor))) // Proyecto
-  );
-  paginaActual = 1;
-  mostrarRegistrosPaginados(filtrados);
-});
+const registroSearchEl = document.getElementById('registro-search');
+if (registroSearchEl) {
+  registroSearchEl.addEventListener('input', function() {
+    const valor = this.value.trim().toLowerCase();
+    const filtrados = registrosOriginales.filter(r =>
+      (r.pago && r.pago.toLowerCase().includes(valor)) || // Tipo de pago
+      (r.establecimiento && r.establecimiento.toLowerCase().includes(valor)) || // Establecimiento
+      (r.folio && r.folio.toLowerCase().includes(valor)) || // Folio
+      (proyectosInfo.find(p => p.id_proyecto === r.id_proyecto && p.nombre.toLowerCase().includes(valor))) // Proyecto
+    );
+    paginaActual = 1;
+    mostrarRegistrosPaginados(filtrados);
+  });
+}
 
 // Autocompletado
 const proyectoInput = document.getElementById('proyecto-autocomplete');
 const autocompleteList = document.getElementById('autocomplete-list');
 
-proyectoInput.addEventListener('input', function() {
-  const valor = this.value.trim().toLowerCase();
-  autocompleteList.innerHTML = '';
-  if (!valor) {
-    paginaActual = 1;
-    mostrarRegistrosPaginados(registrosOriginales);
-    return;
-  }
-  const sugerencias = proyectosNombres.filter(n => n.toLowerCase().includes(valor));
-  sugerencias.forEach(nombre => {
-    const div = document.createElement('div');
-    div.textContent = nombre;
-    div.onclick = function() {
-      proyectoInput.value = nombre;
-      autocompleteList.innerHTML = '';
-      filtrarPorProyecto(nombre);
-    };
-    autocompleteList.appendChild(div);
+if (proyectoInput && autocompleteList) {
+  proyectoInput.addEventListener('input', function() {
+    const valor = this.value.trim().toLowerCase();
+    autocompleteList.innerHTML = '';
+    if (!valor) {
+      paginaActual = 1;
+      mostrarRegistrosPaginados(registrosOriginales);
+      return;
+    }
+    const sugerencias = proyectosNombres.filter(n => n.toLowerCase().includes(valor));
+    sugerencias.forEach(nombre => {
+      const div = document.createElement('div');
+      div.textContent = nombre;
+      div.onclick = function() {
+        proyectoInput.value = nombre;
+        autocompleteList.innerHTML = '';
+        filtrarPorProyecto(nombre);
+      };
+      autocompleteList.appendChild(div);
+    });
   });
-});
 
-// Filtrar registros por nombre de proyecto
-function filtrarPorProyecto(nombreProyecto) {
-  const filtrados = registrosOriginales.filter(r =>
-    proyectosInfo.find(p => p.id_proyecto === r.id_proyecto && p.nombre === nombreProyecto)
-  );
-  paginaActual = 1;
-  mostrarRegistrosPaginados(filtrados);
+  // Opcional: Oculta el autocompletado si se hace clic fuera
+  document.addEventListener('click', function(e) {
+    if (!autocompleteList.contains(e.target) && e.target !== proyectoInput) {
+      autocompleteList.innerHTML = '';
+    }
+  });
 }
 
-// Opcional: Oculta el autocompletado si se hace clic fuera
-document.addEventListener('click', function(e) {
-  if (!autocompleteList.contains(e.target) && e.target !== proyectoInput) {
-    autocompleteList.innerHTML = '';
-  }
-});
+// Editar proyecto - autocompletado (solo si existe)
+const editarProyectoInput = document.getElementById('editar-proyecto-autocomplete');
+const editarAutocompleteList = document.getElementById('editar-autocomplete-list');
 
-document.addEventListener('DOMContentLoaded', cargarRegistrosSupabase);
+if (editarProyectoInput && editarAutocompleteList) {
+  editarProyectoInput.addEventListener('input', function() {
+    const valor = this.value.trim().toLowerCase();
+    editarAutocompleteList.innerHTML = '';
+    if (!valor) return;
+    const sugerencias = proyectosNombres.filter(n => n.toLowerCase().includes(valor));
+    sugerencias.forEach(nombre => {
+      const div = document.createElement('div');
+      div.textContent = nombre;
+      div.onclick = function() {
+        editarProyectoInput.value = nombre;
+        editarAutocompleteList.innerHTML = '';
+      };
+      editarAutocompleteList.appendChild(div);
+    });
+  });
 
-// document.getElementById('descargar-csv').addEventListener('click', function() {
-//   //window.location.href = '/proyecto_facturas/modules/impresion/imprimir.html';
-//   window.location.href = '../impresion/imprimir.html';
-// });
-
-document.getElementById('descargar-btn').addEventListener('click', function() {
-  document.getElementById('modalPreguntas').style.display = 'flex';
-});
+  document.addEventListener('click', function(e) {
+    if (!editarAutocompleteList.contains(e.target) && e.target !== editarProyectoInput) {
+      editarAutocompleteList.innerHTML = '';
+    }
+  });
+}
 
 // Guardar cambios al editar
 document.getElementById('form-editar-gasto').onsubmit = async function(e) {
@@ -440,33 +470,6 @@ function obtenerNombreProyecto(id_proyecto) {
   const proyecto = proyectosInfo.find(p => p.id_proyecto === id_proyecto);
   return proyecto ? proyecto.nombre : '';
 }
-
-const editarProyectoInput = document.getElementById('editar-proyecto-autocomplete');
-const editarAutocompleteList = document.getElementById('editar-autocomplete-list');
-
-// Al escribir en el input, muestra sugerencias de todos los proyectos
-editarProyectoInput.addEventListener('input', function() {
-  const valor = this.value.trim().toLowerCase();
-  editarAutocompleteList.innerHTML = '';
-  if (!valor) return;
-  const sugerencias = proyectosNombres.filter(n => n.toLowerCase().includes(valor));
-  sugerencias.forEach(nombre => {
-    const div = document.createElement('div');
-    div.textContent = nombre;
-    div.onclick = function() {
-      editarProyectoInput.value = nombre;
-      editarAutocompleteList.innerHTML = '';
-    };
-    editarAutocompleteList.appendChild(div);
-  });
-});
-
-// Opcional: Oculta el autocompletado si se hace clic fuera
-document.addEventListener('click', function(e) {
-  if (!editarAutocompleteList.contains(e.target) && e.target !== editarProyectoInput) {
-    editarAutocompleteList.innerHTML = '';
-  }
-});
 
 function normalizarPago(str) {
   return (str || '')
@@ -619,50 +622,59 @@ function generarHTMLImpresion(registros, proyecto) {
 }
 
 // Evento para el botón de imprimir (flecha)
-document.querySelector('.table-footer .btn').addEventListener('click', async function() {
-  // Usa los registros filtrados actualmente
-  let registros = registrosFiltrados.length ? registrosFiltrados : registrosOriginales;
+const imprimirBtn = document.querySelector('.table-footer .btn') || document.getElementById('imprimir-descargar-csv');
+if (imprimirBtn) {
+  imprimirBtn.addEventListener('click', async function() {
+    // Usa los registros filtrados actualmente
+    let registros = registrosFiltrados.length ? registrosFiltrados : registrosOriginales;
 
-  // Si hay filtro de proyecto, busca el proyecto
-  let nombreProyecto = document.getElementById('proyecto-autocomplete').value.trim();
-  let proyecto = null;
-  if (nombreProyecto) {
-    proyecto = proyectosInfo.find(p => p.nombre === nombreProyecto);
-    registros = registros.filter(r => proyecto && r.id_proyecto === proyecto.id_proyecto);
-  }
+    // Si hay filtro de proyecto, busca el proyecto
+    let nombreProyecto = document.getElementById('proyecto-autocomplete').value.trim();
+    let proyecto = null;
+    if (nombreProyecto) {
+      proyecto = proyectosInfo.find(p => p.nombre === nombreProyecto);
+      registros = registros.filter(r => proyecto && r.id_proyecto === proyecto.id_proyecto);
+    }
 
-  // Genera el HTML de impresión
-  const htmlImpresion = generarHTMLImpresion(registros, proyecto);
+    // Genera el HTML de impresión
+    const htmlImpresion = generarHTMLImpresion(registros, proyecto);
 
-  // Inserta en el área oculta
-  const printArea = document.getElementById('print-area');
-  printArea.innerHTML = htmlImpresion;
+    // Inserta en el área oculta
+    const printArea = document.getElementById('print-area');
+    if (printArea) printArea.innerHTML = htmlImpresion;
 
-  // Imprime solo el área generada
-  const ventana = window.open('', '', 'width=900,height=700');
-  ventana.document.write(`
-    <html>
-      <head>
-        <title>Imprimir Registros</title>
-        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
-        <style>
-          body { font-family:Montserrat,Roboto,sans-serif; color:#003B5C; }
-          table { border-collapse:collapse; width:100%; }
-          th, td { border:1px solid #ececec; padding:6px; }
-          th { background:#ececec; }
-          h2, h3 { color:#003B5C; }
-        </style>
-      </head>
-      <body>
-        ${htmlImpresion}
-      </body>
-    </html>
-  `);
-  ventana.document.close();
-  ventana.focus();
-  ventana.print();
-  ventana.close();
-});
+    // Imprime solo el área generada
+    const ventana = window.open('', '', 'width=900,height=700');
+    if (!ventana) {
+      alert('No se pudo abrir la ventana de impresión. Revisa las ventanas emergentes del navegador.');
+      return;
+    }
+    ventana.document.write(`
+      <html>
+        <head>
+          <title>Imprimir Registros</title>
+          <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
+          <style>
+            body { font-family:Montserrat,Roboto,sans-serif; color:#003B5C; }
+            table { border-collapse:collapse; width:100%; }
+            th, td { border:1px solid #ececec; padding:6px; }
+            th { background:#ececec; }
+            h2, h3 { color:#003B5C; }
+          </style>
+        </head>
+        <body>
+          ${htmlImpresion}
+        </body>
+      </html>
+    `);
+    ventana.document.close();
+    ventana.focus();
+    ventana.print();
+    ventana.close();
+  });
+} else {
+  console.warn('Botón de imprimir no encontrado en el DOM.');
+}
 
 // Ejemplo para dashboard.js
 const user = JSON.parse(localStorage.getItem('user'));

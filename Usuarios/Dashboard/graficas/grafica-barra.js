@@ -1,4 +1,5 @@
 import { supabase } from '../../../supabase/db.js';
+import { getIdTrabajador, isAdmin } from '../../../supabase/auth.js';
 
 // Configuración de la gráfica de tipos
 function initTypesChart() {
@@ -611,10 +612,33 @@ function createSoftTextureBarra() {
 async function cargarPagoChartDesdeSupabase(projectId = null) {
   try {
     let query = supabase.from('registro').select('pago, importe');
-    if (projectId) query = query.eq('id_proyecto', projectId);
+    if (projectId) {
+      query = query.eq('id_proyecto', projectId);
+    } else {
+      const idTrabajador = getIdTrabajador();
+      if (idTrabajador && !isAdmin()) {
+        const { data: asigns, error: asignErr } = await supabase
+          .from('asignar_proyecto')
+          .select('id_proyecto')
+          .eq('id_trabajador', Number(idTrabajador));
+        if (asignErr) { console.error('[barra] error asigns:', asignErr); return; }
+        const ids = (asigns || []).map(a => Number(a.id_proyecto));
+        if (!ids.length) { console.warn('[barra] usuario sin proyectos asignados'); return; }
+
+        const { data: visibleProjs, error: visErr } = await supabase
+          .from('proyecto')
+          .select('id_proyecto')
+          .in('id_proyecto', ids)
+          .eq('visibilidad', true);
+        if (visErr) { console.error('[barra] error proyectos visibles:', visErr); return; }
+        const visibleIds = (visibleProjs || []).map(p => Number(p.id_proyecto));
+        if (!visibleIds.length) { console.warn('[barra] no hay proyectos visibles asignados'); return; }
+
+        query = query.in('id_proyecto', visibleIds);
+      }
+    }
 
     const { data, error } = await query;
-
     if (error) {
       console.error('Error leyendo columna pago:', error);
       return;
@@ -651,13 +675,12 @@ async function cargarPagoChartDesdeSupabase(projectId = null) {
         trigger: 'axis',
         axisPointer: { type: 'shadow' },
         formatter: function (params) {
-          // muestra texto completo en tooltip
           const p = params[0] || params;
           return `<strong style="color:#003B5C">${p.name}</strong><br/>Cantidad: <strong>${p.value}</strong>`;
         }
       },
       grid: {
-        left: '18%',   // más espacio para etiquetas largas
+        left: '18%',
         right: '8%',
         top: 30,
         bottom: 20,
@@ -672,7 +695,6 @@ async function cargarPagoChartDesdeSupabase(projectId = null) {
           fontSize: 13,
           fontWeight: 600,
           formatter: function (value) {
-            // truncar visualmente en el eje, el tooltip sigue mostrando completo
             const max = 36;
             return value.length > max ? value.slice(0, max - 3) + '...' : value;
           }

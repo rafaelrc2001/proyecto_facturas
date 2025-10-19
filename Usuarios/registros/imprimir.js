@@ -14,6 +14,18 @@ const tiposPago = [
 let proyectosInfo = [];
 let proyectosNombres = [];
 let registrosOriginales = [];
+let respuestasPreguntas = {}; // inicialización correcta (antes causaba ReferenceError)
+
+// Helper para escapar HTML en las respuestas (evita inyección en el HTML generado)
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
 
 // Cargar proyectos y registros al iniciar
 document.addEventListener('DOMContentLoaded', async () => {
@@ -60,9 +72,78 @@ async function cargarProyectosNombres() {
 
 // Cargar registros
 async function cargarRegistrosSupabase() {
-  const { data } = await supabase.from('registro').select('*');
-  registrosOriginales = data || [];
-  mostrarTablasPorProyecto(""); // Muestra todo al inicio
+  const idTrabajadorRaw = localStorage.getItem('id_trabajador');
+  const idTrabajador = idTrabajadorRaw ? Number(idTrabajadorRaw) : null;
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+
+  try {
+    // Si es trabajador, traer solo registros de los proyectos asignados
+    if (idTrabajador && user.role === 'trabajador') {
+      // obtiene proyectos asignados al trabajador
+      const { data: asigns, error: asignErr } = await supabase
+        .from('asignar_proyecto')
+        .select('id_proyecto')
+        .eq('id_trabajador', idTrabajador);
+
+      if (asignErr) throw asignErr;
+      const ids = (asigns || []).map(a => a.id_proyecto);
+      if (ids.length === 0) {
+        registrosOriginales = [];
+        mostrarTablasPorProyecto(""); // no hay proyectos asignados
+        return;
+      }
+
+      // FILTRAR: limitar solo a proyectos visibles
+      const { data: visibleProjs, error: visErr } = await supabase
+        .from('proyecto')
+        .select('id_proyecto')
+        .in('id_proyecto', ids)
+        .eq('visibilidad', true);
+
+      if (visErr) throw visErr;
+      const visibleIds = (visibleProjs || []).map(p => p.id_proyecto);
+      if (visibleIds.length === 0) {
+        registrosOriginales = [];
+        mostrarTablasPorProyecto("");
+        return;
+      }
+
+      // traer registros solo para proyectos visibles asignados
+      const { data, error } = await supabase
+        .from('registro')
+        .select('*')
+        .in('id_proyecto', visibleIds)
+        .order('fecha_cargo', { ascending: false });
+
+      if (error) throw error;
+      registrosOriginales = data || [];
+      mostrarTablasPorProyecto("");
+      return;
+    }
+
+    // Fallback (admin / ver todos) -> traer sólo registros de proyectos visibles
+    const proyectosVisiblesIds = proyectosInfo.map(p => p.id_proyecto);
+    let data, error;
+    if (proyectosVisiblesIds.length > 0) {
+      ({ data, error } = await supabase
+        .from('registro')
+        .select('*')
+        .in('id_proyecto', proyectosVisiblesIds)
+        .order('fecha_cargo', { ascending: false }));
+    } else {
+      // Si no hay proyectos visibles definidos, devolvemos arreglo vacío
+      data = [];
+      error = null;
+    }
+
+    if (error) throw error;
+    registrosOriginales = data || [];
+    mostrarTablasPorProyecto("");
+  } catch (err) {
+    console.error('Error cargando registros (imprimir):', err);
+    registrosOriginales = [];
+    mostrarTablasPorProyecto("");
+  }
 }
 
 // Autocompletado de proyectos
@@ -257,7 +338,6 @@ document.getElementById('imprimir-descargar-csv').addEventListener('click', func
   document.getElementById('modalPreguntas').style.display = 'flex';
 });
 
-let respuestasPreguntas = respuestasPreguntas || {}; // ya existía, reafirmamos
 function buildRespuestasHTML() {
   if (!respuestasPreguntas || Object.keys(respuestasPreguntas).length === 0) return '';
   return Object.entries(respuestasPreguntas)

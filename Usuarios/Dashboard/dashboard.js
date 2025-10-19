@@ -1,42 +1,70 @@
 import { supabase } from '../../supabase/db.js';
 import { getIdTrabajador, isAdmin } from '../../supabase/auth.js';
 
-import { cargarTablaSupabase } from './graficas/tabla.js';
-import { cargarPagoChartDesdeSupabase } from './graficas/grafica-barra.js';
 import { cargarPastelDesdeSupabase } from './graficas/grafica-pastel.js';
+import { cargarPagoChartDesdeSupabase } from './graficas/grafica-barra.js';
+import { cargarTablaSupabase } from './graficas/tabla.js';
 
-const SHEET_URL =
-"https://docs.google.com/spreadsheets/d/e/2PACX-1vQFNxPS_lZrhCuH7xrQfeMJgZIb3vaHirtKySurmZCvrQmKV45caRB-eJAqJ6sju3Mxdwy6ituHWBEA/pub?gid=0&single=true&output=csv";
-let registrosOriginales = []; // Guarda todos los registros
-let projectsMap = {}; // nombre_lower -> id_proyecto
-let projectsList = []; // lista de nombres para sugerencias
+// Variables para autocompletado / mapping de proyectos
+let projectsMap = {};   // { 'proyecto x': 123, ... }
+let projectsList = [];  // ['Proyecto X', ...]
 
-function getColIndex(nombreColumna, filas) {
-  // Busca el índice por el nombre en la primera fila (encabezado)
-  if (!filas || !filas.length) return -1;
-  return filas[0].findIndex(col => col.trim().toLowerCase() === nombreColumna.trim().toLowerCase());
-}
-
-// Ejemplo de uso en cargarDatosDashboard:
 async function cargarDatosDashboard() {
-  const idTrabajador = getIdTrabajador();
+  try {
+    const idTrabajador = getIdTrabajador();
 
-  // Consulta de ejemplo: traer registros para KPIs/gráficas
-  let query = supabase
-    .from('registro')
-    .select('id_registro, importe, fecha_facturacion', { count: 'exact' });
+    // Si es trabajador (no admin) usamos los proyectos asignados y visibles
+    if (idTrabajador && !isAdmin()) {
+      // obtener proyectos asignados
+      const { data: asigns, error: asignErr } = await supabase
+        .from('asignar_proyecto')
+        .select('id_proyecto')
+        .eq('id_trabajador', Number(idTrabajador));
+      if (asignErr) { console.error('Error cargando asignaciones:', asignErr); registrosOriginales = []; return; }
+      const ids = (asigns || []).map(a => Number(a.id_proyecto));
+      if (!ids.length) { registrosOriginales = []; return; }
 
-  if (idTrabajador && !isAdmin()) {
-    query = query.eq('id_trabajador', idTrabajador);
+      // filtrar solo proyectos visibles entre los asignados
+      const { data: visibleProjs, error: visErr } = await supabase
+        .from('proyecto')
+        .select('id_proyecto')
+        .in('id_proyecto', ids)
+        .eq('visibilidad', true);
+      if (visErr) { console.error('Error cargando proyectos visibles:', visErr); registrosOriginales = []; return; }
+      const visibleIds = (visibleProjs || []).map(p => Number(p.id_proyecto));
+      if (!visibleIds.length) { registrosOriginales = []; return; }
+
+      // consultar registros sólo para proyectos visibles asignados
+      const { data, error, count } = await supabase
+        .from('registro')
+        .select('id_registro, importe, fecha_facturacion', { count: 'exact' })
+        .in('id_proyecto', visibleIds);
+
+      if (error) { console.error('Error cargando registros dashboard:', error); registrosOriginales = []; return; }
+      registrosOriginales = data || [];
+
+      // Cargar KPIs y luego gráficas/tablas
+      await cargarKPIsSupabase(null); // o pasar projectId específico si aplica
+      await Promise.all([
+        cargarPastelDesdeSupabase(null),
+        cargarPagoChartDesdeSupabase(null),
+        cargarTablaSupabase({ limit: 300, projectId: null })
+      ]);
+      return;
+    }
+
+    // Admin u otros: comportamiento original (sin filtro por proyecto)
+    let query = supabase
+      .from('registro')
+      .select('id_registro, importe, fecha_facturacion', { count: 'exact' });
+
+    const { data, error, count } = await query;
+    if (error) { console.error('Error cargando datos dashboard:', error); registrosOriginales = []; return; }
+
+    registrosOriginales = data || [];
+  } catch (err) {
+    console.error('Error cargarDatosDashboard:', err);
   }
-
-  const { data, error, count } = await query;
-  if (error) {
-    console.error('Error cargando datos dashboard:', error);
-    return;
-  }
-
-  // ...existing code para usar data / count en KPIs y gráficas...
 }
 
 document.addEventListener('DOMContentLoaded', cargarDatosDashboard);
@@ -78,37 +106,27 @@ function actualizarGraficaTipos(registros) {
 }
 
 // Procesa y actualiza la gráfica de estatus
-function actualizarGraficaEstatus(registros) {
-  // Contar facturas y tickets totales
-  let totalFacturas = 0;
-  let totalTickets = 0;
-
-  registros.forEach((fila) => {
-    const tipo = (fila[1] || "").trim().toLowerCase();
-    if (tipo === "factura") totalFacturas++;
-    else if (tipo === "ticket") totalTickets++;
-  });
-
-  // Asegura que sean números válidos
-  totalFacturas = Number.isFinite(totalFacturas) ? totalFacturas : 0;
-  totalTickets = Number.isFinite(totalTickets) ? totalTickets : 0;
-
-  // Si ambos son cero, pon 1 y 1 para evitar división por cero
-  if (totalFacturas === 0 && totalTickets === 0) {
-    totalFacturas = 1;
-    totalTickets = 1;
-  }
-
-  const categories = ["Facturas", "Tickets"];
-  const values = [totalFacturas, totalTickets];
-  const colors = ["#1D3E53", "#77ABB7"];
-
-  if (window.statusChartInstance) {
-    window.statusChartInstance.updateData({
-      categories,
-      values,
-      colors,
+async function actualizarGraficaEstatus(registros) {
+  // Delegar la creación/actualización del gráfico de pastel al módulo dedicado.
+  // Evitar crear o actualizar aquí cualquier instancia de "statusChartInstance".
+  try {
+    // Si ya existe una función para cargar el pastel, llámala sin parámetros
+    if (typeof cargarPastelDesdeSupabase === 'function') {
+      await cargarPastelDesdeSupabase(null);
+      return;
+    }
+    // Si no existe el loader, sólo computar resumen (opcional) sin renderizar
+    let totalFacturas = 0;
+    let totalTickets = 0;
+    registros.forEach((fila) => {
+      const tipo = (fila[1] || "").trim().toLowerCase();
+      if (tipo === "factura") totalFacturas++;
+      else if (tipo === "ticket") totalTickets++;
     });
+    // No renderizar nada aquí.
+    console.debug('[dashboard] actualizarGraficaEstatus (delegada) facturas:', totalFacturas, 'tickets:', totalTickets);
+  } catch (err) {
+    console.error('Error delegando actualización del gráfico de estatus:', err);
   }
 }
 
@@ -320,64 +338,52 @@ function actualizarGraficaEstablecimientosTipo(registros) {
  */
 async function cargarKPIsSupabase(projectId = null) {
   try {
-    console.log('[KPIs] iniciar, projectId=', projectId);
+    const idTrabajador = getIdTrabajador();
 
-    if (typeof supabase === 'undefined' || !supabase) {
-      console.error('[KPIs] supabase no está definido (revisar supabase/db.js import).');
-      setTextById('total-gastos', 'Error');
-      setTextById('facturas-gastos', 'Error');
-      setTextById('tickets-gastos', 'Error');
+    // Si se pide projectId explícito lo usamos inmediatamente
+    if (projectId) {
+      const { data, error } = await supabase.from('registro').select('importe, tipo').eq('id_proyecto', projectId);
+      if (error) { console.error('[KPIs] error de Supabase:', error); calcularYSetearKPIs([]); return; }
+      calcularYSetearKPIs(data || []);
       return;
     }
 
-    let query = supabase.from('registro').select('importe, tipo');
-    if (projectId) query = query.eq('id_proyecto', projectId);
+    // Si es trabajador y no admin, limitar a proyectos asignados y visibles
+    if (idTrabajador && !isAdmin()) {
+      const { data: asigns, error: asignErr } = await supabase
+        .from('asignar_proyecto')
+        .select('id_proyecto')
+        .eq('id_trabajador', Number(idTrabajador));
+      if (asignErr) { console.error('[KPIs] error asigns:', asignErr); calcularYSetearKPIs([]); return; }
+      const ids = (asigns || []).map(a => Number(a.id_proyecto));
+      if (!ids.length) { calcularYSetearKPIs([]); return; }
 
-    const { data, error, status } = await query;
-    console.log('[KPIs] respuesta Supabase status=', status, 'error=', error, 'rows=', (data && data.length) || 0);
+      const { data: visibleProjs, error: visErr } = await supabase
+        .from('proyecto')
+        .select('id_proyecto')
+        .in('id_proyecto', ids)
+        .eq('visibilidad', true);
+      if (visErr) { console.error('[KPIs] error proyectos visibles:', visErr); calcularYSetearKPIs([]); return; }
+      const visibleIds = (visibleProjs || []).map(p => Number(p.id_proyecto));
+      if (!visibleIds.length) { calcularYSetearKPIs([]); return; }
 
-    if (error) {
-      console.error('[KPIs] error de Supabase:', error);
-      setTextById('total-gastos', 'Error');
-      setTextById('facturas-gastos', 'Error');
-      setTextById('tickets-gastos', 'Error');
+      const { data, error } = await supabase
+        .from('registro')
+        .select('importe, tipo')
+        .in('id_proyecto', visibleIds);
+
+      if (error) { console.error('[KPIs] error de Supabase:', error); calcularYSetearKPIs([]); return; }
+      calcularYSetearKPIs(data || []);
       return;
     }
 
-    if (!data || data.length === 0) {
-      console.warn('[KPIs] no hay datos (data vacía).');
-      setTextById('total-gastos', '-');
-      setTextById('facturas-gastos', '-');
-      setTextById('tickets-gastos', '-');
-      return;
-    }
-
-    // Nueva lógica: "Sin facturar" = suma de todo lo que NO sea factura
-    let total = 0;
-    let totalFacturas = 0;
-
-    data.forEach(r => {
-      const importe = Number(String(r.importe).replace(',', '.')) || 0;
-      total += importe;
-      const tipo = (r.tipo || '').toString().toLowerCase();
-      if (tipo.includes('factura')) {
-        totalFacturas += importe;
-      }
-    });
-
-    const totalSinFacturar = total - totalFacturas;
-
-    setTextById('total-gastos', formatCurrency(total));
-    setTextById('facturas-gastos', formatCurrency(totalFacturas));
-    setTextById('tickets-gastos', formatCurrency(totalSinFacturar));
-
-    console.log('[KPIs] actualizados:', { total, totalFacturas, totalSinFacturar });
-
+    // Caso admin / sin filtro: traer todo
+    const { data, error } = await supabase.from('registro').select('importe, tipo');
+    if (error) { console.error('[KPIs] error de Supabase:', error); calcularYSetearKPIs([]); return; }
+    calcularYSetearKPIs(data || []);
   } catch (err) {
     console.error('[KPIs] excepción:', err);
-    setTextById('total-gastos', 'Error');
-    setTextById('facturas-gastos', 'Error');
-    setTextById('tickets-gastos', 'Error');
+    calcularYSetearKPIs([]);
   }
 }
 
@@ -419,14 +425,18 @@ async function cargarProyectosSupabase() {
       proyectos = data || [];
     }
 
+    // normalizar y almacenar map/list
     projectsMap = {};
     projectsList = proyectos.map(p => {
       const name = (p.nombre || '').toString().trim();
-      if (name) projectsMap[name.toLowerCase()] = p.id_proyecto;
+      const key = name.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
+      if (key) projectsMap[key] = Number(p.id_proyecto);
       return name;
     }).filter(Boolean);
   } catch (err) {
     console.error('Exception cargando proyectos:', err);
+    projectsMap = {};
+    projectsList = [];
   }
 }
 
@@ -496,17 +506,15 @@ async function filterByProject(queryOrId) {
       projectId = null;
     } else {
       const v = String(queryOrId).trim();
-      // si parece un id numérico exacto lo usamos
       if (/^\d+$/.test(v)) {
-        projectId = v;
+        projectId = Number(v);
       } else {
-        // buscar por nombre en projectsMap (keys en lowercase)
-        const q = v.toLowerCase();
+        const q = v.toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu, '');
         const keys = Object.keys(projectsMap || {});
-        // prioridad: startsWith -> includes
+        // prioridad: exact -> startsWith -> includes
         let key = keys.find(k => k === q) || keys.find(k => k.startsWith(q));
         if (!key) key = keys.find(k => k.includes(q));
-        projectId = key ? projectsMap[key] : null;
+        projectId = key ? Number(projectsMap[key]) : null;
       }
     }
 
@@ -518,7 +526,6 @@ async function filterByProject(queryOrId) {
     await cargarTablaSupabase({ limit: 300, projectId });
     if (typeof cargarPagoChartDesdeSupabase === 'function') await cargarPagoChartDesdeSupabase(projectId);
     if (typeof cargarPastelDesdeSupabase === 'function') await cargarPastelDesdeSupabase(projectId);
-    // cargar KPIs si existe (puede estar deshabilitada)
     if (typeof cargarKPIsSupabase === 'function') await cargarKPIsSupabase(projectId);
   } catch (err) {
     console.error('filterByProject error:', err);
@@ -591,4 +598,30 @@ document.addEventListener('DOMContentLoaded', async () => {
 function setTextById(id, text) {
   const el = document.getElementById(id);
   if (el) el.textContent = text;
+}
+
+function calcularYSetearKPIs(data) {
+  console.log('[KPIs] calcularYSetearKPIs recibidos:', (data || []).length, data?.slice(0,5));
+  if (!data || data.length === 0) {
+    // indicar explícito en DOM para no dejar guiones vacíos
+    setTextById('total-gastos', formatCurrency(0));
+    setTextById('facturas-gastos', formatCurrency(0));
+    setTextById('tickets-gastos', formatCurrency(0));
+    return;
+  }
+
+  let total = 0;
+  let totalFacturas = 0;
+
+  data.forEach(r => {
+    const importe = Number(String(r.importe).replace(',', '.')) || 0;
+    total += importe;
+    const tipo = (r.tipo || '').toString().toLowerCase();
+    if (tipo.includes('factura')) totalFacturas += importe;
+  });
+
+  const totalSinFacturar = total - totalFacturas;
+  setTextById('total-gastos', formatCurrency(total));
+  setTextById('facturas-gastos', formatCurrency(totalFacturas));
+  setTextById('tickets-gastos', formatCurrency(totalSinFacturar));
 }
