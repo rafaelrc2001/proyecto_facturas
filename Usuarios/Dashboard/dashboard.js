@@ -1,6 +1,52 @@
 import { supabase } from '../../supabase/db.js';
 import { getIdTrabajador, isAdmin } from '../../supabase/auth.js';
 
+
+// Añadir: verificación rápida de sesión de trabajador (overlay blanco si no hay id)
+function verificarSesionTrabajador() {
+  const idRaw = getIdTrabajador() ?? localStorage.getItem('id_trabajador');
+  const id = (idRaw === null || idRaw === undefined || String(idRaw).trim() === '') ? null : idRaw;
+  const existing = document.getElementById('login-warning-user');
+
+  if (id === null) {
+    if (!existing) {
+      const overlay = document.createElement('div');
+      overlay.id = 'login-warning-user';
+      overlay.style.cssText = [
+        'position:fixed',
+        'inset:0',
+        'background:#fff',
+        'z-index:2147483647',
+        'display:flex',
+        'align-items:center',
+        'justify-content:center',
+        'font-size:20px',
+        'color:#000',
+        'padding:20px'
+      ].join(';');
+      overlay.textContent = 'Por favor inicie sesión';
+      document.body.appendChild(overlay);
+      // Evita scroll detrás del overlay
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+    }
+    return false;
+  }
+
+  // Si ahora está autenticado, quitar overlay si existe
+  if (existing) {
+    existing.remove();
+    document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
+  }
+  return true;
+}
+
+// Listener precoz que muestra la pantalla blanca si no está autenticado
+document.addEventListener('DOMContentLoaded', () => {
+  verificarSesionTrabajador();
+});
+
 import { cargarPastelDesdeSupabase } from './graficas/grafica-pastel.js';
 import { cargarPagoChartDesdeSupabase } from './graficas/grafica-barra.js';
 import { cargarTablaSupabase } from './graficas/tabla.js';

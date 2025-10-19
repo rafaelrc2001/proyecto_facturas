@@ -1,6 +1,52 @@
 import { supabase } from '../../supabase/db.js';
 import { getIdTrabajador, isAdmin } from '../../supabase/auth.js';
 
+// Añadir: verificación rápida de sesión de trabajador (muestra overlay blanco si no hay id)
+function verificarSesionTrabajador() {
+  const idRaw = getIdTrabajador() ?? localStorage.getItem('id_trabajador');
+  const id = (idRaw === null || idRaw === undefined || String(idRaw).trim() === '') ? null : idRaw;
+
+  if (id === null) {
+    if (!document.getElementById('login-warning-user')) {
+      const overlay = document.createElement('div');
+      overlay.id = 'login-warning-user';
+      overlay.style.cssText = [
+        'position:fixed',
+        'inset:0',
+        'background:#fff',
+        'z-index:2147483647',
+        'display:flex',
+        'align-items:center',
+        'justify-content:center',
+        'font-size:20px',
+        'color:#000',
+        'padding:20px'
+      ].join(';');
+      overlay.textContent = 'Por favor inicie sesión';
+      document.body.appendChild(overlay);
+      // Evitar scroll detrás del overlay
+      document.documentElement.style.overflow = 'hidden';
+      document.body.style.overflow = 'hidden';
+    }
+    return false;
+  }
+
+  // Si existe overlay y ahora hay id, quitarlo
+  const existing = document.getElementById('login-warning-user');
+  if (existing) {
+    existing.remove();
+    document.documentElement.style.overflow = '';
+    document.body.style.overflow = '';
+  }
+
+  return true;
+}
+
+// Listener precoz que muestra la pantalla blanca si no está autenticado
+document.addEventListener('DOMContentLoaded', () => {
+  verificarSesionTrabajador();
+});
+
 let gastosOriginales = [];
 
 const GASTOS_POR_PAGINA = 7;
