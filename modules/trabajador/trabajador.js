@@ -9,6 +9,23 @@ const TRABAJADORES_POR_PAGINA = 7;
 let paginaActual = 1;
 let trabajadoresFiltrados = [];
 
+// Función agregada: verifica sesión y muestra mensaje si no hay id_trabajador
+function verificarSesion() {
+  const projectidadmin = localStorage.getItem('projectidadmin');
+  // Permitir solo si projectidadmin existe y es '1' (cámbialo si tu admin usa otro valor)
+  if (!projectidadmin || projectidadmin !== '1') {
+    const body = document.body;
+    Array.from(body.children).forEach(el => el.style.display = 'none');
+    const aviso = document.createElement('div');
+    aviso.id = 'login-warning';
+    aviso.style.cssText = 'display:flex;align-items:center;justify-content:center;height:100vh;padding:1rem;font-size:1.25rem;';
+    aviso.textContent = 'Por favor inicie sesión';
+    body.appendChild(aviso);
+    return false;
+  }
+  return true;
+}
+
 async function cargarTrabajadores() {
   const { data: trabajadores, error } = await obtenerTrabajadores();
   trabajadoresList = trabajadores || [];
@@ -148,6 +165,9 @@ function renderizarPaginacionTrabajadores(totalPaginas) {
 
 // Llama la función al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
+  // Llamada agregada: si no hay sesión, no continúa
+  if (!verificarSesion()) return;
+
   cargarTrabajadores();
 
   // Abrir modal "Nuevo Trabajador"

@@ -3,6 +3,40 @@ import { cargarTablaSupabase } from './graficas/tabla.js';
 import { cargarPagoChartDesdeSupabase } from './graficas/grafica-barra.js';
 import { cargarPastelDesdeSupabase } from './graficas/grafica-pastel.js';
 
+// Función simple: muestra overlay blanco fullscreen si no hay admin autenticado
+function verificarSesion() {
+  const projectidadmin = localStorage.getItem('projectidadmin');
+  if (projectidadmin && projectidadmin === '1') return true;
+
+  if (!document.getElementById('login-warning')) {
+    const overlay = document.createElement('div');
+    overlay.id = 'login-warning';
+    overlay.style.cssText = [
+      'position:fixed',
+      'inset:0',
+      'background:#fff',
+      'z-index:2147483647',
+      'display:flex',
+      'align-items:center',
+      'justify-content:center',
+      'font-size:20px',
+      'color:#000',
+      'padding:20px'
+    ].join(';');
+    overlay.innerHTML = '<div>Por favor inicie sesión</div>';
+    document.body.appendChild(overlay);
+    // Evita scroll detrás del overlay
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+  }
+  return false;
+}
+
+// Listener muy corto que crea el overlay lo antes posible al cargar
+document.addEventListener('DOMContentLoaded', () => {
+  verificarSesion();
+});
+
 const SHEET_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vQFNxPS_lZrhCuH7xrQfeMJgZIb3vaHirtKySurmZCvrQmKV45caRB-eJAqJ6sju3Mxdwy6ituHWBEA/pub?gid=0&single=true&output=csv";
 let registrosOriginales = []; // Guarda todos los registros

@@ -16,8 +16,25 @@ let proyectosNombres = [];
 let registrosOriginales = [];
 let respuestasHTML = '';
 
+// Agregar función: verifica session solo por projectidadmin === '1'
+function verificarSesion() {
+  const projectidadmin = localStorage.getItem('projectidadmin');
+  if (!projectidadmin || projectidadmin !== '1') {
+    const body = document.body;
+    Array.from(body.children).forEach(el => el.style.display = 'none');
+    const aviso = document.createElement('div');
+    aviso.id = 'login-warning';
+    aviso.style.cssText = 'display:flex;align-items:center;justify-content:center;height:100vh;padding:1rem;font-size:1.25rem;';
+    aviso.textContent = 'Por favor inicie sesión';
+    body.appendChild(aviso);
+    return false;
+  }
+  return true;
+}
+
 // Cargar proyectos y registros al iniciar
 document.addEventListener('DOMContentLoaded', async () => {
+  if (!verificarSesion()) return;
   await cargarProyectosNombres();
   await cargarRegistrosSupabase();
 });

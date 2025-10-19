@@ -11,6 +11,22 @@ const PROYECTOS_POR_PAGINA = 7;
 let paginaActual = 1;
 let proyectosFiltrados = [];
 
+// Agregar: función que verifica solo projectidadmin === '1'
+function verificarSesion() {
+  const projectidadmin = localStorage.getItem('projectidadmin');
+  if (!projectidadmin || projectidadmin !== '1') {
+    const body = document.body;
+    Array.from(body.children).forEach(el => el.style.display = 'none');
+    const aviso = document.createElement('div');
+    aviso.id = 'login-warning';
+    aviso.style.cssText = 'display:flex;align-items:center;justify-content:center;height:100vh;padding:1rem;font-size:1.25rem;';
+    aviso.textContent = 'Por favor inicie sesión';
+    body.appendChild(aviso);
+    return false;
+  }
+  return true;
+}
+
 async function cargarProyectos() {
   // 1. Obtén todos los proyectos
   const { data: proyectos, error: errorProyectos } = await obtenerProyectos();
@@ -85,6 +101,7 @@ async function cargarProyectos() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+  if (!verificarSesion()) return;
   cargarProyectos();
 
   const btnNuevo = document.querySelector('.btn-nuevo');
@@ -168,6 +185,123 @@ document.addEventListener('DOMContentLoaded', function() {
       this.style.height = 'auto';
       this.style.height = (this.scrollHeight) + 'px';
     });
+  });
+});
+
+// Reemplaza el segundo DOMContentLoaded por esta versión (asignar proyecto)
+document.addEventListener('DOMContentLoaded', () => {
+  if (!verificarSesion()) return;
+
+  const btnAsignar = document.querySelector('.btn-asignar');
+  const modalAsignar = document.getElementById('modalAsignarProyecto');
+  const cerrarModal = document.getElementById('cerrarModalAsignarProyecto');
+  const inputTrabajador = document.getElementById('inputTrabajador');
+  const listTrabajador = document.getElementById('listTrabajador');
+  const inputProyecto = document.getElementById('inputProyecto');
+  const listProyecto = document.getElementById('listProyecto');
+  const formAsignar = document.getElementById('formAsignarProyecto');
+
+  btnAsignar.addEventListener('click', async () => {
+    modalAsignar.style.display = 'flex';
+    await cargarDatosAsignar();
+  });
+
+  cerrarModal.addEventListener('click', () => {
+    modalAsignar.style.display = 'none';
+    formAsignar.reset();
+    trabajadorSeleccionadoId = null;
+    proyectoSeleccionadoId = null;
+    listTrabajador.innerHTML = '';
+    listProyecto.innerHTML = '';
+  });
+
+  // Opcional: cerrar el modal si se hace clic fuera del contenido
+  modalAsignar.addEventListener('click', function(e) {
+    if (e.target === modalAsignar) {
+      modalAsignar.style.display = 'none';
+      formAsignar.reset();
+      trabajadorSeleccionadoId = null;
+      proyectoSeleccionadoId = null;
+      listTrabajador.innerHTML = '';
+      listProyecto.innerHTML = '';
+    }
+  });
+
+  async function cargarDatosAsignar() {
+    // Cargar trabajadores
+    const { data: trabajadores } = await obtenerTrabajadores();
+    trabajadoresList = trabajadores || [];
+    // Cargar proyectos
+    const { data: proyectos } = await obtenerProyectos();
+    proyectosList = proyectos || [];
+  }
+
+  // Autocompletado para trabajador
+  inputTrabajador.addEventListener('input', function() {
+    const valor = this.value.trim().toLowerCase();
+    listTrabajador.innerHTML = '';
+    trabajadorSeleccionadoId = null;
+    if (!valor) return;
+    const sugerencias = trabajadoresList.filter(t => t.nombre.toLowerCase().includes(valor));
+    sugerencias.forEach(t => {
+      const div = document.createElement('div');
+      div.textContent = t.nombre;
+      div.onclick = function() {
+        inputTrabajador.value = t.nombre;
+        trabajadorSeleccionadoId = t.id_trabajador;
+        listTrabajador.innerHTML = '';
+      };
+      listTrabajador.appendChild(div);
+    });
+  });
+
+  // Autocompletado para proyecto
+  inputProyecto.addEventListener('input', function() {
+    const valor = this.value.trim().toLowerCase();
+    listProyecto.innerHTML = '';
+    proyectoSeleccionadoId = null;
+    if (!valor) return;
+    const sugerencias = proyectosList.filter(p => p.nombre.toLowerCase().includes(valor));
+    sugerencias.forEach(p => {
+      const div = document.createElement('div');
+      div.textContent = p.nombre;
+      div.onclick = function() {
+        inputProyecto.value = p.nombre;
+        proyectoSeleccionadoId = p.id_proyecto;
+        listProyecto.innerHTML = '';
+      };
+      listProyecto.appendChild(div);
+    });
+  });
+
+  // Oculta sugerencias si se hace clic fuera
+  document.addEventListener('click', function(e) {
+    if (!listTrabajador.contains(e.target) && e.target !== inputTrabajador) listTrabajador.innerHTML = '';
+    if (!listProyecto.contains(e.target) && e.target !== inputProyecto) listProyecto.innerHTML = '';
+  });
+
+  // Guardar asignación
+  formAsignar.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    if (!trabajadorSeleccionadoId || !proyectoSeleccionadoId) {
+      alert('Selecciona un encargado y un proyecto válido.');
+      return;
+    }
+    // Usa la nueva función
+    const { error } = await asignarProyectoATrabajador(proyectoSeleccionadoId, trabajadorSeleccionadoId);
+    if (error) {
+      alert('Error al asignar: ' + error.message);
+    } else {
+      enviarDatosAsignacion(trabajadorSeleccionadoId, proyectoSeleccionadoId);
+      alert('Proyecto asignado correctamente');
+      modalAsignar.style.display = 'none';
+      formAsignar.reset();
+      trabajadorSeleccionadoId = null;
+      proyectoSeleccionadoId = null;
+      listTrabajador.innerHTML = '';
+      listProyecto.innerHTML = '';
+      cargarProyectos(); // Actualiza la tabla
+    }
   });
 });
 

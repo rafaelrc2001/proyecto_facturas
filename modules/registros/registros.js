@@ -17,7 +17,10 @@ async function cargarProyectosNombres() {
   proyectosInfo = data || [];
   proyectosNombres = proyectosInfo.map(p => p.nombre);
 }
-document.addEventListener('DOMContentLoaded', cargarProyectosNombres);
+document.addEventListener('DOMContentLoaded', () => {
+  if (!verificarSesion()) return;
+  cargarProyectosNombres();
+});
 
 async function cargarRegistrosSupabase() {
   const { data, error } = await supabase
@@ -259,7 +262,10 @@ document.addEventListener('click', function(e) {
   }
 });
 
-document.addEventListener('DOMContentLoaded', cargarRegistrosSupabase);
+document.addEventListener('DOMContentLoaded', () => {
+  if (!verificarSesion()) return;
+  cargarRegistrosSupabase();
+});
 
 document.getElementById('descargar-csv').addEventListener('click', function() {
   //window.location.href = '/proyecto_facturas/modules/impresion/imprimir.html';
@@ -547,6 +553,22 @@ document.querySelector('.table-footer .btn').addEventListener('click', async fun
   ventana.print();
   ventana.close();
 });
+
+// Agregar función: verifica session solo por projectidadmin === '1'
+function verificarSesion() {
+  const projectidadmin = localStorage.getItem('projectidadmin');
+  if (!projectidadmin || projectidadmin !== '1') {
+    const body = document.body;
+    Array.from(body.children).forEach(el => el.style.display = 'none');
+    const aviso = document.createElement('div');
+    aviso.id = 'login-warning';
+    aviso.style.cssText = 'display:flex;align-items:center;justify-content:center;height:100vh;padding:1rem;font-size:1.25rem;';
+    aviso.textContent = 'Por favor inicie sesión';
+    body.appendChild(aviso);
+    return false;
+  }
+  return true;
+}
 
 // Ejemplo para dashboard.js
 const user = JSON.parse(localStorage.getItem('user'));
