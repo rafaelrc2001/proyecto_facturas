@@ -83,13 +83,13 @@
 
 
         <div class="sidebar-footer">
-          <div class="user-profile">
-            <div class="avatar">Ad</div>
-            <div class="user-info">
-              <span class="name">Admin</span>
-              <span class="role">Administrador</span>
-            </div>
-          </div>
+         <div class="user-profile">
+            <button id="avatar-btn" class="avatar" aria-label="Abrir menú de usuario">Ad</button>
+             <div class="user-info">
+               <span class="name">Admin</span>
+               <span class="role">Administrador</span>
+             </div>
+           </div>
           <button class="logout-btn">
             <i class="ri-logout-box-r-line"></i>
           </button>
@@ -278,5 +278,67 @@
     </div>
   </div>
 </div>
+
+
+
+
+
+
+<div id="avatar-modal" class="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:2000; align-items:center; justify-content:center;">
+  <div style="background:#fff; border-radius:8px; width:420px; max-width:90%; padding:18px; box-shadow:0 10px 30px rgba(0,0,0,0.2);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <h3 style="margin:0; font-size:1.1rem; color:#003B5C;">Configuración del administrador</h3>
+      <button id="close-avatar-modal" aria-label="Cerrar" style="background:none;border:0;font-size:1.3rem;cursor:pointer;color:#666;">&times;</button>
+    </div>
+ <div style="height:4px; background:#FF6F00; border-radius:3px; width:100%; margin:10px 0 14px 0;"></div>
+   
+    <form id="avatar-config-form" style="display:flex;flex-direction:column;gap:10px;">
+      <label style="font-size:0.9rem;color:#333;">
+        Usuario
+        <input id="cfg-usuario" name="usuario" type="text" placeholder="Usuario" style="width:100%;padding:8px;border:1px solid #e6e6e6;border-radius:6px;" />
+      </label>
+
+      <label style="font-size:0.9rem;color:#333;">
+        Contraseña actual
+        <div style="position:relative;">
+          <input id="cfg-current-password" name="current_password" type="password" placeholder="Ingrese su contraseña actual" style="width:100%;padding:8px 44px 8px 8px;border:1px solid #e6e6e6;border-radius:6px;" />
+          <button type="button" class="pw-toggle" data-target="cfg-current-password" aria-label="Mostrar contraseña"
+            style="position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:#FF6F00;width:36px;height:32px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+            <i class="ri-eye-line" style="font-size:16px;line-height:0;color:inherit;"></i>
+          </button>
+        </div>
+      </label>
+
+      <label style="font-size:0.9rem;color:#333;">
+        Nueva contraseña
+        <div style="position:relative;">
+          <input id="cfg-password" name="password" type="password" placeholder="Nueva contraseña" style="width:100%;padding:8px 44px 8px 8px;border:1px solid #e6e6e6;border-radius:6px;" />
+          <button type="button" class="pw-toggle" data-target="cfg-password" aria-label="Mostrar contraseña"
+            style="position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:#FF6F00;width:36px;height:32px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+            <i class="ri-eye-line" style="font-size:16px;line-height:0;color:inherit;"></i>
+          </button>
+        </div>
+      </label>
+
+      <label style="font-size:0.9rem;color:#333;">
+        Repita la nueva contraseña
+        <div style="position:relative;">
+          <input id="cfg-password2" name="password2" type="password" placeholder="Repita la nueva contraseña" style="width:100%;padding:8px 44px 8px 8px;border:1px solid #e6e6e6;border-radius:6px;" />
+          <button type="button" class="pw-toggle" data-target="cfg-password2" aria-label="Mostrar contraseña"
+            style="position:absolute;right:6px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:#FF6F00;width:36px;height:32px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+            <i class="ri-eye-line" style="font-size:16px;line-height:0;color:inherit;"></i>
+          </button>
+        </div>
+      </label>
+
+      <div id="cfg-msg" style="min-height:18px;color:#c00;font-size:0.9rem;"></div>
+
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px;">
+           <button type="submit" id="cfg-save" style="background:#FF6F00;color:#fff;border:0;padding:8px 12px;border-radius:6px;cursor:pointer;">Actualizar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
   </body>
 </html>

@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (a.password === contrasena) {
           localStorage.setItem('user', JSON.stringify({ id: a.id, usuario: a.usuario, role: 'admin' }));
           localStorage.removeItem('id_trabajador');
-          window.location.href = '/../modules/dashboard/dashboard.html';
+          window.location.href = '/../../modules/dashboard/dashboard.html';
           return;
         } else {
           if (passwordError) passwordError.textContent = 'Contraseña incorrecta';
