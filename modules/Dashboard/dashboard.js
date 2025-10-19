@@ -314,6 +314,14 @@ function actualizarGraficaEstablecimientosTipo(registros) {
 //   console.log(`Ingresaste con el id_trabajador: ${idTrabajador}`);
 // }
 
+// Agrega esto para mostrar el id del admin (projectidadmin)
+const projectidadmin = localStorage.getItem('projectidadmin');
+if (projectidadmin) {
+  console.log(`ID del admin autenticado (projectidadmin): ${projectidadmin}`);
+} else {
+  console.log('No hay projectidadmin en localStorage');
+}
+
 /**
  * Carga KPIs desde Supabase y actualiza el DOM.
  * Acepta projectId opcional.
@@ -572,3 +580,170 @@ function setTextById(id, text) {
   const el = document.getElementById(id);
   if (el) el.textContent = text;
 }
+
+// ==============================
+// Configuración del administrador
+// Maneja mostrar modal, validar contraseña actual, verificar confirmación y actualizar en Supabase
+// ==============================
+document.addEventListener('DOMContentLoaded', () => {
+  const avatarBtn = document.getElementById('avatar-btn');
+  const avatarModal = document.getElementById('avatar-modal');
+  const closeAvatar = document.getElementById('close-avatar-modal');
+  const form = document.getElementById('avatar-config-form');
+  const msgEl = document.getElementById('cfg-msg');
+  const saveBtn = document.getElementById('cfg-save');
+
+  // Abrir modal y cargar usuario actual (opcional)
+  avatarBtn?.addEventListener('click', async () => {
+    if (avatarModal) avatarModal.style.display = 'flex';
+    msgEl && (msgEl.textContent = '');
+    const adminId = localStorage.getItem('projectidadmin');
+    if (!adminId) return;
+    try {
+      const { data, error } = await supabase
+        .from('login')
+        .select('usuario')
+        .eq('id', adminId)
+        .single();
+      if (!error && data && form) {
+        form.usuario && (form.usuario.value = data.usuario || '');
+      }
+    } catch (err) {
+      console.error('Error cargando usuario admin:', err);
+    }
+  });
+
+  closeAvatar?.addEventListener('click', () => {
+    if (avatarModal) avatarModal.style.display = 'none';
+    msgEl && (msgEl.textContent = '');
+  });
+
+  // Toggle mostrar contraseña (usa los botones .pw-toggle existentes en HTML)
+  document.querySelectorAll('.pw-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.getAttribute('data-target');
+      const input = document.getElementById(targetId);
+      if (!input) return;
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      const icon = btn.querySelector('i');
+      if (icon) icon.className = isPassword ? 'ri-eye-off-line' : 'ri-eye-line';
+    });
+  });
+
+  // Toggle para mostrar/ocultar campos de contraseña (usa botones con class="pw-toggle" y data-target="#inputId")
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.pw-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetId = btn.getAttribute('data-target');
+        if (!targetId) return;
+        const input = document.getElementById(targetId);
+        if (!input) return;
+        const isPassword = input.type === 'password';
+        input.type = isPassword ? 'text' : 'password';
+        const icon = btn.querySelector('i');
+        if (icon) {
+          // intercambia clases de icono (ajusta según los iconos que uses)
+          if (isPassword) {
+            icon.classList.remove('ri-eye-off-line');
+            icon.classList.add('ri-eye-line');
+          } else {
+            icon.classList.remove('ri-eye-line');
+            icon.classList.add('ri-eye-off-line');
+          }
+        }
+      });
+    });
+  });
+
+  // Submit: validar y actualizar contraseña
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    if (!msgEl) return;
+    msgEl.style.color = '#c00';
+    msgEl.textContent = '';
+
+    const adminId = localStorage.getItem('projectidadmin');
+    if (!adminId) {
+      msgEl.textContent = 'Administrador no identificado.';
+      return;
+    }
+
+    const currentPwd = (form.current_password && form.current_password.value) ? form.current_password.value.trim() : '';
+    const newPwd = (form.password && form.password.value) ? form.password.value.trim() : '';
+    const newPwd2 = (form.password2 && form.password2.value) ? form.password2.value.trim() : '';
+
+    if (!currentPwd || !newPwd || !newPwd2) {
+      msgEl.textContent = 'Completa todos los campos.';
+      return;
+    }
+
+    if (newPwd !== newPwd2) {
+      msgEl.textContent = 'La nueva contraseña y su confirmación no coinciden.';
+      return;
+    }
+
+    saveBtn && (saveBtn.disabled = true);
+
+    try {
+      // Obtiene la contraseña actual desde la tabla login
+      const { data: loginRow, error: selectError } = await supabase
+        .from('login')
+        .select('password')
+        .eq('id', adminId)
+        .single();
+
+      if (selectError || !loginRow) {
+        console.error('Error consultando login:', selectError, loginRow);
+        msgEl.textContent = 'Error al verificar la contraseña actual.';
+        saveBtn && (saveBtn.disabled = false);
+        return;
+      }
+
+      // Compara contraseña actual (ajusta si estás usando hashing)
+      if ((loginRow.password || '') !== currentPwd) {
+        msgEl.textContent = 'La contraseña actual no coincide.';
+        saveBtn && (saveBtn.disabled = false);
+        return;
+      }
+
+      // Asegúrate que el id sea número (si la columna es int)
+      const adminIdNum = parseInt(adminId, 10);
+      console.log('Actualizar password para id (raw,type):', adminId, typeof adminId, 'parsed:', adminIdNum);
+
+      // Actualiza la contraseña en Supabase y pide que devuelva la fila actualizada
+      const { data: updateData, error: updateError } = await supabase
+        .from('login')
+        .update({ password: newPwd })
+        .eq('id', Number.isNaN(adminIdNum) ? adminId : adminIdNum)
+        .select(); // devuelve la(s) fila(s) actualizada(s)
+
+      console.log('update response:', { updateData, updateError });
+      if (updateError || !updateData || updateData.length === 0) {
+        msgEl.textContent = updateError ? 'No se pudo actualizar la contraseña.' : 'No se actualizaron filas (id no encontrado).';
+        saveBtn && (saveBtn.disabled = false);
+        return;
+      }
+ 
+      // Éxito
+      msgEl.style.color = '#0a0';
+      msgEl.textContent = 'Contraseña actualizada correctamente.';
+      // Limpia inputs
+      form.current_password && (form.current_password.value = '');
+      form.password && (form.password.value = '');
+      form.password2 && (form.password2.value = '');
+
+      // Cerrar modal luego de breve tiempo
+      setTimeout(() => {
+        if (avatarModal) avatarModal.style.display = 'none';
+        msgEl && (msgEl.textContent = '');
+        saveBtn && (saveBtn.disabled = false);
+      }, 1400);
+
+    } catch (err) {
+      console.error('Exception updating password:', err);
+      msgEl.textContent = 'Ocurrió un error inesperado.';
+      saveBtn && (saveBtn.disabled = false);
+    }
+  });
+});

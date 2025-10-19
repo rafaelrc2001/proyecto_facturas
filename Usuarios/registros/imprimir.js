@@ -36,7 +36,16 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Cargar nombres de proyectos
 async function cargarProyectosNombres() {
   const idTrabajador = localStorage.getItem('id_trabajador');
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const userRaw = localStorage.getItem('user');
+
+  // NUEVO: si no hay usuario o no hay id_trabajador -> no cargar nada
+  if (!userRaw || !idTrabajador) {
+    proyectosInfo = [];
+    proyectosNombres = [];
+    return;
+  }
+
+  const user = JSON.parse(userRaw || '{}');
   try {
     if (idTrabajador && user.role === 'trabajador') {
       const { data: asigns, error: asignErr } = await supabase
@@ -57,6 +66,8 @@ async function cargarProyectosNombres() {
         .eq('visibilidad', true);
       proyectosInfo = data || [];
     } else {
+      // Si llegamos aquí, no hay id_trabajador o role distinto; pero ya bloqueamos arriba,
+      // así que esto normalmente no se ejecuta. Lo dejamos por compatibilidad.
       const { data } = await supabase
         .from('proyecto')
         .select('id_proyecto, nombre, cliente, ubicación, fecha_inicio, fecha_final')
@@ -74,7 +85,16 @@ async function cargarProyectosNombres() {
 async function cargarRegistrosSupabase() {
   const idTrabajadorRaw = localStorage.getItem('id_trabajador');
   const idTrabajador = idTrabajadorRaw ? Number(idTrabajadorRaw) : null;
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const userRaw = localStorage.getItem('user');
+
+  // NUEVO: si no hay usuario autenticado o no hay id_trabajador -> no mostrar nada
+  if (!userRaw || idTrabajador === null) {
+    registrosOriginales = [];
+    mostrarTablasPorProyecto("");
+    return;
+  }
+
+  const user = JSON.parse(userRaw || '{}');
 
   try {
     // Si es trabajador, traer solo registros de los proyectos asignados

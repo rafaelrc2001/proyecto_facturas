@@ -99,29 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Toggle para mostrar/ocultar contraseñas del modal (usa iconos tipo 'ri-...')
-document.addEventListener('click', (e) => {
-  const btn = e.target.closest && e.target.closest('.pw-toggle');
-  if (!btn) return;
-  const targetId = btn.getAttribute('data-target');
-  if (!targetId) return;
-  const input = document.getElementById(targetId);
-  if (!input) return;
 
-  // alternar tipo
-  const wasPassword = input.type === 'password';
-  input.type = wasPassword ? 'text' : 'password';
-
-  // actualizar icono (usa clases tipo Remix Icon: ri-eye-line / ri-eye-off-line)
-  const nowShown = input.type === 'text';
-  // botón sin fondo, icono en color naranja (hereda color desde el button)
-  btn.innerHTML = `<i class="${nowShown ? 'ri-eye-off-line' : 'ri-eye-line'}" style="font-size:16px;line-height:0;color:inherit;"></i>`;
-
-  // accesibilidad
-  btn.setAttribute('aria-pressed', String(nowShown));
-  btn.setAttribute('title', nowShown ? 'Ocultar contraseña' : 'Mostrar contraseña');
-
-  btn.classList.toggle('pw-toggle-active', nowShown);
-});
 
 // Asegúrate de tener supabase importado al inicio del archivo:
 // import { supabase } from '../supabase/db.js';

@@ -51,16 +51,43 @@ async function cargarProyectosNombres() {
 }
 document.addEventListener('DOMContentLoaded', cargarProyectosNombres);
 
-async function cargarRegistros() {
-  const idTrabajador = getIdTrabajador();
+async function cargarRegistros(projectId = undefined) {
+  // Si caller pidió explícitamente "no resultados"
+  if (projectId === null) {
+    registrosOriginales = [];
+    paginaActual = 1;
+    mostrarRegistrosPaginados(registrosOriginales);
+    return;
+  }
 
-  // Consulta base (ajusta nombre de tabla y columnas según tu modelo)
+  // Si no hay usuario autenticado => no mostrar nada
+  const userRaw = localStorage.getItem('user');
+  if (!userRaw) {
+    registrosOriginales = [];
+    mostrarRegistrosPaginados(registrosOriginales);
+    return;
+  }
+
+  // NUEVO: si no hay id_trabajador -> NO mostrar registros (como en gastos)
+  const idTrabajador = getIdTrabajador();
+  if (idTrabajador === null) {
+    console.log('[registros] no hay id_trabajador -> no mostrar registros por seguridad');
+    registrosOriginales = [];
+    paginaActual = 1;
+    mostrarRegistrosPaginados(registrosOriginales);
+    return;
+  }
+
+  // Consulta base (ajusta según parámetro projectId)
   let query = supabase
     .from('registro')
     .select('*')
     .order('fecha', { ascending: false });
 
-  // Si es trabajador, limitar por id_trabajador
+  if (typeof projectId === 'number') {
+    query = query.eq('id_proyecto', Number(projectId));
+  }
+
   if (idTrabajador && !isAdmin()) {
     query = query.eq('id_trabajador', idTrabajador);
   }
@@ -68,6 +95,8 @@ async function cargarRegistros() {
   const { data, error } = await query;
   if (error) {
     console.error('Error cargando registros:', error);
+    registrosOriginales = [];
+    mostrarRegistrosPaginados(registrosOriginales);
     return;
   }
 
@@ -76,14 +105,42 @@ async function cargarRegistros() {
   mostrarRegistrosPaginados(registrosOriginales);
 }
 
-async function cargarRegistrosSupabase() {
-  console.log('[registros] iniciar cargarRegistrosSupabase');
-  const idRaw = localStorage.getItem('id_trabajador');
-  const idTrabajador = idRaw ? Number(idRaw) : null;
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
-  const isTrabajador = !!(idTrabajador && user && user.role === 'trabajador');
+async function cargarRegistrosSupabase(projectId = undefined) {
+  console.log('[registros] iniciar cargarRegistrosSupabase, projectId=', projectId);
 
-  console.log('[registros] localStorage id_trabajador:', idRaw, '=> Number:', idTrabajador, 'user:', user, 'isTrabajador:', isTrabajador);
+  // sentinel null -> retornar vacío inmediato
+  if (projectId === null) {
+    registrosOriginales = [];
+    paginaActual = 1;
+    mostrarRegistrosPaginados(registrosOriginales);
+    return;
+  }
+
+  // Si no hay usuario autenticado => no mostrar nada
+  const userRaw = localStorage.getItem('user');
+  if (!userRaw) {
+    registrosOriginales = [];
+    mostrarRegistrosPaginados(registrosOriginales);
+    return;
+  }
+
+  // NUEVO: usar helper y bloquear cuando no exista id_trabajador
+  const idTrabajador = getIdTrabajador();
+  if (idTrabajador === null) {
+    console.log('[registros] no hay id_trabajador -> no mostrar registros (supabase)');
+    registrosOriginales = [];
+    paginaActual = 1;
+    mostrarRegistrosPaginados(registrosOriginales);
+    return;
+  }
+
+  // resto de la función (mantén la lógica existente)
+  const idRaw = localStorage.getItem('id_trabajador');
+  const idTrab = idRaw ? Number(idRaw) : null;
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const isTrabajador = !!(idTrab && user && user.role === 'trabajador');
+
+  console.log('[registros] localStorage id_trabajador:', idRaw, '=> Number:', idTrab, 'user:', user, 'isTrabajador:', isTrabajador);
 
   try {
     // Si es trabajador: obtener proyectos asignados y luego registros solo para esos proyectos

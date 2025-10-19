@@ -392,3 +392,9 @@ const idTrabajador = localStorage.getItem('id_trabajador');
 if (idTrabajador) {
   console.log(`ID del trabajador autenticado: ${idTrabajador}`);
 }
+
+// Muestra id del admin (si existe)
+const projectidadmin = localStorage.getItem('projectidadmin');
+if (projectidadmin) {
+  console.log(`ID del admin autenticado (projectidadmin): ${projectidadmin}`);
+}

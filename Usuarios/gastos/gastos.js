@@ -7,12 +7,41 @@ const GASTOS_POR_PAGINA = 7;
 let paginaActual = 1;
 let gastosFiltrados = [];
 
-async function cargarGastos() {
-  console.log('[gastos] iniciar cargarGastos', { href: window.location.href });
+async function cargarGastos(projectId = undefined) {
+  console.log('[gastos] iniciar cargarGastos', { href: window.location.href, projectId });
+
+  // sentinel null -> no devolver nada
+  if (projectId === null) {
+    gastosOriginales = [];
+    paginaActual = 1;
+    mostrarGastosPaginados(gastosOriginales);
+    return;
+  }
+
+  // Si no hay usuario autenticado => no mostrar nada
+  const userRaw = localStorage.getItem('user');
+  if (!userRaw) {
+    gastosOriginales = [];
+    paginaActual = 1;
+    mostrarGastosPaginados(gastosOriginales);
+    return;
+  }
+
   const idRaw = getIdTrabajador();
   const idTrabajador = idRaw ? Number(idRaw) : null;
   const admin = typeof isAdmin === 'function' ? isAdmin() : false;
   console.log('[gastos] idTrabajadorRaw:', idRaw, '=> Number:', idTrabajador, 'isAdmin:', admin);
+
+  // NUEVO: si no hay id_trabajador (null) -> NO mostrar registros
+  // Esto evita que, aun existiendo user/localStorage o rol admin, se muestren todos cuando
+  // no hay un id de trabajador asociado.
+  if (idTrabajador === null) {
+    console.log('[gastos] no hay id_trabajador -> no mostrar gastos por seguridad');
+    gastosOriginales = [];
+    paginaActual = 1;
+    mostrarGastosPaginados(gastosOriginales);
+    return;
+  }
 
   try {
     if (idTrabajador && !admin) {
