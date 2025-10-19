@@ -1,6 +1,13 @@
+import { supabase } from '../../supabase/db.js';
+import { cargarTablaSupabase } from './graficas/tabla.js';
+import { cargarPagoChartDesdeSupabase } from './graficas/grafica-barra.js';
+import { cargarPastelDesdeSupabase } from './graficas/grafica-pastel.js';
+
 const SHEET_URL =
 "https://docs.google.com/spreadsheets/d/e/2PACX-1vQFNxPS_lZrhCuH7xrQfeMJgZIb3vaHirtKySurmZCvrQmKV45caRB-eJAqJ6sju3Mxdwy6ituHWBEA/pub?gid=0&single=true&output=csv";
 let registrosOriginales = []; // Guarda todos los registros
+let projectsMap = {}; // nombre_lower -> id_proyecto
+let projectsList = []; // lista de nombres para sugerencias
 
 function getColIndex(nombreColumna, filas) {
   // Busca el índice por el nombre en la primera fila (encabezado)
@@ -21,16 +28,17 @@ async function cargarDatosDashboard() {
 
   registrosOriginales = registros;
 
-  mostrarTiendas(registros);
+  // Cargar KPIs (Supabase) después de tener registros cargados
+  // (esto evita errores por llamadas fuera de scope)
+  cargarKPIsSupabase();
 
-  actualizarTarjetasDashboard(registros, window.totalIndex);
-
-  actualizarGraficaTipos(registros);
-  actualizarGraficaEstatus(registros);
-  actualizarGraficaTicketsPorDia(registros);
-  actualizarGraficaPastel(registros);
-  actualizarGraficaEstablecimientos(registros);
-  actualizarGraficaEstablecimientosTipo(registros);
+  // Si quieres actualizar gráficas al cargar, descomenta y deja las llamadas aquí,
+  // usando la variable `registros` (que sí existe en este scope):
+  // actualizarGraficaEstablecimientos(registros);
+  // actualizarGraficaEstablecimientosTipo(registros);
+  // actualizarGraficaTipos(registros);
+  // actualizarGraficaEstatus(registros);
+  // actualizarGraficaTicketsPorDia(registros);
 }
 
 // Procesa y actualiza la gráfica de tipos
@@ -105,47 +113,10 @@ function actualizarGraficaEstatus(registros) {
 }
 
 function actualizarTarjetasDashboard(registros, totalIndex) {
-  registros.forEach((fila, idx) => {
-    console.log(`Fila ${idx}:`, fila); // Imprime todas las columnas de cada fila
-  });
-
-  let conteoTickets = 0;
-  let conteoFacturas = 0;
-  let sumaTotalGastos = 0;
-  let sumaFacturas = 0;
-  let sumaTickets = 0;
-
-  registros.forEach((fila) => {
-    if (fila.length > totalIndex && totalIndex >= 0) {
-      // Limpia el valor: quita $ y espacios
-      let valor = (fila[totalIndex] || "").replace(/[$,\s]/g, "");
-      let total = parseFloat(valor);
-      if (!isNaN(total)) {
-        sumaTotalGastos += total;
-
-        const tipo = (fila[2] || "").toLowerCase().trim();
-        if (tipo === "ticket" || tipo === "tickets") {
-          conteoTickets++;
-          sumaTickets += total;
-        } else if (tipo === "factura" || tipo === "facturas") {
-          conteoFacturas++;
-          sumaFacturas += total;
-        }
-      }
-    }
-  });
-
-  const totalGeneral = conteoTickets + conteoFacturas;
-
-  // KPIs de gastos
-  document.getElementById("total-gastos").textContent = "$" + sumaTotalGastos.toFixed(2);
-  document.getElementById("facturas-gastos").textContent = "$" + sumaFacturas.toFixed(2);
-  document.getElementById("tickets-gastos").textContent = "$" + sumaTickets.toFixed(2);
-
-  // Summary cards
-  document.getElementById("total-count").textContent = totalGeneral;
-  document.getElementById("tickets-count").textContent = conteoTickets;
-  document.getElementById("facturas-count").textContent = conteoFacturas;
+  // Stub: deshabilitado el cálculo automático de totales.
+  // Si en el futuro quieres recalcular, implementa la lógica aquí.
+  console.log('actualizarTarjetasDashboard deshabilitada — registros recibidos:', registros.length);
+  return;
 }
 
 function actualizarGraficaTicketsPorDia(registros) {
@@ -183,78 +154,12 @@ function actualizarGraficaTicketsPorDia(registros) {
   });
 }
 
-// Filtra por establecimiento o factura
-function filtrarRegistros(valor) {
-  valor = valor.toLowerCase();
-  const filtrados = registrosOriginales.filter(fila =>
-    fila[0].toLowerCase().includes(valor) ||
-    fila[1].toLowerCase().includes(valor)
-  );
-  actualizarTarjetasDashboard(filtrados, window.totalIndex); // <-- CORREGIDO
-  // Aquí puedes actualizar también la tabla si tienes una
-}
-
-// Muestra las tiendas disponibles en los registros
-function mostrarTiendas(registros) {
-  const TIENDA_INDEX = 4;
-
-  const tiendasSet = new Set();
-  registros.forEach(fila => {
-    if (fila[TIENDA_INDEX]) tiendasSet.add(fila[TIENDA_INDEX].trim());
-  });
-  const tiendas = Array.from(tiendasSet);
-
-  const menu = document.querySelector('.filter-menu');
-  menu.innerHTML = "";
-
-  // Opción "Todos"
-  const opcionTodos = document.createElement('div');
-  opcionTodos.className = 'filter-option';
-  opcionTodos.textContent = "Todos";
-  opcionTodos.onclick = () => {
-    actualizarTarjetasDashboard(registrosOriginales, window.totalIndex); // <-- CORREGIDO
-    document.querySelector('.filter-dropdown').classList.remove('active');
-  };
-  menu.appendChild(opcionTodos);
-
-  tiendas.forEach(tienda => {
-    const opcion = document.createElement('div');
-    opcion.className = 'filter-option';
-    opcion.textContent = tienda;
-    opcion.onclick = () => {
-      filtrarPorTienda(tienda);
-      document.querySelector('.filter-dropdown').classList.remove('active');
-    };
-    menu.appendChild(opcion);
-  });
-
-  console.log("Tiendas agregadas:", tiendas);
-  console.log("Opciones en el menú:", menu.innerHTML);
-}
-
-// Filtra los registros por tienda seleccionada
-function filtrarPorTienda(tienda) {
-  const filtrados = registrosOriginales.filter(fila => fila[0].trim() === tienda);
-  actualizarTarjetasDashboard(filtrados, window.totalIndex); // <-- CORREGIDO
-  // Si tienes una tabla, actualízala aquí también
-}
-
-// Evento para el input de búsqueda
+// Elimina el listener de búsqueda / filtrado y solo carga datos al DOMContentLoaded
 document.addEventListener("DOMContentLoaded", () => {
   cargarDatosDashboard();
 
-  document.querySelector('.dashboard-search').addEventListener('input', function(e) {
-    const valor = e.target.value.toLowerCase();
-    const filtrados = registrosOriginales.filter(fila =>
-      (fila[4] && fila[4].toLowerCase().includes(valor)) || // Establecimiento/Folio
-      (fila[3] && fila[3].toLowerCase().includes(valor))    // Columna 3 (ej. factura)
-    );
-
-    actualizarTarjetasDashboard(filtrados, window.totalIndex);
-    actualizarGraficaPastel(filtrados);
-    actualizarGraficaEstablecimientosTipo(filtrados);
-    // ...otras gráficas si tienes
-  });
+  // Borrado: ya no existe el filtrado por input
+  // Si hay otras inicializaciones necesarias, agrégalas aquí.
 });
 
 function actualizarGraficaEstablecimientos(registros) {
@@ -404,16 +309,266 @@ function actualizarGraficaEstablecimientosTipo(registros) {
   });
 }
 
-// Llama después de cargar los datos
-actualizarGraficaEstablecimientosTipo(registros);
-actualizarGraficaEstablecimientosGradiente(registros);
-// Al cargar los datos
-window.totalIndex = getColIndex("Total", filas);
+// const idTrabajador = localStorage.getItem('id_trabajador');
+// if (idTrabajador) {
+//   console.log(`Ingresaste con el id_trabajador: ${idTrabajador}`);
+// }
 
-// En el filtro del buscador
-actualizarTarjetasDashboard(filtrados, window.totalIndex);
+/**
+ * Carga KPIs desde Supabase y actualiza el DOM.
+ * Acepta projectId opcional.
+ */
+async function cargarKPIsSupabase(projectId = null) {
+  try {
+    console.log('[KPIs] iniciar, projectId=', projectId);
 
-const idTrabajador = localStorage.getItem('id_trabajador');
-if (idTrabajador) {
-  console.log(`Ingresaste con el id_trabajador: ${idTrabajador}`);
+    if (typeof supabase === 'undefined' || !supabase) {
+      console.error('[KPIs] supabase no está definido (revisar supabase/db.js import).');
+      setTextById('total-gastos', 'Error');
+      setTextById('facturas-gastos', 'Error');
+      setTextById('tickets-gastos', 'Error');
+      return;
+    }
+
+    let query = supabase.from('registro').select('importe, tipo');
+    if (projectId) query = query.eq('id_proyecto', projectId);
+
+    const { data, error, status } = await query;
+    console.log('[KPIs] respuesta Supabase status=', status, 'error=', error, 'rows=', (data && data.length) || 0);
+
+    if (error) {
+      console.error('[KPIs] error de Supabase:', error);
+      setTextById('total-gastos', 'Error');
+      setTextById('facturas-gastos', 'Error');
+      setTextById('tickets-gastos', 'Error');
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      console.warn('[KPIs] no hay datos (data vacía).');
+      setTextById('total-gastos', '-');
+      setTextById('facturas-gastos', '-');
+      setTextById('tickets-gastos', '-');
+      return;
+    }
+
+    // Nueva lógica: "Sin facturar" = suma de todo lo que NO sea factura
+    let total = 0;
+    let totalFacturas = 0;
+
+    data.forEach(r => {
+      const importe = Number(String(r.importe).replace(',', '.')) || 0;
+      total += importe;
+      const tipo = (r.tipo || '').toString().toLowerCase();
+      if (tipo.includes('factura')) {
+        totalFacturas += importe;
+      }
+    });
+
+    const totalSinFacturar = total - totalFacturas;
+
+    setTextById('total-gastos', formatCurrency(total));
+    setTextById('facturas-gastos', formatCurrency(totalFacturas));
+    setTextById('tickets-gastos', formatCurrency(totalSinFacturar));
+
+    console.log('[KPIs] actualizados:', { total, totalFacturas, totalSinFacturar });
+
+  } catch (err) {
+    console.error('[KPIs] excepción:', err);
+    setTextById('total-gastos', 'Error');
+    setTextById('facturas-gastos', 'Error');
+    setTextById('tickets-gastos', 'Error');
+  }
+}
+
+// helper formato moneda (si no la tienes)
+function formatCurrency(n) {
+  return '$' + Number(n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+// Carga proyectos en memoria (no renderiza select)
+async function cargarProyectosSupabase() {
+  try {
+    const { data, error } = await supabase
+      .from('proyecto')
+      .select('id_proyecto, nombre')
+      .eq('visibilidad', true);
+
+    if (error) {
+      console.error('Error cargando proyectos:', error);
+      return;
+    }
+    const proyectos = data || [];
+    projectsMap = {};
+    projectsList = proyectos.map(p => {
+      const name = (p.nombre || '').toString().trim();
+      if (name) projectsMap[name.toLowerCase()] = p.id_proyecto;
+      return name;
+    }).filter(Boolean);
+  } catch (err) {
+    console.error('Exception cargando proyectos:', err);
+  }
+}
+
+function escapeHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// muestra sugerencias inmediatas
+function showProjectSuggestions(query) {
+  const box = document.getElementById('project-suggestions');
+  if (!box) return;
+  const q = (query || '').toLowerCase().trim();
+  if (!q) { box.style.display='none'; box.innerHTML=''; return; }
+
+  const matches = projectsList.filter(name => name.toLowerCase().includes(q)).slice(0,8);
+  if (matches.length === 0) { box.style.display='none'; box.innerHTML=''; return; }
+
+  box.innerHTML = matches.map(name =>
+    `<div class="suggest-item" data-name="${escapeHtml(name)}" style="padding:10px 12px; cursor:pointer; border-bottom:1px solid #f2f2f2;">${escapeHtml(name)}</div>`
+  ).join('');
+  box.style.display = 'block';
+}
+
+// cuando el usuario elige una sugerencia
+async function onSuggestionSelect(projectName) {
+  const projectId = projectsMap[(projectName||'').toLowerCase()] || null;
+  // actualizar input (ya contiene projectName normalmente)
+  const input = document.getElementById('dashboard-search');
+  if (input) input.value = projectName;
+  // ocultar sugerencias
+  const box = document.getElementById('project-suggestions');
+  if (box) { box.style.display='none'; box.innerHTML=''; }
+  // recargar vistas con filtro
+  await cargarTablaSupabase({ limit: 300, projectId });
+  await cargarKPIsSupabase(projectId);
+  await cargarPagoChartDesdeSupabase(projectId);
+  await cargarPastelDesdeSupabase(projectId);
+}
+
+// Cerrar sugerencias al click fuera
+document.addEventListener('click', (e) => {
+  const box = document.getElementById('project-suggestions');
+  if (!box) return;
+  if (!e.target.closest('#project-suggestions') && !e.target.closest('#dashboard-search')) {
+    box.style.display = 'none'; box.innerHTML = '';
+  }
+});
+
+/**
+ * Helper debounce
+ */
+function debounce(fn, wait = 400) {
+  let t;
+  return (...args) => {
+    clearTimeout(t);
+    t = setTimeout(() => fn(...args), wait);
+  };
+}
+
+/**
+ * Filtrado centralizado por proyecto.
+ * - acepta id numérico o nombre parcial/texto del proyecto
+ * - oculta sugerencias, recarga tabla, gráficas y KPIs (si existe la función)
+ */
+async function filterByProject(queryOrId) {
+  try {
+    let projectId = null;
+    if (!queryOrId) {
+      projectId = null;
+    } else {
+      const v = String(queryOrId).trim();
+      // si parece un id numérico exacto lo usamos
+      if (/^\d+$/.test(v)) {
+        projectId = v;
+      } else {
+        // buscar por nombre en projectsMap (keys en lowercase)
+        const q = v.toLowerCase();
+        const keys = Object.keys(projectsMap || {});
+        // prioridad: startsWith -> includes
+        let key = keys.find(k => k === q) || keys.find(k => k.startsWith(q));
+        if (!key) key = keys.find(k => k.includes(q));
+        projectId = key ? projectsMap[key] : null;
+      }
+    }
+
+    // esconder sugerencias
+    const box = document.getElementById('project-suggestions');
+    if (box) { box.style.display = 'none'; box.innerHTML = ''; }
+
+    // recargar vistas con filtro (projectId puede ser null)
+    await cargarTablaSupabase({ limit: 300, projectId });
+    if (typeof cargarPagoChartDesdeSupabase === 'function') await cargarPagoChartDesdeSupabase(projectId);
+    if (typeof cargarPastelDesdeSupabase === 'function') await cargarPastelDesdeSupabase(projectId);
+    // cargar KPIs si existe (puede estar deshabilitada)
+    if (typeof cargarKPIsSupabase === 'function') await cargarKPIsSupabase(projectId);
+  } catch (err) {
+    console.error('filterByProject error:', err);
+  }
+}
+
+// Debounced handler para el input (usar en el listener)
+const debouncedFilterByProject = debounce((val) => filterByProject(val), 450);
+
+// Inicialización: cargar proyectos y conectar listeners
+document.addEventListener('DOMContentLoaded', async () => {
+  await cargarProyectosSupabase();
+
+  const input = document.getElementById('dashboard-search');
+  const suggestionsBox = document.getElementById('project-suggestions');
+
+  if (input) {
+    // Mostrar sugerencias al tipear
+    input.addEventListener('input', (e) => {
+      const val = e.target.value || '';
+      showProjectSuggestions(val);
+
+      // Si el campo quedó vacío, restablecer a todos los registros
+      if (val.trim() === '') {
+        // oculta sugerencias
+        const box = document.getElementById('project-suggestions');
+        if (box) { box.style.display = 'none'; box.innerHTML = ''; }
+        // recargar todo sin filtro
+        filterByProject(null).catch(err => console.error('filterByProject:', err));
+      }
+      // NOTA: no aplicamos filtro automático cuando hay texto (se aplica con Enter o selección)
+    });
+
+    // Enter aplica el filtro (busca proyecto y carga)
+    input.addEventListener('keydown', async (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        await filterByProject(input.value);
+      }
+    });
+
+    // Selección con mouse: usar mousedown para que ocurra antes del blur/hide
+    suggestionsBox?.addEventListener('mousedown', (e) => {
+      const item = e.target.closest('.suggest-item');
+      if (!item) return;
+      e.preventDefault(); // evitar que el input pierda foco antes de esta acción
+      const name = item.dataset.name;
+      onSuggestionSelect(name);
+    });
+
+    // (Opcional) permitir selección con teclado: flechas + Enter — implementar si lo deseas
+  }
+
+  // click fuera: oculta sugerencias (se mantiene)
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('#project-suggestions') && !e.target.closest('#dashboard-search')) {
+      suggestionsBox.style.display = 'none';
+      suggestionsBox.innerHTML = '';
+    }
+  });
+
+  // cargas iniciales sin filtro
+  await cargarTablaSupabase({ limit: 300, projectId: null });
+  if (typeof cargarPagoChartDesdeSupabase === 'function') await cargarPagoChartDesdeSupabase(null);
+  if (typeof cargarPastelDesdeSupabase === 'function') await cargarPastelDesdeSupabase(null);
+  if (typeof cargarKPIsSupabase === 'function') await cargarKPIsSupabase(null);
+});
+
+// Helper seguro para escribir texto en un elemento por id
+function setTextById(id, text) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = text;
 }

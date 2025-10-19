@@ -516,10 +516,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   const suggestionsBox = document.getElementById('project-suggestions');
 
   if (input) {
-    // Solo mostrar sugerencias al tipear (NO llamar al filtro aquí)
+    // Mostrar sugerencias al tipear
     input.addEventListener('input', (e) => {
-      showProjectSuggestions(e.target.value);
-      // retirado: debouncedFilterByProject(e.target.value);
+      const val = e.target.value || '';
+      showProjectSuggestions(val);
+
+      // Si el campo quedó vacío, restablecer a todos los registros
+      if (val.trim() === '') {
+        // oculta sugerencias
+        const box = document.getElementById('project-suggestions');
+        if (box) { box.style.display = 'none'; box.innerHTML = ''; }
+        // recargar todo sin filtro
+        filterByProject(null).catch(err => console.error('filterByProject:', err));
+      }
+      // NOTA: no aplicamos filtro automático cuando hay texto (se aplica con Enter o selección)
     });
 
     // Enter aplica el filtro (busca proyecto y carga)

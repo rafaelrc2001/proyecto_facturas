@@ -1,3 +1,5 @@
+import { supabase } from '../../../supabase/db.js';
+
 // Configuración de la gráfica de tipos
 function initTypesChart() {
     const typesData = {
@@ -197,27 +199,6 @@ function initTypesChart() {
     };
 }
 
- //Auto-inicializar cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', function() {
-  const chartDom = document.getElementById('type-chart');
-  if (!chartDom) return;
-  const chart = echarts.init(chartDom);
-
-  window.typesChartInstance = {
-    updateData: function({ categories, values, colors }) {
-      chart.setOption({
-        xAxis: { type: 'category', data: categories },
-        yAxis: { type: 'value' },
-        series: [{
-          data: values,
-          type: 'bar',
-          itemStyle: { color: function(params) { return colors[params.dataIndex] || '#0284c7'; } }
-        }]
-      });
-    }
-  };
-});
-
 function initBarChart({ elementId, label, color }) {
     const chartDom = document.getElementById(elementId);
     if (!chartDom) return null;
@@ -348,17 +329,17 @@ function initBarChart({ elementId, label, color }) {
 }
 
 // Inicialización global para ambas gráficas
-window.facturasChartInstance = initBarChart({
-    elementId: 'type-chart',
-    label: 'Facturas',
-    color: '#77ABB7' // --color-accent
-});
+// window.facturasChartInstance = initBarChart({
+//     elementId: 'type-chart',
+//     label: 'Facturas',
+//     color: '#77ABB7' // --color-accent
+// });
 
-window.ticketsChartInstance = initBarChart({
-    elementId: 'tickets-dia-chart',
-    label: 'Tickets',
-    color: '#1D3E53' // --color-sidebar
-});
+// window.ticketsChartInstance = initBarChart({
+//     elementId: 'tickets-dia-chart',
+//     label: 'Tickets',
+//     color: '#1D3E53' // --color-sidebar
+// });
 
 // Mantén solo las funciones que realmente usas con datos reales:
 // actualizarGraficaEstablecimientosTipo(registros)
@@ -626,3 +607,111 @@ function createSoftTextureBarra() {
   img.src = 'data:image/svg+xml;base64,' + btoa(svg);
   return img;
 }
+
+async function cargarPagoChartDesdeSupabase(projectId = null) {
+  try {
+    let query = supabase.from('registro').select('pago, importe');
+    if (projectId) query = query.eq('id_proyecto', projectId);
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error('Error leyendo columna pago:', error);
+      return;
+    }
+    if (!data || data.length === 0) {
+      console.warn('No hay datos en registro.pago');
+      return;
+    }
+
+    // Conteo por tipo de pago (o suma si prefieres)
+    const conteo = {};
+    data.forEach(r => {
+      const key = (r.pago || 'Desconocido').toString().trim();
+      if (!key) return;
+      conteo[key] = (conteo[key] || 0) + 1;
+    });
+
+    // Ordena por cantidad descendente
+    const entries = Object.entries(conteo).sort((a, b) => b[1] - a[1]);
+    const categorias = entries.map(e => e[0]);
+    const valores = entries.map(e => e[1]);
+
+    // Selecciona el contenedor (ajusta id si usas otro)
+    const chartDom = document.getElementById('establecimientos-chart') || document.getElementById('type-chart');
+    if (!chartDom) {
+      console.warn('Contenedor de chart no encontrado (establecimientos-chart / type-chart).');
+      return;
+    }
+
+    const chart = echarts.init(chartDom);
+    const option = {
+      backgroundColor: 'transparent',
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        formatter: function (params) {
+          // muestra texto completo en tooltip
+          const p = params[0] || params;
+          return `<strong style="color:#003B5C">${p.name}</strong><br/>Cantidad: <strong>${p.value}</strong>`;
+        }
+      },
+      grid: {
+        left: '18%',   // más espacio para etiquetas largas
+        right: '8%',
+        top: 30,
+        bottom: 20,
+        containLabel: true
+      },
+      xAxis: { type: 'value', show: false },
+      yAxis: {
+        type: 'category',
+        data: categorias,
+        axisLabel: {
+          color: '#003B5C',
+          fontSize: 13,
+          fontWeight: 600,
+          formatter: function (value) {
+            // truncar visualmente en el eje, el tooltip sigue mostrando completo
+            const max = 36;
+            return value.length > max ? value.slice(0, max - 3) + '...' : value;
+          }
+        },
+        axisLine: { show: false },
+        axisTick: { show: false }
+      },
+      series: [{
+        name: 'Cantidad',
+        type: 'bar',
+        data: valores,
+        barWidth: 18,
+        itemStyle: {
+          color: '#FF6F00',
+          borderRadius: 6,
+          shadowBlur: 8,
+          shadowColor: 'rgba(255,111,0,0.10)'
+        },
+        label: {
+          show: true,
+          position: 'right',
+          color: '#003B5C',
+          fontWeight: 700,
+          formatter: '{c}'
+        }
+      }]
+    };
+
+    chart.setOption(option);
+    window.addEventListener('resize', () => chart.resize());
+  } catch (err) {
+    console.error('Exception cargando chart de pago:', err);
+  }
+}
+
+// Inicializa automáticamente si el DOM ya cargó
+document.addEventListener('DOMContentLoaded', () => {
+  cargarPagoChartDesdeSupabase();
+});
+
+// También exporta la función por si quieres llamarla manualmente desde dashboard.js
+export { cargarPagoChartDesdeSupabase };
