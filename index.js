@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (row.contrasena === contrasena) {
           localStorage.setItem('user', JSON.stringify({ id: row.id_trabajador, nombre: row.nombre, role: 'trabajador' }));
           localStorage.setItem('id_trabajador', String(row.id_trabajador));
-          window.location.href = '/Usuarios/Dashboard/dashboard.html';
+          window.location.href = '/../Usuarios/Dashboard/dashboard.html';
           return;
         } else {
           console.warn('Password mismatch for trabajador (value in DB shown above). If it is hashed you must use backend/Supabase Auth.');
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (a.password === contrasena) {
           localStorage.setItem('user', JSON.stringify({ id: a.id, usuario: a.usuario, role: 'admin' }));
           localStorage.removeItem('id_trabajador');
-          window.location.href = '/modules/dashboard/dashboard.html';
+          window.location.href = '/../modules/dashboard/dashboard.html';
           return;
         } else {
           if (passwordError) passwordError.textContent = 'Contraseña incorrecta';

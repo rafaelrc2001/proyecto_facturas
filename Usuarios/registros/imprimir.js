@@ -240,8 +240,7 @@ function mostrarTablasPorProyecto(nombreProyecto) {
       <hr style="border:1px solid #FF6F00; margin-bottom:18px;">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
         <div style="flex:1;">
-          <span style="font-size:1.1em;">Mostrando todos los proyectos</span>
-        </div>
+         </div>
         <div style="flex:0 0 180px; text-align:right;">
           <img src="../../img/inxite.png" alt="Logo Inxite" style="max-width:160px;">
         </div>
