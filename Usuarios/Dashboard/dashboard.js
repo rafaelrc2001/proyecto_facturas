@@ -594,6 +594,31 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (typeof cargarKPIsSupabase === 'function') await cargarKPIsSupabase(null);
 });
 
+// Rellenar avatar/nombre del usuario en el header (seguro si faltan selectores)
+document.addEventListener('DOMContentLoaded', () => {
+  try {
+    const userRaw = localStorage.getItem('user');
+    if (!userRaw) return;
+    const user = JSON.parse(userRaw);
+
+    const avatarEl = document.querySelector('.avatar') || document.querySelector('.user-avatar');
+    const nameEl = document.querySelector('.name') || document.querySelector('.user-name');
+    const roleEl = document.querySelector('.role') || document.querySelector('.user-role');
+
+    if (user && avatarEl) {
+      const nombre = (user.nombre || '').trim();
+      const initials = nombre
+        ? nombre.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2)
+        : '';
+      avatarEl.textContent = initials;
+    }
+    if (user && nameEl) nameEl.textContent = user.nombre || '';
+    if (user && roleEl) roleEl.textContent = user.puesto || '';
+  } catch (err) {
+    console.warn('dashboard: no se pudo renderizar usuario:', err);
+  }
+});
+
 // Helper seguro para escribir texto en un elemento por id
 function setTextById(id, text) {
   const el = document.getElementById(id);
