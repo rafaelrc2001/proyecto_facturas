@@ -280,29 +280,64 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!listProyecto.contains(e.target) && e.target !== inputProyecto) listProyecto.innerHTML = '';
   });
 
-  // Guardar asignación
-  formAsignar.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    if (!trabajadorSeleccionadoId || !proyectoSeleccionadoId) {
-      alert('Selecciona un encargado y un proyecto válido.');
-      return;
-    }
-    // Usa la nueva función
-    const { error } = await asignarProyectoATrabajador(proyectoSeleccionadoId, trabajadorSeleccionadoId);
-    if (error) {
-      alert('Error al asignar: ' + error.message);
-    } else {
-      enviarDatosAsignacion(trabajadorSeleccionadoId, proyectoSeleccionadoId);
-      alert('Proyecto asignado correctamente');
-      modalAsignar.style.display = 'none';
-      formAsignar.reset();
-      trabajadorSeleccionadoId = null;
-      proyectoSeleccionadoId = null;
-      listTrabajador.innerHTML = '';
-      listProyecto.innerHTML = '';
-      cargarProyectos(); // Actualiza la tabla
-    }
-  });
+  // Guardar asignación (evita bind duplicado y previene duplicados en BD)
+  if (formAsignar && !formAsignar.dataset.bound) {
+    formAsignar.dataset.bound = '1';
+    formAsignar.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const submitBtn = this.querySelector('button[type="submit"], input[type="submit"]');
+      if (submitBtn) submitBtn.disabled = true;
+
+      try {
+        if (!trabajadorSeleccionadoId || !proyectoSeleccionadoId) {
+          alert('Selecciona un encargado y un proyecto válido.');
+          return;
+        }
+
+        // Comprobar existencia previa (cliente-side) antes de insertar
+        const { data: existe, error: errCheck } = await supabase
+          .from('asignar_proyecto')
+          .select('id_asignacion')
+          .eq('id_proyecto', proyectoSeleccionadoId)
+          .eq('id_trabajador', trabajadorSeleccionadoId)
+          .limit(1);
+
+        if (errCheck) {
+          console.error('Error comprobando existencia:', errCheck);
+          alert('Error al asignar (verifica la consola).');
+          return;
+        }
+
+        if (existe && existe.length > 0) {
+          alert('La asignación ya existe.');
+          return;
+        }
+
+        // Inserta la asignación usando tu helper (que también puede tener su propia comprobación)
+        const { error } = await asignarProyectoATrabajador(proyectoSeleccionadoId, trabajadorSeleccionadoId);
+
+        if (error) {
+          console.error('Error al insertar asignación:', error);
+          alert('Error al asignar: ' + (error.message || JSON.stringify(error)));
+        } else {
+          enviarDatosAsignacion(trabajadorSeleccionadoId, proyectoSeleccionadoId);
+          alert('Proyecto asignado correctamente');
+          modalAsignar.style.display = 'none';
+          formAsignar.reset();
+          trabajadorSeleccionadoId = null;
+          proyectoSeleccionadoId = null;
+          listTrabajador.innerHTML = '';
+          listProyecto.innerHTML = '';
+          cargarProyectos(); // Actualiza la tabla
+        }
+      } catch (ex) {
+        console.error('Exception en submit asignar proyecto:', ex);
+        alert('Ocurrió un error inesperado al asignar.');
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    });
+  }
 });
 
 function mostrarProyectosPaginados(proyectos) {
@@ -627,29 +662,64 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!listProyecto.contains(e.target) && e.target !== inputProyecto) listProyecto.innerHTML = '';
   });
 
-  // Guardar asignación
-  formAsignar.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    if (!trabajadorSeleccionadoId || !proyectoSeleccionadoId) {
-      alert('Selecciona un encargado y un proyecto válido.');
-      return;
-    }
-    // Usa la nueva función
-    const { error } = await asignarProyectoATrabajador(proyectoSeleccionadoId, trabajadorSeleccionadoId);
-    if (error) {
-      alert('Error al asignar: ' + error.message);
-    } else {
-      enviarDatosAsignacion(trabajadorSeleccionadoId, proyectoSeleccionadoId);
-      alert('Proyecto asignado correctamente');
-      modalAsignar.style.display = 'none';
-      formAsignar.reset();
-      trabajadorSeleccionadoId = null;
-      proyectoSeleccionadoId = null;
-      listTrabajador.innerHTML = '';
-      listProyecto.innerHTML = '';
-      cargarProyectos(); // Actualiza la tabla
-    }
-  });
+  // Guardar asignación (evita bind duplicado y previene duplicados en BD)
+  if (formAsignar && !formAsignar.dataset.bound) {
+    formAsignar.dataset.bound = '1';
+    formAsignar.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const submitBtn = this.querySelector('button[type="submit"], input[type="submit"]');
+      if (submitBtn) submitBtn.disabled = true;
+
+      try {
+        if (!trabajadorSeleccionadoId || !proyectoSeleccionadoId) {
+          alert('Selecciona un encargado y un proyecto válido.');
+          return;
+        }
+
+        // Comprobar existencia previa (cliente-side) antes de insertar
+        const { data: existe, error: errCheck } = await supabase
+          .from('asignar_proyecto')
+         .select('id_asignacion')
+          .eq('id_proyecto', proyectoSeleccionadoId)
+          .eq('id_trabajador', trabajadorSeleccionadoId)
+          .limit(1);
+
+        if (errCheck) {
+          console.error('Error comprobando existencia:', errCheck);
+          alert('Error al asignar (verifica la consola).');
+          return;
+        }
+
+        if (existe && existe.length > 0) {
+          alert('La asignación ya existe.');
+          return;
+        }
+
+        // Inserta la asignación usando tu helper (que también puede tener su propia comprobación)
+        const { error } = await asignarProyectoATrabajador(proyectoSeleccionadoId, trabajadorSeleccionadoId);
+
+        if (error) {
+          console.error('Error al insertar asignación:', error);
+          alert('Error al asignar: ' + (error.message || JSON.stringify(error)));
+        } else {
+          enviarDatosAsignacion(trabajadorSeleccionadoId, proyectoSeleccionadoId);
+          alert('Proyecto asignado correctamente');
+          modalAsignar.style.display = 'none';
+          formAsignar.reset();
+          trabajadorSeleccionadoId = null;
+          proyectoSeleccionadoId = null;
+          listTrabajador.innerHTML = '';
+          listProyecto.innerHTML = '';
+          cargarProyectos(); // Actualiza la tabla
+        }
+      } catch (ex) {
+        console.error('Exception en submit asignar proyecto:', ex);
+        alert('Ocurrió un error inesperado al asignar.');
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    });
+  }
 });
 
 const idTrabajador = localStorage.getItem('id_trabajador');

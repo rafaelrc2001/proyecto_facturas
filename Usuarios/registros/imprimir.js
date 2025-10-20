@@ -38,15 +38,17 @@ async function cargarProyectosNombres() {
   const idTrabajador = localStorage.getItem('id_trabajador');
   const userRaw = localStorage.getItem('user');
 
-  // NUEVO: si no hay usuario o no hay id_trabajador -> no cargar nada
-  if (!userRaw || !idTrabajador) {
+  if (!userRaw) {
     proyectosInfo = [];
     proyectosNombres = [];
     return;
   }
 
   const user = JSON.parse(userRaw || '{}');
+
   try {
+    let proyectos = [];
+
     if (idTrabajador && user.role === 'trabajador') {
       const { data: asigns, error: asignErr } = await supabase
         .from('asignar_proyecto')
@@ -64,21 +66,49 @@ async function cargarProyectosNombres() {
         .select('id_proyecto, nombre, cliente, ubicación, fecha_inicio, fecha_final')
         .in('id_proyecto', ids)
         .eq('visibilidad', true);
-      proyectosInfo = data || [];
+      proyectos = data || [];
     } else {
-      // Si llegamos aquí, no hay id_trabajador o role distinto; pero ya bloqueamos arriba,
-      // así que esto normalmente no se ejecuta. Lo dejamos por compatibilidad.
       const { data } = await supabase
         .from('proyecto')
         .select('id_proyecto, nombre, cliente, ubicación, fecha_inicio, fecha_final')
         .eq('visibilidad', true);
-      proyectosInfo = data || [];
+      proyectos = data || [];
     }
+
+    // Obtener asignaciones para los proyectos obtenidos
+    const proyectoIds = proyectos.map(p => p.id_proyecto);
+    let asignaciones = [];
+    if (proyectoIds.length > 0) {
+      const { data: asigData, error: asigErr } = await supabase
+        .from('asignar_proyecto')
+        .select('id_proyecto, id_trabajador')
+        .in('id_proyecto', proyectoIds);
+      if (asigErr) throw asigErr;
+      asignaciones = asigData || [];
+    }
+
+    // Obtener trabajadores para mapear nombres
+    const { data: trabajadoresData } = await supabase
+      .from('trabajador')
+      .select('id_trabajador, nombre')
+      .eq('visibilidad', true);
+    const trabajadores = trabajadoresData || [];
+    const trabajadorMap = {};
+    trabajadores.forEach(t => { trabajadorMap[String(t.id_trabajador)] = t.nombre || ''; });
+
+    // Construir proyectosInfo con responsable
+    proyectosInfo = proyectos.map(p => {
+      const asign = asignaciones.find(a => String(a.id_proyecto) === String(p.id_proyecto));
+      const responsableNombre = asign ? (trabajadorMap[String(asign.id_trabajador)] || '') : '';
+      return { ...p, responsable: responsableNombre };
+    });
+
+    proyectosNombres = proyectosInfo.map(p => p.nombre);
   } catch (err) {
-    console.error('Error cargando proyectos (imprimir):', err);
+    console.error('Error cargando proyectos (imprimir - Usuarios):', err);
     proyectosInfo = [];
+    proyectosNombres = [];
   }
-  proyectosNombres = proyectosInfo.map(p => p.nombre);
 }
 
 // Cargar registros
@@ -243,6 +273,10 @@ function mostrarTablasPorProyecto(nombreProyecto) {
           <td><strong>FECHA DE TERMINACIÓN:</strong></td>
           <td>${formatearFecha(proyecto.fecha_final)}</td>
         </tr>
+      <tr>
+         <td><strong>RESPONSABLE DEL PROYECTO:</strong></td>
+        <td>${proyecto.responsable || ''}</td>
+       </tr>
       </table>
     </div>
     <div style="flex:0 0 180px; text-align:right;">
