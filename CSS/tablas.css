@@ -1242,3 +1242,55 @@
 #modal-editar-gasto .modal-close:hover i {
   color: #FF6F00;
 }
+
+
+/* ...existing code... */
+
+/* Estilos para autocompletado */
+.autocomplete-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-top: none;
+  border-radius: 0 0 8px 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.autocomplete-list div {
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s;
+  font-size: 0.95em;
+  color: #333;
+}
+
+.autocomplete-list div:last-child {
+  border-bottom: none;
+}
+
+.autocomplete-list div:hover {
+  background-color: #f8f9fa;
+  color: #276080;
+}
+
+.modal-form-group {
+  position: relative;
+}
+
+/* Asegurar que el contenedor del modal tenga z-index apropiado */
+.modal-content {
+  z-index: 999;
+}
+
+/* Estilos específicos para inputs en modales */
+.modal-form-group input:focus {
+  border-color: #FF6F00 !important;
+  box-shadow: 0 0 0 2px rgba(255, 111, 0, 0.1) !important;
+}

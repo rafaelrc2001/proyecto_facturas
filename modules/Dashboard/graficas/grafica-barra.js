@@ -350,7 +350,7 @@ function initBarChart({ elementId, label, color }) {
 
 function actualizarGraficaEstablecimientosTipo(registros) {
   const TIENDA_INDEX = 4; // Columna de establecimiento
-  const TIPO_INDEX = 2;   // Columna de tipo (ticket/factura)
+  const TIPO_INDEX = 2;   // Columna de tipo
 
   // Conteo por establecimiento y tipo
   const conteo = {};
@@ -358,24 +358,24 @@ function actualizarGraficaEstablecimientosTipo(registros) {
     const tienda = (fila[TIENDA_INDEX] || '').trim();
     const tipo = (fila[TIPO_INDEX] || '').trim().toLowerCase();
     if (!tienda || !tipo) return;
-    if (!conteo[tienda]) conteo[tienda] = { ticket: 0, factura: 0 };
-    if (tipo === 'ticket') conteo[tienda].ticket++;
-    else if (tipo === 'factura') conteo[tienda].factura++;
+    if (!conteo[tienda]) conteo[tienda] = { cfdi: 0, 'sin comprobante(ticket o nota)': 0 };
+    if (tipo === 'cfdi') conteo[tienda].cfdi++;
+    else if (tipo === 'sin comprobante(ticket o nota)') conteo[tienda]['sin comprobante(ticket o nota)']++;
   });
 
   // Ordena por suma total descendente
   const establecimientos = Object.keys(conteo)
     .map(nombre => ({
       nombre,
-      total: conteo[nombre].ticket + conteo[nombre].factura,
-      ticket: conteo[nombre].ticket,
-      factura: conteo[nombre].factura
+      total: conteo[nombre].cfdi + conteo[nombre]['sin comprobante(ticket o nota)'],
+      cfdi: conteo[nombre].cfdi,
+      sinComprobante: conteo[nombre]['sin comprobante(ticket o nota)']
     }))
     .sort((a, b) => b.total - a.total);
 
   const categorias = establecimientos.map(e => e.nombre);
-  const tickets = establecimientos.map(e => e.ticket);
-  const facturas = establecimientos.map(e => e.factura);
+  const cfdis = establecimientos.map(e => e.cfdi);
+  const sinComprobantes = establecimientos.map(e => e.sinComprobante);
 
   const chartDom = document.getElementById('establecimientos-chart');
   if (!chartDom) return;
@@ -416,7 +416,7 @@ function actualizarGraficaEstablecimientosTipo(registros) {
       }
     },
     legend: {
-      data: ['Tickets', 'Facturas'],
+      data: ['CFDI', 'SIN COMPROBANTE'],
       top: 8,
       left: 'center',
       itemWidth: 18,
@@ -446,35 +446,10 @@ function actualizarGraficaEstablecimientosTipo(registros) {
     },
     series: [
       {
-        name: 'Tickets',
+        name: 'CFDI',
         type: 'bar',
         stack: 'total',
-        data: tickets,
-        barWidth: 22,
-        itemStyle: {
-          color: '#FF6F00', // naranja-seguridad
-          borderRadius: [6, 6, 6, 6],
-          shadowBlur: 8,
-          shadowColor: 'rgba(255,111,0,0.10)'
-        },
-        label: {
-          show: true,
-          position: 'right',
-          fontSize: 13,
-          color: '#FF6F00',
-          fontWeight: 600,
-          formatter: v => v.value > 0 ? v.value : ''
-        },
-        emphasis: {
-          focus: 'series'
-        },
-        animationDelay: idx => idx * 120
-      },
-      {
-        name: 'Facturas',
-        type: 'bar',
-        stack: 'total',
-        data: facturas,
+        data: cfdis,
         barWidth: 22,
         itemStyle: {
           color: '#003B5C', // azul-petroleo
@@ -493,7 +468,32 @@ function actualizarGraficaEstablecimientosTipo(registros) {
         emphasis: {
           focus: 'series'
         },
-        animationDelay: idx => idx * 120 + 60
+        animationDelay: idx => idx * 120
+      },
+      {
+        name: 'SIN COMPROBANTE',
+        type: 'bar',
+        stack: 'total',
+        data: sinComprobantes,
+        barWidth: 22,
+        itemStyle: {
+          color: '#FF6F00', // naranja-seguridad
+          borderRadius: [6, 6, 6, 6],
+          shadowBlur: 8,
+          shadowColor: 'rgba(255,111,0,0.10)'
+        },
+        label: {
+          show: true,
+          position: 'right',
+          fontSize: 13,
+          color: '#FF6F00',
+          fontWeight: 600,
+          formatter: v => v.value > 0 ? v.value : ''
+        },
+        emphasis: {
+          focus: 'series'
+        },
+        animationDelay: idx => idx * 120 + 120
       }
     ],
     animationEasing: 'elasticOut',

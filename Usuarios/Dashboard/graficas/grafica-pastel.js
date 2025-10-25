@@ -85,8 +85,18 @@ async function cargarPastelDesdeSupabase(projectId = null) {
     // construir conteo por tipo usando solo los registros obtenidos
     const conteo = {};
     (data || []).forEach(r => {
-      const tipo = (r.tipo || 'Desconocido').toString().trim() || 'Desconocido';
-      conteo[tipo] = (conteo[tipo] || 0) + 1;
+      const tipo = (r.tipo || 'Desconocido').toString().trim().toLowerCase();
+      let tipoDisplay = 'Desconocido';
+      
+      if (tipo === 'cfdi') {
+        tipoDisplay = 'CFDI';
+      } else if (tipo === 'sin comprobante(ticket o nota)') {
+        tipoDisplay = 'SIN COMPROBANTE';
+      } else if (tipo !== 'desconocido') {
+        tipoDisplay = tipo.toUpperCase();
+      }
+      
+      conteo[tipoDisplay] = (conteo[tipoDisplay] || 0) + 1;
     });
 
     const palette = ['#003B5C', '#FF6F00', '#77ABB7', '#D9A400', '#1D3E53', '#FFC107'];

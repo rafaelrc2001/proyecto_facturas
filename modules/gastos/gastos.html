@@ -66,6 +66,12 @@
                 <span>Gastos</span>
               </a>
             </li>
+            <li>
+              <a href="../vehiculos/vehiculos.html" class="submenu-link">
+                <i class="ri-car-line"></i>
+                Vehículos
+              </a>
+            </li>
             </ul>
                 </li>
                       </ul>
@@ -241,22 +247,22 @@
               <label for="tipo">Tipo</label>
               <select id="tipo" name="tipo" required>
                 <option value="" disabled selected>Selecciona tipo</option>
-                <option value="ticket">Ticket</option>
-                <option value="factura">Factura</option>
-                <option value="no comprobable">No comprobable</option>
+                <option value="CFDI">CFDI</option>
+                <option value="SIN COMPROBANTE(TICKET O NOTA)">SIN COMPROBANTE(TICKET O NOTA)</option>
               </select>
             </div>
             <div class="modal-form-group">
-              <label for="pago">Tipo de pago</label>
-              <select id="pago" name="pago" >
+              <label for="pago">Tipo de Pago</label>
+              <select id="pago" name="pago" required>
                 <option value="" disabled selected>Selecciona tipo de pago</option>
-                <option value="Pagos con tarjeta facturados.">Pagos con tarjeta facturados.</option>
-                <option value="Pagos con tarjeta tickets">Pagos con tarjeta tickets</option>
-                <option value="Pagos con efectivo retiro tarjeta facturados.">Pagos con efectivo retiro tarjeta facturados.</option>
-                <option value="Pagos con efectivo retiro tarjeta  tickets.">Pagos con efectivo retiro tarjeta  tickets.</option>
-                <option value="Pagos efectivo retiro tarjeta sin comprobante">Pagos efectivo retiro tarjeta sin comprobante</option>
-                <option value="Pagos efectivo (caja) tickets">Pagos efectivo (caja) tickets</option>
-                <option value="Pago efectivo (caja) sin comprobante">Pago efectivo (caja) sin comprobante</option>
+                <option value="PAGO EDENRED CON CFDI">PAGO EDENRED CON CFDI</option>
+                <option value="PAGO EDENRED SIN COMPROBANTE">PAGO EDENRED SIN COMPROBANTE</option>
+                <option value="RETIRO EDENRED CFDI">RETIRO EDENRED CFDI</option>
+                <option value="RETIBO EDENRED SIN COMPROBANTE">RETIBO EDENRED SIN COMPROBANTE</option>
+                <option value="PAGO EFECTIVO CAJA CFDI">PAGO EFECTIVO CAJA CFDI</option>
+                <option value="PAGO EFECTIVO CAJA SIN COMPROBANTE">PAGO EFECTIVO CAJA SIN COMPROBANTE</option>
+                <option value="PAGO TARJETA PERSONAL CON CFDI">PAGO TARJETA PERSONAL CON CFDI</option>
+                <option value="PAGO TARJETA PERSONAL SIN COMPROBANTE">PAGO TARJETA PERSONAL SIN COMPROBANTE</option>
               </select>
             </div>
             <div class="modal-form-group">
@@ -314,22 +320,22 @@
           <label for="gasto-editar-tipo" id="gasto-label-tipo">Tipo</label>
           <select id="gasto-editar-tipo" name="tipo" required>
             <option value="" disabled selected>Selecciona tipo</option>
-            <option value="ticket">Ticket</option>
-            <option value="factura">Factura</option>
-            <option value="no comprobable">No comprobable</option>
+            <option value="CFDI">CFDI</option>
+            <option value="SIN COMPROBANTE(TICKET O NOTA)">SIN COMPROBANTE(TICKET O NOTA)</option>
           </select>
         </div>
         <div class="modal-form-group" id="gasto-grupo-pago">
-          <label for="gasto-editar-pago" id="gasto-label-pago">Tipo de pago</label>
+          <label for="gasto-editar-pago" id="gasto-label-pago">Tipo de Pago</label>
           <select id="gasto-editar-pago" name="pago" required>
             <option value="" disabled selected>Selecciona tipo de pago</option>
-            <option value="Pagos con tarjeta facturados.">Pagos con tarjeta facturados.</option>
-            <option value="Pagos con tarjeta tickets">Pagos con tarjeta tickets</option>
-            <option value="Pagos con efectivo retiro tarjeta facturados.">Pagos con efectivo retiro tarjeta facturados.</option>
-            <option value="Pagos con efectivo retiro tarjeta  tickets.">Pagos con efectivo retiro tarjeta  tickets.</option>
-            <option value="Pagos efectivo retiro tarjeta sin comprobante">Pagos efectivo retiro tarjeta sin comprobante</option>
-            <option value="Pagos efectivo (caja) tickets">Pagos efectivo (caja) tickets</option>
-            <option value="Pago efectivo (caja) sin comprobante">Pago efectivo (caja) sin comprobante</option>
+            <option value="PAGO EDENRED CON CFDI">PAGO EDENRED CON CFDI</option>
+            <option value="PAGO EDENRED SIN COMPROBANTE">PAGO EDENRED SIN COMPROBANTE</option>
+            <option value="RETIRO EDENRED CFDI">RETIRO EDENRED CFDI</option>
+            <option value="RETIBO EDENRED SIN COMPROBANTE">RETIBO EDENRED SIN COMPROBANTE</option>
+            <option value="PAGO EFECTIVO CAJA CFDI">PAGO EFECTIVO CAJA CFDI</option>
+            <option value="PAGO EFECTIVO CAJA SIN COMPROBANTE">PAGO EFECTIVO CAJA SIN COMPROBANTE</option>
+            <option value="PAGO TARJETA PERSONAL CON CFDI">PAGO TARJETA PERSONAL CON CFDI</option>
+            <option value="PAGO TARJETA PERSONAL SIN COMPROBANTE">PAGO TARJETA PERSONAL SIN COMPROBANTE</option>
           </select>
         </div>
         <div class="modal-form-group" id="gasto-grupo-folio">

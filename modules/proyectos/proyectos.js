@@ -30,26 +30,58 @@ function verificarSesion() {
 async function cargarProyectos() {
   // 1. Obtén todos los proyectos
   const { data: proyectos, error: errorProyectos } = await obtenerProyectos();
-  // 2. Obtén todas las asignaciones y trabajadores
+  
+  // 2. Obtén todas las asignaciones con trabajadores (corregir la consulta)
   const { data: asignaciones, error: errorAsignaciones } = await supabase
     .from('asignar_proyecto')
-    .select('id_proyecto, trabajador:trabajador(id_trabajador, nombre)');
+    .select(`
+      id_proyecto, 
+      id_trabajador,
+      id_viatico,
+      trabajador:trabajador!asignar_proyecto_id_trabajador_fkey(id_trabajador, nombre),
+      responsable_viaticos:trabajador!asignar_proyecto_id_viatico_fkey(id_trabajador, nombre)
+    `);
+
+  console.log('Error asignaciones:', errorAsignaciones); // Para debug
 
   const tbody = document.getElementById('table-body');
   tbody.innerHTML = '';
 
   if (errorProyectos) {
-    tbody.innerHTML = `<tr><td colspan="7">Error al cargar proyectos</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8">Error al cargar proyectos</td></tr>`;
     return;
   }
   if (!proyectos || proyectos.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7">No hay proyectos</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="8">No hay proyectos</td></tr>`;
     return;
+  }
+
+  // Si hay error en asignaciones, usar consulta alternativa
+  let asignacionesCorregidas = [];
+  if (errorAsignaciones) {
+    console.log('Usando consulta alternativa...');
+    // Consulta más simple sin foreign keys complejas
+    const { data: asignacionesSimples } = await supabase
+      .from('asignar_proyecto')
+      .select('*');
+    
+    // Obtener trabajadores por separado
+    const { data: trabajadores } = await supabase
+      .from('trabajador')
+      .select('id_trabajador, nombre');
+
+    asignacionesCorregidas = asignacionesSimples?.map(asig => ({
+      ...asig,
+      trabajador: trabajadores?.find(t => t.id_trabajador === asig.id_trabajador),
+      responsable_viaticos: trabajadores?.find(t => t.id_trabajador === asig.id_viatico)
+    })) || [];
+  } else {
+    asignacionesCorregidas = asignaciones || [];
   }
 
   proyectosData = proyectos.map(proyecto => ({
     ...proyecto,
-    asignacion: asignaciones?.find(a => a.id_proyecto === proyecto.id_proyecto)
+    asignacion: asignacionesCorregidas?.find(a => a.id_proyecto === proyecto.id_proyecto)
   }));
 
   mostrarProyectosPaginados(proyectosData);
@@ -197,6 +229,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const cerrarModal = document.getElementById('cerrarModalAsignarProyecto');
   const inputTrabajador = document.getElementById('inputTrabajador');
   const listTrabajador = document.getElementById('listTrabajador');
+  const inputResponsableViaticos = document.getElementById('inputResponsableViaticos'); // Agregar esta línea
+  const listResponsableViaticos = document.getElementById('listResponsableViaticos'); // Agregar esta línea
   const inputProyecto = document.getElementById('inputProyecto');
   const listProyecto = document.getElementById('listProyecto');
   const formAsignar = document.getElementById('formAsignarProyecto');
@@ -210,8 +244,10 @@ document.addEventListener('DOMContentLoaded', () => {
     modalAsignar.style.display = 'none';
     formAsignar.reset();
     trabajadorSeleccionadoId = null;
+    responsableViaticosSeleccionadoId = null; // Agregar esta línea
     proyectoSeleccionadoId = null;
     listTrabajador.innerHTML = '';
+    listResponsableViaticos.innerHTML = ''; // Agregar esta línea
     listProyecto.innerHTML = '';
   });
 
@@ -221,8 +257,10 @@ document.addEventListener('DOMContentLoaded', () => {
       modalAsignar.style.display = 'none';
       formAsignar.reset();
       trabajadorSeleccionadoId = null;
+      responsableViaticosSeleccionadoId = null; // Agregar esta línea
       proyectoSeleccionadoId = null;
       listTrabajador.innerHTML = '';
+      listResponsableViaticos.innerHTML = ''; // Agregar esta línea
       listProyecto.innerHTML = '';
     }
   });
@@ -242,10 +280,12 @@ document.addEventListener('DOMContentLoaded', () => {
     listTrabajador.innerHTML = '';
     trabajadorSeleccionadoId = null;
     if (!valor) return;
+    
     const sugerencias = trabajadoresList.filter(t => t.nombre.toLowerCase().includes(valor));
     sugerencias.forEach(t => {
       const div = document.createElement('div');
       div.textContent = t.nombre;
+      div.className = 'autocomplete-item';
       div.onclick = function() {
         inputTrabajador.value = t.nombre;
         trabajadorSeleccionadoId = t.id_trabajador;
@@ -255,16 +295,39 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Autocompletado para responsable de viáticos
+  inputResponsableViaticos.addEventListener('input', function() {
+    const valor = this.value.trim().toLowerCase();
+    listResponsableViaticos.innerHTML = '';
+    responsableViaticosSeleccionadoId = null;
+    if (!valor) return;
+    
+    const sugerencias = trabajadoresList.filter(t => t.nombre.toLowerCase().includes(valor));
+    sugerencias.forEach(t => {
+      const div = document.createElement('div');
+      div.textContent = t.nombre;
+      div.className = 'autocomplete-item';
+      div.onclick = function() {
+        inputResponsableViaticos.value = t.nombre;
+        responsableViaticosSeleccionadoId = t.id_trabajador;
+        listResponsableViaticos.innerHTML = '';
+      };
+      listResponsableViaticos.appendChild(div);
+    });
+  });
+
   // Autocompletado para proyecto
   inputProyecto.addEventListener('input', function() {
     const valor = this.value.trim().toLowerCase();
     listProyecto.innerHTML = '';
     proyectoSeleccionadoId = null;
     if (!valor) return;
+    
     const sugerencias = proyectosList.filter(p => p.nombre.toLowerCase().includes(valor));
     sugerencias.forEach(p => {
       const div = document.createElement('div');
       div.textContent = p.nombre;
+      div.className = 'autocomplete-item';
       div.onclick = function() {
         inputProyecto.value = p.nombre;
         proyectoSeleccionadoId = p.id_proyecto;
@@ -274,9 +337,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Oculta sugerencias si se hace clic fuera
+  // Oculta sugerencias si se hace clic fuera (actualizar esta línea)
   document.addEventListener('click', function(e) {
     if (!listTrabajador.contains(e.target) && e.target !== inputTrabajador) listTrabajador.innerHTML = '';
+    if (!listResponsableViaticos.contains(e.target) && e.target !== inputResponsableViaticos) listResponsableViaticos.innerHTML = ''; // Agregar esta línea
     if (!listProyecto.contains(e.target) && e.target !== inputProyecto) listProyecto.innerHTML = '';
   });
 
@@ -313,8 +377,12 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
 
-        // Inserta la asignación usando tu helper (que también puede tener su propia comprobación)
-        const { error } = await asignarProyectoATrabajador(proyectoSeleccionadoId, trabajadorSeleccionadoId);
+        // Inserta la asignación incluyendo el responsable de viáticos
+        const { error } = await asignarProyectoATrabajador(
+          proyectoSeleccionadoId, 
+          trabajadorSeleccionadoId,
+          responsableViaticosSeleccionadoId // Agregar este parámetro
+        );
 
         if (error) {
           console.error('Error al insertar asignación:', error);
@@ -325,10 +393,12 @@ document.addEventListener('DOMContentLoaded', () => {
           modalAsignar.style.display = 'none';
           formAsignar.reset();
           trabajadorSeleccionadoId = null;
+          responsableViaticosSeleccionadoId = null; 
           proyectoSeleccionadoId = null;
           listTrabajador.innerHTML = '';
+          listResponsableViaticos.innerHTML = '';
           listProyecto.innerHTML = '';
-          cargarProyectos(); // Actualiza la tabla
+          cargarProyectos();
         }
       } catch (ex) {
         console.error('Exception en submit asignar proyecto:', ex);
@@ -351,7 +421,9 @@ function mostrarProyectosPaginados(proyectos) {
   const tbody = document.getElementById('table-body');
   tbody.innerHTML = '';
   proyectosPagina.forEach((proyecto, i) => {
-    const responsable = proyecto.asignacion?.trabajador?.nombre || 'Sin asignar';
+    const responsableProyecto = proyecto.asignacion?.trabajador?.nombre || 'Sin asignar';
+    const responsableViaticos = proyecto.asignacion?.responsable_viaticos?.nombre || 'Sin asignar';
+    
     tbody.innerHTML += `
       <tr>
         <td>${proyecto.cliente}</td>
@@ -360,7 +432,8 @@ function mostrarProyectosPaginados(proyectos) {
         <td>${proyecto.ubicación || ''}</td>
         <td>${proyecto.fecha_inicio || ''}</td>
         <td>${proyecto.fecha_final || ''}</td>
-        <td>${responsable}</td>
+        <td>${responsableProyecto}</td>
+        <td>${responsableViaticos}</td>
         <td>
           <div class="acciones-btns">
             <button class="btn-accion btn-editar" title="Editar" data-index="${i + inicio}"><i class="ri-edit-2-line"></i></button>
@@ -570,6 +643,7 @@ document.getElementById('form-editar-proyecto').addEventListener('submit', async
 let trabajadoresList = [];
 let proyectosList = [];
 let trabajadorSeleccionadoId = null;
+let responsableViaticosSeleccionadoId = null; // Agregar esta línea
 let proyectoSeleccionadoId = null;
 
 // Mostrar el modal al hacer clic en el botón "Asignar proyecto"
@@ -579,6 +653,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const cerrarModal = document.getElementById('cerrarModalAsignarProyecto');
   const inputTrabajador = document.getElementById('inputTrabajador');
   const listTrabajador = document.getElementById('listTrabajador');
+  const inputResponsableViaticos = document.getElementById('inputResponsableViaticos'); // Agregar esta línea
+  const listResponsableViaticos = document.getElementById('listResponsableViaticos'); // Agregar esta línea
   const inputProyecto = document.getElementById('inputProyecto');
   const listProyecto = document.getElementById('listProyecto');
   const formAsignar = document.getElementById('formAsignarProyecto');
@@ -592,8 +668,10 @@ document.addEventListener('DOMContentLoaded', () => {
     modalAsignar.style.display = 'none';
     formAsignar.reset();
     trabajadorSeleccionadoId = null;
+    responsableViaticosSeleccionadoId = null; // Agregar esta línea
     proyectoSeleccionadoId = null;
     listTrabajador.innerHTML = '';
+    listResponsableViaticos.innerHTML = ''; // Agregar esta línea
     listProyecto.innerHTML = '';
   });
 
@@ -603,8 +681,10 @@ document.addEventListener('DOMContentLoaded', () => {
       modalAsignar.style.display = 'none';
       formAsignar.reset();
       trabajadorSeleccionadoId = null;
+      responsableViaticosSeleccionadoId = null; // Agregar esta línea
       proyectoSeleccionadoId = null;
       listTrabajador.innerHTML = '';
+      listResponsableViaticos.innerHTML = ''; // Agregar esta línea
       listProyecto.innerHTML = '';
     }
   });
@@ -624,10 +704,12 @@ document.addEventListener('DOMContentLoaded', () => {
     listTrabajador.innerHTML = '';
     trabajadorSeleccionadoId = null;
     if (!valor) return;
+    
     const sugerencias = trabajadoresList.filter(t => t.nombre.toLowerCase().includes(valor));
     sugerencias.forEach(t => {
       const div = document.createElement('div');
       div.textContent = t.nombre;
+      div.className = 'autocomplete-item';
       div.onclick = function() {
         inputTrabajador.value = t.nombre;
         trabajadorSeleccionadoId = t.id_trabajador;
@@ -637,16 +719,39 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Autocompletado para responsable de viáticos
+  inputResponsableViaticos.addEventListener('input', function() {
+    const valor = this.value.trim().toLowerCase();
+    listResponsableViaticos.innerHTML = '';
+    responsableViaticosSeleccionadoId = null;
+    if (!valor) return;
+    
+    const sugerencias = trabajadoresList.filter(t => t.nombre.toLowerCase().includes(valor));
+    sugerencias.forEach(t => {
+      const div = document.createElement('div');
+      div.textContent = t.nombre;
+      div.className = 'autocomplete-item';
+      div.onclick = function() {
+        inputResponsableViaticos.value = t.nombre;
+        responsableViaticosSeleccionadoId = t.id_trabajador;
+        listResponsableViaticos.innerHTML = '';
+      };
+      listResponsableViaticos.appendChild(div);
+    });
+  });
+
   // Autocompletado para proyecto
   inputProyecto.addEventListener('input', function() {
     const valor = this.value.trim().toLowerCase();
     listProyecto.innerHTML = '';
     proyectoSeleccionadoId = null;
     if (!valor) return;
+    
     const sugerencias = proyectosList.filter(p => p.nombre.toLowerCase().includes(valor));
     sugerencias.forEach(p => {
       const div = document.createElement('div');
       div.textContent = p.nombre;
+      div.className = 'autocomplete-item';
       div.onclick = function() {
         inputProyecto.value = p.nombre;
         proyectoSeleccionadoId = p.id_proyecto;
@@ -656,9 +761,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Oculta sugerencias si se hace clic fuera
+  // Oculta sugerencias si se hace clic fuera (actualizar esta línea)
   document.addEventListener('click', function(e) {
     if (!listTrabajador.contains(e.target) && e.target !== inputTrabajador) listTrabajador.innerHTML = '';
+    if (!listResponsableViaticos.contains(e.target) && e.target !== inputResponsableViaticos) listResponsableViaticos.innerHTML = ''; // Agregar esta línea
     if (!listProyecto.contains(e.target) && e.target !== inputProyecto) listProyecto.innerHTML = '';
   });
 
@@ -679,7 +785,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Comprobar existencia previa (cliente-side) antes de insertar
         const { data: existe, error: errCheck } = await supabase
           .from('asignar_proyecto')
-         .select('id_asignacion')
+          .select('id_asignacion')
           .eq('id_proyecto', proyectoSeleccionadoId)
           .eq('id_trabajador', trabajadorSeleccionadoId)
           .limit(1);
@@ -695,8 +801,12 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
 
-        // Inserta la asignación usando tu helper (que también puede tener su propia comprobación)
-        const { error } = await asignarProyectoATrabajador(proyectoSeleccionadoId, trabajadorSeleccionadoId);
+        // Inserta la asignación incluyendo el responsable de viáticos
+        const { error } = await asignarProyectoATrabajador(
+          proyectoSeleccionadoId, 
+          trabajadorSeleccionadoId,
+          responsableViaticosSeleccionadoId // Agregar este parámetro
+        );
 
         if (error) {
           console.error('Error al insertar asignación:', error);
@@ -707,10 +817,12 @@ document.addEventListener('DOMContentLoaded', () => {
           modalAsignar.style.display = 'none';
           formAsignar.reset();
           trabajadorSeleccionadoId = null;
+          responsableViaticosSeleccionadoId = null; 
           proyectoSeleccionadoId = null;
           listTrabajador.innerHTML = '';
+          listResponsableViaticos.innerHTML = '';
           listProyecto.innerHTML = '';
-          cargarProyectos(); // Actualiza la tabla
+          cargarProyectos();
         }
       } catch (ex) {
         console.error('Exception en submit asignar proyecto:', ex);

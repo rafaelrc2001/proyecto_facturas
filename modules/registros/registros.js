@@ -115,23 +115,23 @@ function mostrarRegistros(data) {
 
   // Contadores
   const total = data.length;
-  const tickets = data.filter(r => r.tipo && r.tipo.toLowerCase() === 'ticket').length;
-  const facturas = data.filter(r => r.tipo && r.tipo.toLowerCase() === 'factura').length;
+  const cfdi = data.filter(r => r.tipo && r.tipo.toLowerCase() === 'cfdi').length;
+  const sinComprobante = data.filter(r => r.tipo && r.tipo.toLowerCase() === 'sin comprobante(ticket o nota)').length;
 
   document.getElementById('total-count').textContent = total;
-  document.getElementById('tickets-count').textContent = tickets;
-  document.getElementById('facturas-count').textContent = facturas;
+  document.getElementById('cfdi-count').textContent = cfdi;
+  document.getElementById('sin-comprobante-count').textContent = sinComprobante;
   document.getElementById('contador-registros').textContent = `Registros Totales: ${data.length}`;
 }
 
 function actualizarContadores() {
   const total = registrosFiltrados.length;
-  const tickets = registrosFiltrados.filter(r => r.tipo && r.tipo.toLowerCase() === 'ticket').length;
-  const facturas = registrosFiltrados.filter(r => r.tipo && r.tipo.toLowerCase() === 'factura').length;
+  const cfdi = registrosFiltrados.filter(r => r.tipo && r.tipo.toLowerCase() === 'cfdi').length;
+  const sinComprobante = registrosFiltrados.filter(r => r.tipo && r.tipo.toLowerCase() === 'sin comprobante(ticket o nota)').length;
 
   document.getElementById('contador-total').textContent = total;
-  document.getElementById('contador-tickets').textContent = tickets;
-  document.getElementById('contador-facturas').textContent = facturas;
+  document.getElementById('contador-cfdi').textContent = cfdi;
+  document.getElementById('contador-sin-comprobante').textContent = sinComprobante;
 }
 
 function mostrarRegistrosPaginados(registros) {
@@ -151,8 +151,8 @@ function mostrarRegistrosPaginados(registros) {
 
   // Actualiza los contadores con el total filtrado
   document.getElementById('total-count').textContent = registros.length;
-  document.getElementById('tickets-count').textContent = registros.filter(r => r.tipo && r.tipo.toLowerCase() === 'ticket').length;
-  document.getElementById('facturas-count').textContent = registros.filter(r => r.tipo && r.tipo.toLowerCase() === 'factura').length;
+  document.getElementById('cfdi-count').textContent = registros.filter(r => r.tipo && r.tipo.toLowerCase() === 'cfdi').length;
+  document.getElementById('sin-comprobante-count').textContent = registros.filter(r => r.tipo && r.tipo.toLowerCase() === 'sin comprobante(ticket o nota)').length;
 
   document.getElementById('contador-registros').textContent = `Registros Totales: ${registros.length}`;
   renderizarPaginacion(totalPaginas);
@@ -366,14 +366,16 @@ function normalizarPago(str) {
     .toLowerCase();
 }
 
-const tiposPago = [
-  "Pagos con tarjeta facturados.",
-  "Pagos con tarjeta tickets",
-  "Pagos con efectivo retiro tarjeta facturados.",
-  "Pagos con efectivo retiro tarjeta tickets.",
-  "Pagos efectivo retiro tarjeta sin comprobante",
-  "Pagos efectivo (caja) tickets",
-  "Pago efectivo (caja) sin comprobante"
+// Array de tipos de pago actualizados
+const TIPOS_PAGO = [
+  "PAGO EDENRED CON CFDI",
+  "PAGO EDENRED SIN COMPROBANTE", 
+  "RETIRO EDENRED CFDI",
+  "RETIBO EDENRED SIN COMPROBANTE",
+  "PAGO EFECTIVO CAJA CFDI",
+  "PAGO EFECTIVO CAJA SIN COMPROBANTE",
+  "PAGO TARJETA PERSONAL CON CFDI",
+  "PAGO TARJETA PERSONAL SIN COMPROBANTE"
 ];
 
 // Formatea fecha igual que imprimir.js
@@ -411,9 +413,9 @@ function generarHTMLImpresion(registros, proyecto) {
   `;
 
   let totalRegistros = 0;
-  const tiposPagoNormalizados = tiposPago.map(normalizarPago);
+  const tiposPagoNormalizados = TIPOS_PAGO.map(normalizarPago);
 
-  tiposPago.forEach(tipo => {
+  TIPOS_PAGO.forEach(tipo => {
     const tipoNormalizado = normalizarPago(tipo);
     const registrosPorTipo = registros.filter(r =>
       normalizarPago(r.pago) === tipoNormalizado

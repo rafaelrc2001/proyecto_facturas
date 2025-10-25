@@ -69,9 +69,15 @@
   <li>
   <a href="../gastos/gastos.html">
     <i class="ri-money-dollar-circle-line"></i>
-    <span>Gastos</span>
-  </a>
-</li>
+      <span>Gastos</span>
+    </a>
+  </li>
+  <li>
+    <a href="../vehiculos/vehiculos.html" class="submenu-link">
+      <i class="ri-car-line"></i>
+      Vehículos
+    </a>
+  </li>
 </ul>
     </li>
           </ul>
@@ -192,12 +198,13 @@
       <thead>
         <tr>
         <th style="text-align:center;">Cliente</th>
-        <th style="text-align:center;">Proyecto</th>
-        <th style="text-align:center;">Descripción</th>
+        <th style="text-align:center;">Id</th>
+        <th style="text-align:center;">Nombre</th>
         <th style="text-align:center;">Ubicación</th>
         <th style="text-align:center;">Fecha inicio</th>
         <th style="text-align:center;">Fecha fin</th>
-        <th style="text-align:center;">Responsable</th>
+        <th style="text-align:center;">Responsable Proyecto</th>
+        <th style="text-align:center;">Responsable Viáticos</th>
         <th style="text-align:center;">Acciones</th>
         </tr>
       </thead>
@@ -232,21 +239,31 @@
 
     
 
-  <!-- Modal Asignar Proyecto Mejorado -->
+
+
+    <!-- ...existing code... -->
+
+<!-- Modal Asignar Proyecto Mejorado -->
 <div id="modalAsignarProyecto" class="modal" style="display:none;">
-  <div class="modal-content modal-proyecto" style="max-width:600px; min-width:550px; padding:32px 32px 24px 32px; border-radius:18px; box-shadow:0 4px 24px rgba(0,59,92,0.12); position:relative;">
+  <div class="modal-content modal-proyecto" style="max-width:800px; min-width:750px; padding:32px 32px 24px 32px; border-radius:18px; box-shadow:0 4px 24px rgba(0,59,92,0.12); position:relative;">
     <button id="cerrarModalAsignarProyecto" class="modal-close" style="position:absolute; top:18px; right:18px; background:none; border:none; font-size:1.5em; cursor:pointer;">
       <i class="ri-close-line"></i>
     </button>
     <h2 class="modal-title" style="font-family:Montserrat,sans-serif; font-size:2rem; color:#003B5C; margin-bottom:8px;">Asignar proyecto</h2>
     <div class="modal-title-line" style="height:4px; background:#FF6F00; border-radius:2px; margin-bottom:24px;"></div>
     <form id="formAsignarProyecto">
-      <div class="modal-form-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:24px 32px; margin-bottom:24px;">
+      <div class="modal-form-grid" style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; margin-bottom:24px;">
         <div class="modal-form-group" style="display:flex; flex-direction:column;">
-          <label for="inputTrabajador" style="font-weight:600; color:#276080; margin-bottom:6px;">Responsable</label>
+          <label for="inputTrabajador" style="font-weight:600; color:#276080; margin-bottom:6px;">Responsable del proyecto</label>
           <input type="text" id="inputTrabajador" placeholder="Selecciona un encargado" autocomplete="off"
             style="padding:10px 12px; border:1.5px solid #ececec; border-radius:8px; background:#f7f8f6; font-size:1em; outline:none; transition:border 0.2s;">
           <div id="listTrabajador" class="autocomplete-list"></div>
+        </div>
+        <div class="modal-form-group" style="display:flex; flex-direction:column;">
+          <label for="inputResponsableViaticos" style="font-weight:600; color:#276080; margin-bottom:6px;">Responsable de viáticos</label>
+          <input type="text" id="inputResponsableViaticos" placeholder="Selecciona un responsable" autocomplete="off"
+            style="padding:10px 12px; border:1.5px solid #ececec; border-radius:8px; background:#f7f8f6; font-size:1em; outline:none; transition:border 0.2s;">
+          <div id="listResponsableViaticos" class="autocomplete-list"></div>
         </div>
         <div class="modal-form-group" style="display:flex; flex-direction:column;">
           <label for="inputProyecto" style="font-weight:600; color:#276080; margin-bottom:6px;">Proyecto</label>
@@ -257,11 +274,12 @@
       </div>
       <div class="modal-actions" style="display:flex; justify-content:flex-end; gap:16px;">
         <button type="submit" class="btn primary" style="background:#FF6F00; color:#fff; border:none; padding:12px 32px; border-radius:8px; font-size:1.1em; font-weight:700; cursor:pointer; box-shadow:0 2px 8px rgba(255,111,0,0.08); transition:background 0.2s;">Asignar</button>
-          </div>
+      </div>
     </form>
   </div>
 </div>
 
+<!-- ...existing code... -->
     <script src="../../Js/menu.js"></script>
    <script type="module" src="../../Js/correo.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>

@@ -274,7 +274,7 @@ document.querySelector('.input-buscar').addEventListener('input', function() {
     (g.pago && g.pago.toLowerCase().includes(valor)) || // Tipo de pago
     (g.establecimiento && g.establecimiento.toLowerCase().includes(valor)) || // Establecimiento
     (g.folio && g.folio.toLowerCase().includes(valor)) || // Folio
-     (g.tipo && g.tipo.toLowerCase().includes(valor)) || // <-- Nuevo filtro por tipo
+    (g.tipo && g.tipo.toLowerCase().includes(valor)) || // <-- Filtro por tipo actualizado
     (proyectosInfo.find(p => p.id_proyecto === g.id_proyecto && p.nombre.toLowerCase().includes(valor))) // Proyecto
   );
   paginaActual = 1;

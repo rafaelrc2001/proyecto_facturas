@@ -588,7 +588,8 @@ const tiposPago = [
   "Pagos con efectivo retiro tarjeta tickets.",
   "Pagos efectivo retiro tarjeta sin comprobante",
   "Pagos efectivo (caja) tickets",
-  "Pago efectivo (caja) sin comprobante"
+  "Pago efectivo (caja) sin comprobante",
+  "Pago con efectivo (caja) facturado." // <-- NUEVO
 ];
 
 // Formatea fecha igual que imprimir.js

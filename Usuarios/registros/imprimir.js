@@ -2,13 +2,14 @@ import { supabase } from '../../supabase/db.js';
 
 // Tipos de pago para separar las tablas
 const tiposPago = [
-  "Pagos con tarjeta facturados.",
-  "Pagos con tarjeta tickets",
-  "Pagos con efectivo retiro tarjeta facturados.",
-  "Pagos con efectivo retiro tarjeta tickets.",
-  "Pagos efectivo retiro tarjeta sin comprobante",
-  "Pagos efectivo (caja) tickets",
-  "Pago efectivo (caja) sin comprobante"
+  "PAGO EDENRED CON CFDI",
+  "PAGO EDENRED SIN COMPROBANTE",
+  "RETIRO EDENRED CFDI",
+  "RETIBO EDENRED SIN COMPROBANTE",
+  "PAGO EFECTIVO CAJA CFDI",
+  "PAGO EFECTIVO CAJA SIN COMPROBANTE",
+  "PAGO TARJETA PERSONAL CON CFDI",
+  "PAGO TARJETA PERSONAL SIN COMPROBANTE"
 ];
 
 let proyectosInfo = [];

@@ -281,18 +281,18 @@ function initStatusChart() {
 // });
 
 function actualizarGraficaPastel(registros) {
-  let totalFacturas = 0;
-  let totalTickets = 0;
+  let totalCFDI = 0;
+  let totalSinComprobante = 0;
 
   registros.forEach((fila) => {
     const tipo = (fila[2] || "").trim().toLowerCase();
-    if (tipo === "factura") totalFacturas++;
-    else if (tipo === "ticket") totalTickets++;
+    if (tipo === "cfdi") totalCFDI++;
+    else if (tipo === "sin comprobante(ticket o nota)") totalSinComprobante++;
   });
 
-  const total = totalFacturas + totalTickets;
-  const percentTickets = total ? ((totalTickets / total) * 100).toFixed(2) : 0;
-  const percentFacturas = total ? ((totalFacturas / total) * 100).toFixed(2) : 0;
+  const total = totalCFDI + totalSinComprobante;
+  const percentCFDI = total ? ((totalCFDI / total) * 100).toFixed(2) : 0;
+  const percentSinComprobante = total ? ((totalSinComprobante / total) * 100).toFixed(2) : 0;
 
   const chartDom = document.getElementById('distribution-chart');
   if (!chartDom) return;
@@ -351,7 +351,7 @@ function actualizarGraficaPastel(registros) {
       orient: 'horizontal',
       top: 10,
       left: 'center',
-      data: ['Facturas', 'Tickets'],
+      data: ['CFDI', 'SIN COMPROBANTE'],
       textStyle: {
         color: '#003B5C',
         fontWeight: 500,
@@ -415,16 +415,16 @@ function actualizarGraficaPastel(registros) {
       animationDelay: idx => idx * 120,
       data: [
         {
-          value: totalFacturas,
-          name: 'Facturas',
+          value: totalCFDI,
+          name: 'CFDI',
           itemStyle: {
             color: '#003B5C',
             shadowColor: 'rgba(0,35,60,0.25)'
           }
         },
         {
-          value: totalTickets,
-          name: 'Tickets',
+          value: totalSinComprobante,
+          name: 'SIN COMPROBANTE',
           itemStyle: {
             color: '#FF6F00',
             shadowColor: 'rgba(255,111,0,0.18)'

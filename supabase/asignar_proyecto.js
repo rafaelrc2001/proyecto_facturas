@@ -1,7 +1,6 @@
 import { supabase } from './db.js';
 
-// Nueva función para asignar proyecto a trabajador
-export async function asignarProyectoATrabajador(id_proyecto, id_trabajador) {
+export async function asignarProyectoATrabajador(id_proyecto, id_trabajador, id_viatico = null) {
   // Verifica si ya existe una asignación para ese proyecto
   const { data: asignacionExistente, error } = await supabase
     .from('asignar_proyecto')
@@ -10,16 +9,23 @@ export async function asignarProyectoATrabajador(id_proyecto, id_trabajador) {
     .single();
 
   if (asignacionExistente) {
-    // Actualiza el trabajador asignado
+    // Actualiza el trabajador asignado y el responsable de viáticos
     return await supabase
       .from('asignar_proyecto')
-      .update({ id_trabajador })
+      .update({ 
+        id_trabajador,
+        id_viatico 
+      })
       .eq('id_proyecto', id_proyecto);
   } else {
     // Inserta nueva asignación
     return await supabase
       .from('asignar_proyecto')
-      .insert([{ id_trabajador, id_proyecto }]);
+      .insert([{ 
+        id_proyecto, 
+        id_trabajador,
+        id_viatico 
+      }]);
   }
 }
 

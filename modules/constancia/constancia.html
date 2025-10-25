@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scanalyze</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Orbitron:wght@500;700&family=Roboto:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../../CSS/general.css" />
+    <link rel="stylesheet" href="../../CSS/menu.css" />
+    <link rel="stylesheet" href="../../CSS/tablas.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="icon" href="../../img/inxiteblanco.png" type="image/png" />
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h2 class="logo-container">
+      <i class="ri-line-chart-line logo-icon" style="color:#FF6F00; font-size:1em;"></i>
+      <span class="logo-text">Scanalyze</span>
+    </h2>
+    <button class="collapse-btn" id="sidebarToggle">
+      <i class="ri-menu-line menu-icon"></i>
+      <i class="ri-arrow-right-s-line collapse-icon"></i>
+    </button>
+  </div>
+  
+        <nav class="sidebar-nav">
+          <ul>
+            <li >
+              <a href="../Dashboard/dashboard.html">
+                <i class="ri-pie-chart-2-line"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="../registros/registros.html">
+                <i class="ri-archive-line"></i>
+                <span>Reportes</span>
+              </a>
+            </li>
+            <li class="active">
+              <a href="../constancia/constancia.html">
+               <i class="ri-file-shield-2-line"></i>
+                <span>Constancia</span>
+              </a>
+            </li>
+            <li class="has-submenu ">
+      <a href="#" class="submenu-toggle">
+        <i class="ri-add-line"></i>
+        <span>Registrar</span>
+        <i class="ri-arrow-down-s-line submenu-icon"></i>
+      </a>
+      <ul class="submenu">
+  <li>
+    <a href="../proyectos/proyectos.html" class="submenu-link">
+      <i class="ri-folder-2-line"></i>
+      Proyecto
+    </a>
+  </li>
+  <li>
+    <a href="../trabajador/trabajador.html" class="submenu-link">
+      <i class="ri-user-3-line"></i>
+      Trabajador
+    </a>
+  </li>
+  <li>
+  <a href="../gastos/gastos.html">
+    <i class="ri-money-dollar-circle-line"></i>
+    <span>Gastos</span>
+  </a>
+</li>
+<li>
+    <a href="../vehiculos/vehiculos.html" class="submenu-link">
+      <i class="ri-car-line"></i>
+      Vehículos
+    </a>
+  </li>
+</ul>
+    </li>
+          </ul>
+        </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-profile">
+      <div class="avatar">Ad</div>
+      <div class="user-info">
+        <span class="name">Admin</span>
+        <span class="role">Administrador</span>
+      </div>
+    </div>
+    <button class="logout-btn">
+      <i class="ri-logout-box-r-line"></i>
+    </button>
+  </div>
+</aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+      
+<header class="main-header" style="background: #f7f8f6; box-shadow: none; padding: 0px 0 0px 0;"></header> 
+
+<div style="width: 100%; display: flex; justify-content: flex-start; margin: 0;">
+    <div style="
+      background: #fff;
+      border-radius:  3; /* Solo arriba si quieres esquinas redondeadas */
+      box-shadow: 0 2px 12px rgba(0,59,92,0.07);
+      padding: 18px 32px 12px 32px;
+      width: 100%;
+      margin-left: 0;
+      display: flex;
+      align-items: center;
+      border: 1px solid #ececec;
+     border-bottom: 7px solid #003B5C;
+      gap: 12px;
+    ">
+      <div style="
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: #003B5C;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 8px rgba(255,111,0,0.08);
+        flex-shrink: 0;
+        margin-left: 0;
+        margin-right: 0px;
+      ">
+        <i class="ri-file-list-2-line" style="font-size: 1.5rem; color:#f7f7f7"></i>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: flex-start; margin-left: 0;">
+        <h1 style="
+          font-size: 1.5rem;
+          font-family: 'Montserrat', sans-serif;
+          font-weight: 700;
+          color: #003B5C;
+          margin-bottom: 5px;
+          text-align: left;
+        ">
+          Constancia de Situación Fiscal
+        </h1>
+        <div class="header-subtitle" style="
+          font-size: 0.8rem;
+          color: #276080;
+          font-weight: 600;
+          text-align: left;
+          margin-bottom: 0;
+        ">
+          Sistema INXITE / Gestión de Gastos
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+        <!-- Cards Section -->
+
+
+
+      
+
+
+
+
+        <!-- Registros Table -->
+        <section class="permits-table">
+          <div class="table-header-flex">
+           
+
+         
+
+    <!-- Filtro desplegable -->
+
+
+
+
+<div class="tabla-container" style="border-top: 5px solid #FF6F00; border-radius: 2px;">
+  <div style="padding: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <h3 class="listado-title">
+        <i class="ri-file-shield-2-line" style="color:#FF6F00; margin-right:8px; font-size:1.2em;"></i>
+        Constancia de Situación Fiscal
+      </h3>
+      <button id="btn-subir-constancia" class="btn-nuevo" style="
+        background: #FF6F00;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 2px 8px rgba(255,111,0,0.08);
+        transition: all 0.2s ease;
+      " onmouseover="this.style.background='#e55f00'" onmouseout="this.style.background='#FF6F00'">
+        <i class="ri-upload-2-line"></i>
+        Subir Constancia
+      </button>
+    </div>
+    
+    <!-- Área de visualización del PDF -->
+    <div id="pdf-container" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #003B5C;">
+        <div>
+          <h4 style="margin: 0; color: #003B5C; font-size: 1.1rem;">
+            <i class="ri-file-pdf-line" style="color: #FF6F00; margin-right: 8px;"></i>
+            <span id="nombre-archivo">Constancia_Situacion_Fiscal.pdf</span>
+          </h4>
+          <p style="margin: 5px 0 0 0; color: #666; font-size: 0.9rem;">
+            Fecha de carga: <span id="fecha-carga">-</span>
+          </p>
+        </div>
+        <div style="display: flex; gap: 10px;">
+          <button id="btn-descargar" class="btn" style="
+            background: #003B5C;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+          " onmouseover="this.style.background='#1D3E53'" onmouseout="this.style.background='#003B5C'">
+            <i class="ri-download-2-line"></i>
+            Descargar
+          </button>
+          <button id="btn-eliminar" class="btn" style="
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+          " onmouseover="this.style.background='#c82333'" onmouseout="this.style.background='#dc3545'">
+            <i class="ri-delete-bin-line"></i>
+            Eliminar
+          </button>
+        </div>
+      </div>
+      
+      <!-- Visor de PDF -->
+      <div id="pdf-viewer" style="width: 100%; height: 600px; border: 1px solid #ddd; border-radius: 8px; overflow: hidden;">
+        <iframe id="pdf-iframe" style="width: 100%; height: 100%; border: none;"></iframe>
+      </div>
+    </div>
+    
+    <!-- Mensaje cuando no hay constancia -->
+    <div id="no-constancia" style="text-align: center; padding: 60px 20px; color: #666;">
+      <i class="ri-file-upload-line" style="font-size: 3rem; color: #ccc; margin-bottom: 15px;"></i>
+      <h4 style="color: #999; margin-bottom: 10px;">No hay constancia cargada</h4>
+      <p style="color: #bbb; margin-bottom: 20px;">Sube tu constancia de situación fiscal para visualizarla aquí</p>
+      <button id="btn-subir-inicial" class="btn-nuevo" style="
+        background: #FF6F00;
+        color: white;
+        border: none;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 2px 8px rgba(255,111,0,0.08);
+        transition: all 0.2s ease;
+      " onmouseover="this.style.background='#e55f00'" onmouseout="this.style.background='#FF6F00'">
+        <i class="ri-upload-2-line"></i>
+        Subir Constancia
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para subir constancia -->
+<div id="modal-subir-constancia" class="modal" style="display: none;">
+  <div class="modal-content" style="max-width: 500px;">
+    <div class="modal-header">
+      <h3 style="
+        font-family: 'Montserrat', sans-serif;
+        font-size: 1.5rem;
+        color: #003B5C;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      ">
+        <i class="ri-upload-cloud-2-line" style="color: #FF6F00;"></i>
+        Subir Constancia de Situación Fiscal
+      </h3>
+      <button class="close-btn" id="cerrar-modal-constancia" style="
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #666;
+        padding: 5px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+      " onmouseover="this.style.color='#003B5C'" onmouseout="this.style.color='#666'">
+        <i class="ri-close-line"></i>
+      </button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="upload-area" id="upload-area" style="
+        border: 2px dashed #ddd;
+        border-radius: 8px;
+        padding: 40px 20px;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        background: #fafafa;
+      ">
+        <i class="ri-file-pdf-line" style="font-size: 3rem; color: #ccc; margin-bottom: 15px;"></i>
+        <h4 style="color: #666; margin-bottom: 10px;">Arrastra tu archivo PDF aquí</h4>
+        <p style="color: #999; margin-bottom: 15px;">o haz clic para seleccionar</p>
+        <input type="file" id="file-input" accept=".pdf" style="display: none;">
+        <button type="button" class="btn" style="
+          background: #f7f8f6;
+          color: #003B5C;
+          border: 1px solid #ddd;
+          padding: 10px 20px;
+          border-radius: 6px;
+          font-size: 0.9rem;
+          font-weight: 500;
+          cursor: pointer;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          transition: all 0.2s ease;
+        " onclick="document.getElementById('file-input').click()" 
+        onmouseover="this.style.background='#e9ecef'" 
+        onmouseout="this.style.background='#f7f8f6'">
+          <i class="ri-folder-open-line"></i>
+          Seleccionar archivo
+        </button>
+      </div>
+      
+      <div id="file-info" style="display: none; margin-top: 15px; padding: 15px; background: #f0f8ff; border-radius: 8px; border-left: 4px solid #003B5C;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <i class="ri-file-pdf-line" style="color: #FF6F00; font-size: 1.5rem;"></i>
+          <div>
+            <h5 id="selected-file-name" style="margin: 0; color: #003B5C;"></h5>
+            <p id="selected-file-size" style="margin: 5px 0 0 0; color: #666; font-size: 0.9rem;"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 12px; padding-top: 20px; border-top: 1px solid #eee;">
+      <button type="button" class="btn" id="cancelar-subida" style="
+        background: #f7f8f6;
+        color: #003B5C;
+        border: 1px solid #ddd;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      " onmouseover="this.style.background='#e9ecef'" onmouseout="this.style.background='#f7f8f6'">
+        Cancelar
+      </button>
+      <button type="button" class="btn primary" id="confirmar-subida" disabled style="
+        background: #FF6F00;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s ease;
+        opacity: 0.6;
+      ">
+        <i class="ri-upload-2-line"></i>
+        Subir Constancia
+      </button>
+    </div>
+  </div>
+</div>
+    </div>
+<script type="module" src="../../modules/constancia/constancia.js"></script>
+    <script src="../../Js/menu.js"></script>
+  
+    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+    <script type="module" src="constancia.js"></script>
+
+  </body>
+</html>

@@ -2,13 +2,14 @@ import { supabase } from '../../supabase/db.js';
 
 // Tipos de pago para separar las tablas
 const tiposPago = [
-  "Pagos con tarjeta facturados.",
-  "Pagos con tarjeta tickets",
-  "Pagos con efectivo retiro tarjeta facturados.",
-  "Pagos con efectivo retiro tarjeta tickets.",
-  "Pagos efectivo retiro tarjeta sin comprobante",
-  "Pagos efectivo (caja) tickets",
-  "Pago efectivo (caja) sin comprobante"
+  "PAGO EDENRED CON CFDI",
+  "PAGO EDENRED SIN COMPROBANTE",
+  "RETIRO EDENRED CFDI",
+  "RETIBO EDENRED SIN COMPROBANTE",
+  "PAGO EFECTIVO CAJA CFDI",
+  "PAGO EFECTIVO CAJA SIN COMPROBANTE",
+  "PAGO TARJETA PERSONAL CON CFDI",
+  "PAGO TARJETA PERSONAL SIN COMPROBANTE"
 ];
 
 let proyectosInfo = [];
@@ -131,7 +132,7 @@ function mostrarTablasPorProyecto(nombreProyecto) {
     if (proyecto) {
       registrosFiltrados = registrosOriginales.filter(r => r.id_proyecto === proyecto.id_proyecto);
 
-      // Mostrar datos del proyecto
+      // Mostrar datos del proyecto (sin fechas de inicio y terminación)
       infoContainer.innerHTML = `
   <h2 style="text-align:center; color:#FF6F00; margin-bottom:18px;">Listado de Facturas y Tickets</h2>
   <hr style="border:1px solid #FF6F00; margin-bottom:18px;">
@@ -150,14 +151,6 @@ function mostrarTablasPorProyecto(nombreProyecto) {
         <tr>
           <td><strong>UBICACIÓN DE LA OBRA:</strong></td>
           <td>${proyecto.ubicación || ''}</td>
-        </tr>
-        <tr>
-          <td><strong>FECHA DE INICIO:</strong></td>
-          <td>${formatearFecha(proyecto.fecha_inicio)}</td>
-        </tr>
-        <tr>
-          <td><strong>FECHA DE TERMINACIÓN:</strong></td>
-          <td>${formatearFecha(proyecto.fecha_final)}</td>
         </tr>
          <tr>
           <td><strong>RESPONSABLE DEL PROYECTO:</strong></td>

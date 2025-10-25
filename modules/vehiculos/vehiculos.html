@@ -21,7 +21,8 @@
   <body>
     <div class="app-container">
       <!-- Sidebar -->
-      <aside class="sidebar" id="sidebar">
+      <!-- Menú lateral para Proyecto -->
+<aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
     <h2 class="logo-container">
       <i class="ri-line-chart-line logo-icon" style="color:#FF6F00; font-size:1em;"></i>
@@ -32,8 +33,7 @@
       <i class="ri-arrow-right-s-line collapse-icon"></i>
     </button>
   </div>
-  
-        <nav class="sidebar-nav">
+  <nav class="sidebar-nav">
           <ul>
             <li >
               <a href="../Dashboard/dashboard.html">
@@ -47,7 +47,7 @@
                 <span>Reportes</span>
               </a>
             </li>
-            <li class="has-submenu ">
+                 <li class="has-submenu ">
       <a href="#" class="submenu-toggle">
         <i class="ri-add-line"></i>
         <span>Registrar</span>
@@ -129,7 +129,7 @@
         margin-left: 0;
         margin-right: 0px;
       ">
-        <i class="ri-file-list-2-line" style="font-size: 1.5rem; color:#f7f7f7"></i>
+        <i class="ri-car-line" style="font-size: 1.5rem; color:#f7f7f7"></i>
       </div>
       <div style="display: flex; flex-direction: column; align-items: flex-start; margin-left: 0;">
         <h1 style="
@@ -140,7 +140,7 @@
           margin-bottom: 5px;
           text-align: left;
         ">
-          Registros de trabajadores
+          Registros de Vehículos
         </h1>
         <div class="header-subtitle" style="
           font-size: 0.8rem;
@@ -159,64 +159,52 @@
         <!-- Cards Section -->
 
 
-
-        <div>
+  <div>
           <div class="proyectos-toolbar">
             <button class="btn-nuevo">
               <i class="ri-add-line"></i>
-              Nuevo Trabajador
+              Nuevo vehículo
             </button>
             <div class="search-bar">
               <input type="text" class="input-buscar" placeholder="Buscar...">
               <i class="ri-search-line"></i>
             </div>
-          
+               
           </div>
-        </div>
-
-
+    </div>
 
 
 
         <!-- Registros Table -->
         <section class="permits-table">
           <div class="table-header-flex">
-           
-
-         
+                    
 
     <!-- Filtro desplegable -->
 
 
-
-
 <div class="tabla-container" style="border-top: 5px solid #FF6F00; border-radius: 2px;">
-
-          <h3 class="listado-title">
-  <i class="ri-table-line" style="color:#FF6F00; margin-right:1px; font-size:1.2em;"></i>
-  Listado de Trabajadores
-</h3>
-
-
- <div class="table-container">
-      <table id="trabajadorTable">
-        <thead>
-          <tr>
-            <th style="text-align:center; border-radius:10px 0 0 0;">ID</th>
-            <th style="text-align:center;">Trabajador</th>
-            <th style="text-align:center;">Puesto</th>
-            <th style="text-align:center;">Correo</th>
-            <th style="text-align:center;">Usuario</th>
-            <th style="text-align:center; border-radius:0 10px 0 0;">Acciones</th>
-          </tr>
-        </thead>
-        <tbody id="table-body">
-
-        </tbody>
-      </table>
-    </div>
-     <div class="table-footer">
-  
+  <h3 class="listado-title">
+    <i class="ri-car-line" style="color:#FF6F00; margin-right:1px; font-size:1.2em;"></i>
+    Listado de vehículos
+  </h3>
+  <div class="table-container">
+    <table id="proyectosTable">
+      <thead>
+        <tr>
+          <th style="text-align:center;">Modelo</th>
+          <th style="text-align:center;">Marca</th>
+          <th style="text-align:center;">Placas</th>
+          <th style="text-align:center;">Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <!-- Aquí se llenarán los datos con JS -->
+      </tbody>
+    </table>
+  </div>
+  <!-- Coloca el contador aquí, debajo de la tabla -->
+  <div class="table-footer">
     <div class="pagination">
       <button class="pagination-btn">
         <i class="ri-arrow-left-s-line"></i>
@@ -228,75 +216,129 @@
         <i class="ri-arrow-right-s-line"></i>
       </button>
     </div>
-<span id="contador-registros" ></span>
+    <span id="contador-registros" style="display:block; margin-top:12px; font-weight:600; color:#003B5C;"></span>
   </div>
+</div>
 
 
 
-
-  </div>
+    
+</div>
         </section>
       </main>
     </div>
 
     <!-- Modal de detalle -->
+
     
 
+ 
+
+    <script src="../../Js/menu.js"></script>
+    <script type="module" src="../../modules/vehiculos/vehiculos.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+
+  </body>
+</html>
 
 
 
 
-<!-- Modal Nuevo Trabajador Mejorado -->
-<div id="modalNuevoTrabajador" class="modal" style="display:none;">
-  <div class="modal-content modal-proyecto" style="max-width:600px; min-width:550px; padding:32px 32px 24px 32px; border-radius:18px; box-shadow:0 4px 24px rgba(0,59,92,0.12); position:relative;">
-    <button id="cerrarModalNuevoTrabajador" class="modal-close" style="position:absolute; top:18px; right:18px; background:none; border:none; font-size:1.5em; cursor:pointer;">
-  <i class="ri-close-line"></i>
-</button>
-    <h2 class="modal-title" style="font-family:Montserrat,sans-serif; font-size:2rem; color:#003B5C; margin-bottom:8px;">Trabajador</h2>
-    <div class="modal-title-line" style="height:4px; background:#FF6F00; border-radius:2px; margin-bottom:24px;"></div>
-    <form id="formNuevoTrabajador">
-      <div class="modal-form-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:24px 32px; margin-bottom:24px;">
-        <div class="modal-form-group" style="display:flex; flex-direction:column;">
-          <label for="nombre" style="font-weight:600; color:#276080; margin-bottom:6px;">Nombre</label>
-          <input type="text" name="nombre" id="nombre" placeholder="Nombre" required
-            style="padding:10px 12px; border:1.5px solid #ececec; border-radius:8px; background:#f7f8f6; font-size:1em; outline:none; transition:border 0.2s;">
+<div id="modal-nuevo-proyecto" class="modal" style="display: none;">
+  <div class="modal-content modal-proyecto">
+    <span class="modal-close" id="close-modal-nuevo">&times;</span>
+    <h2 class="modal-title">Nuevo vehículo</h2>
+    <div class="modal-title-line"></div>
+    <form id="form-nuevo-proyecto">
+      <div class="modal-form-grid">
+        <div class="modal-form-group">
+          <label for="vehiculo-modelo">Modelo</label>
+          <input type="text" id="vehiculo-modelo" name="modelo" required />
         </div>
-        <div class="modal-form-group" style="display:flex; flex-direction:column;">
-          <label for="puesto" style="font-weight:600; color:#276080; margin-bottom:6px;">Puesto</label>
-          <input type="text" name="puesto" id="puesto" placeholder="Puesto" required
-            style="padding:10px 12px; border:1.5px solid #ececec; border-radius:8px; background:#f7f8f6; font-size:1em; outline:none; transition:border 0.2s;">
+        <div class="modal-form-group">
+          <label for="vehiculo-marca">Marca</label>
+          <input type="text" id="vehiculo-marca" name="marca" required />
         </div>
-        <div class="modal-form-group" style="display:flex; flex-direction:column;">
-          <label for="idEmpleado" style="font-weight:600; color:#276080; margin-bottom:6px;">ID Empleado</label>
-          <input type="text" name="idEmpleado" id="idEmpleado" placeholder="ID Empleado" required
-            style="padding:10px 12px; border:1.5px solid #ececec; border-radius:8px; background:#f7f8f6; font-size:1em; outline:none; transition:border 0.2s;">
-        </div>
-        <div class="modal-form-group" style="display:flex; flex-direction:column;">
-          <label for="correo" style="font-weight:600; color:#276080; margin-bottom:6px;">Correo</label>
-          <input type="email" name="correo" id="correo" placeholder="Correo" required
-            style="padding:10px 12px; border:1.5px solid #ececec; border-radius:8px; background:#f7f8f6; font-size:1em; outline:none; transition:border 0.2s;">
-        </div>
-        <div class="modal-form-group" style="display:flex; flex-direction:column;">
-          <label for="usuario" style="font-weight:600; color:#276080; margin-bottom:6px;">Usuario</label>
-          <input type="text" name="usuario" id="usuario" placeholder="Usuario" required
-            style="padding:10px 12px; border:1.5px solid #ececec; border-radius:8px; background:#f7f8f6; font-size:1em; outline:none; transition:border 0.2s;">
-        </div>
-        <div class="modal-form-group" style="display:flex; flex-direction:column;">
-          <label for="contrasena" style="font-weight:600; color:#276080; margin-bottom:6px;">Contraseña</label>
-          <input type="password" name="contrasena" id="contrasena" placeholder="Contraseña" required
-            style="padding:10px 12px; border:1.5px solid #ececec; border-radius:8px; background:#f7f8f6; font-size:1em; outline:none; transition:border 0.2s;">
+        <div class="modal-form-group">
+          <label for="vehiculo-placas">Placas</label>
+          <input type="text" id="vehiculo-placas" name="placas" required />
         </div>
       </div>
-      <div class="modal-actions" style="display:flex; justify-content:flex-end; gap:16px;">
-        <button type="submit" class="btn primary" style="background:#FF6F00; color:#fff; border:none; padding:12px 32px; border-radius:8px; font-size:1.1em; font-weight:700; cursor:pointer; box-shadow:0 2px 8px rgba(255,111,0,0.08); transition:background 0.2s;">Guardar</button>
+      <div class="modal-actions">
+        <button type="submit" class="btn primary">Guardar</button>
+        <button type="button" class="btn" id="cancelar-modal-nuevo">Cancelar</button>
       </div>
     </form>
   </div>
 </div>
-<script type="module" src="../../modules/trabajador/trabajador.js"></script>
-    <script src="../../Js/menu.js"></script>
-  
-    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
 
-  </body>
-</html>
+
+<!-- Actualiza el contenido del modal así -->
+<div id="modal-editar-proyecto" class="modal" style="display:none;">
+  <div class="modal-content">
+    <button id="close-modal-editar" class="close-modal" title="Cerrar">&times;</button>
+    <h2>Editar proyecto</h2>
+      <div class="modal-title-line" style="height:4px; background:#FF6F00; border-radius:2px; margin-bottom:24px;"></div>
+ 
+    <form id="form-editar-proyecto">
+      <div class="modal-form-grid">
+        <div class="modal-form-group">
+          <label for="editar-cliente">Cliente</label>
+          <input type="text" id="editar-cliente" name="cliente" required />
+        </div>
+        <div class="modal-form-group">
+          <label for="editar-nombre">Nombre</label>
+          <input type="text" id="editar-nombre" name="nombre" required />
+        </div>
+        <div class="modal-form-group">
+          <label for="editar-ubicacion">Ubicación</label>
+          <input type="text" id="editar-ubicacion" name="ubicacion" required />
+        </div>
+        <div class="modal-form-group">
+          <label for="editar-fecha-inicio">Fecha inicio</label>
+          <input type="date" id="editar-fecha-inicio" name="fecha_inicio" required />
+        </div>
+        <div class="modal-form-group">
+          <label for="editar-fecha-final">Fecha fin</label>
+          <input type="date" id="editar-fecha-final" name="fecha_final" required />
+        </div>
+    <!--     <div class="modal-form-group">
+          <label for="editar-responsable">Responsable</label>
+          <input type="text" id="editar-responsable" name="responsable" required />
+        </div>-->
+      </div>
+      <button type="submit" class="btn primary" style="width:auto; min-width:120px; padding:10px 20px;">Guardar</button>
+    </form>
+  </div>
+</div>
+
+<div id="modal-editar-vehiculo" class="modal" style="display:none;">
+  <div class="modal-content modal-proyecto">
+    <span class="modal-close" id="close-modal-editar">&times;</span>
+    <h2 class="modal-title">Editar vehículo</h2>
+    <div class="modal-title-line"></div>
+
+    <form id="form-editar-vehiculo">
+      <div class="modal-form-grid">
+        <div class="modal-form-group">
+          <label for="editar-modelo">Modelo</label>
+          <input type="text" id="editar-modelo" name="modelo" required />
+        </div>
+        <div class="modal-form-group">
+          <label for="editar-marca">Marca</label>
+          <input type="text" id="editar-marca" name="marca" required />
+        </div>
+        <div class="modal-form-group">
+          <label for="editar-placas">Placas</label>
+          <input type="text" id="editar-placas" name="placas" required />
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="submit" class="btn primary">Guardar</button>
+        <button type="button" class="btn" id="cancelar-modal-editar">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+

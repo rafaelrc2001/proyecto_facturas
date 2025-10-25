@@ -113,35 +113,33 @@ function actualizarGraficaTipos(registros) {
 
 // Procesa y actualiza la gráfica de estatus
 function actualizarGraficaEstatus(registros) {
-  // Contar facturas y tickets totales
-  let totalFacturas = 0;
-  let totalTickets = 0;
+  // Contar CFDI y sin comprobante totales
+  let totalCFDI = 0;
+  let totalSinComprobante = 0;
 
   registros.forEach((fila) => {
-    const tipo = (fila[1] || "").trim().toLowerCase();
-    if (tipo === "factura") totalFacturas++;
-    else if (tipo === "ticket") totalTickets++;
+    const tipo = (fila[2] || "").trim().toLowerCase();
+    if (tipo === "cfdi") totalCFDI++;
+    else if (tipo === "sin comprobante(ticket o nota)") totalSinComprobante++;
   });
 
   // Asegura que sean números válidos
-  totalFacturas = Number.isFinite(totalFacturas) ? totalFacturas : 0;
-  totalTickets = Number.isFinite(totalTickets) ? totalTickets : 0;
+  totalCFDI = Number.isFinite(totalCFDI) ? totalCFDI : 0;
+  totalSinComprobante = Number.isFinite(totalSinComprobante) ? totalSinComprobante : 0;
 
-  // Si ambos son cero, pon 1 y 1 para evitar división por cero
-  if (totalFacturas === 0 && totalTickets === 0) {
-    totalFacturas = 1;
-    totalTickets = 1;
-  }
-
-  const categories = ["Facturas", "Tickets"];
-  const values = [totalFacturas, totalTickets];
-  const colors = ["#1D3E53", "#77ABB7"];
+  const categories = ["CFDI", "SIN COMPROBANTE"];
+  const values = [totalCFDI, totalSinComprobante];
+  const colors = ["#003B5C", "#FF6F00"];
 
   if (window.statusChartInstance) {
-    window.statusChartInstance.updateData({
-      categories,
-      values,
-      colors,
+    window.statusChartInstance.setOption({
+      series: [{
+        data: categories.map((cat, idx) => ({
+          value: values[idx],
+          name: cat,
+          itemStyle: { color: colors[idx] }
+        }))
+      }]
     });
   }
 }
