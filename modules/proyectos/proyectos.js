@@ -1,8 +1,9 @@
 import { supabase } from '../../supabase/db.js';
-import { insertarProyecto, obtenerProyectos, eliminarProyecto, actualizarProyecto } from '../../supabase/proyecto.js';
+import { insertarProyecto, obtenerProyectos, eliminarProyecto, actualizarProyecto, actualizarPresupuestoProyecto } from '../../supabase/proyecto.js';
 import { obtenerTrabajadores } from '../../supabase/trabajador.js';
 import { asignarProyectoATrabajador } from '../../supabase/asignar_proyecto.js';
 import { enviarDatosAsignacion } from '../../Js/correo.js';
+
 
 
 let proyectosData = [];
@@ -142,8 +143,74 @@ document.addEventListener('DOMContentLoaded', function() {
   const cancelarModal = document.getElementById('cancelar-modal-nuevo');
 
 
+//la parte para agregar presupuesto  
+  // EVENT LISTENER PARA EL FORMULARIO DE ASIGNAR PRESUPUESTO
+  const formPresupuesto = document.getElementById('form-asignar-presupuesto');
+  if (formPresupuesto && !formPresupuesto.dataset.bound) {
+    formPresupuesto.dataset.bound = '1';
+    formPresupuesto.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const proyectoId = this.dataset.proyectoId;
+      const presupuesto = document.getElementById('presupuesto-actual').value;
+      
+      console.log('Datos del formulario:', { proyectoId, presupuesto }); // Para debug
+      
+      if (!presupuesto || parseFloat(presupuesto) <= 0) {
+        alert('Por favor ingresa un presupuesto válido');
+        return;
+      }
+      
+      if (!proyectoId) {
+        alert('Error: No se encontró el ID del proyecto');
+        return;
+      }
+      
+      try {
+        console.log('Enviando a la base de datos...'); // Para debug
+        const { data, error } = await actualizarPresupuestoProyecto(proyectoId, parseFloat(presupuesto));
+        
+        console.log('Respuesta de Supabase:', { data, error }); // Para debug
+        
+        if (error) {
+          console.error('Error al asignar presupuesto:', error);
+          alert('Error al asignar presupuesto: ' + error.message);
+        } else {
+          console.log('Presupuesto guardado exitosamente'); // Para debug
+          alert('Presupuesto asignado correctamente');
+          document.getElementById('modal-asignar-presupuesto').style.display = 'none';
+          document.getElementById('presupuesto-actual').value = '';
+          // Opcional: recargar proyectos para ver el cambio
+          // cargarProyectos();
+        }
+      } catch (ex) {
+        console.error('Error inesperado:', ex);
+        alert('Ocurrió un error inesperado al asignar el presupuesto');
+      }
+    });
+  }
+
+
+//hasta aca
+
+
+
+
+
+
+
+
+
 
   //los nuevos modales
+
+
+
+
+
+
+
+
 
 
   // 🔥 AGREGAR ESTAS LÍNEAS AQUÍ:

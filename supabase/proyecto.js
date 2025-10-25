@@ -26,3 +26,11 @@ export async function actualizarProyecto(id, { cliente, nombre, descripción, ub
     .update({ cliente, nombre, descripción, ubicación, fecha_inicio, fecha_final })
     .eq('id_proyecto', id);
 }
+
+// Nueva función para actualizar solo el presupuesto
+export async function actualizarPresupuestoProyecto(id_proyecto, presupuesto) {
+  return await supabase
+    .from('proyecto')
+    .update({ presupuesto })
+    .eq('id_proyecto', id_proyecto);
+}
