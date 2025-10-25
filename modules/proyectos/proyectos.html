@@ -279,7 +279,79 @@
   </div>
 </div>
 
-<!-- ...existing code... -->
+<!-- Modal Asignar Presupuesto -->
+<div id="modal-asignar-presupuesto" class="modal" style="display:none;">
+  <div class="modal-content modal-proyecto" style="max-width:500px; min-width:450px; padding:32px 32px 24px 32px; border-radius:18px; box-shadow:0 4px 24px rgba(0,59,92,0.12); position:relative;">
+    <button id="close-modal-presupuesto" class="modal-close" style="position:absolute; top:18px; right:18px; background:none; border:none; font-size:1.5em; cursor:pointer; color:#666;">
+      <i class="ri-close-line"></i>
+    </button>
+    <h2 class="modal-title" style="font-family:Montserrat,sans-serif; font-size:1.8rem; color:#003B5C; margin-bottom:8px;">Asignar presupuesto</h2>
+    <div class="modal-title-line" style="height:4px; background:#28a745; border-radius:2px; margin-bottom:24px;"></div>
+    
+    <!-- Información del proyecto -->
+    <div style="background:#f8f9fa; padding:16px; border-radius:8px; margin-bottom:20px; border-left:4px solid #28a745;">
+      <h4 style="color:#003B5C; margin:0 0 8px 0;">Proyecto: <span id="presupuesto-proyecto-nombre" style="font-weight:normal;"></span></h4>
+      <p style="color:#666; margin:0; font-size:0.9em;">Cliente: <span id="presupuesto-cliente"></span></p>
+    </div>
+
+    <form id="form-asignar-presupuesto">
+      <div class="modal-form-group" style="margin-bottom:24px;">
+        <label for="presupuesto-actual" style="font-weight:600; color:#276080; margin-bottom:8px; display:block;">Presupuesto ($USD)</label>
+        <input type="number" id="presupuesto-actual" name="presupuesto" step="0.01" min="0" required
+               style="width:100%; padding:12px; border:1.5px solid #ececec; border-radius:8px; background:#fff; font-size:1.1em; outline:none; transition:border 0.2s;"
+               placeholder="Ingresa el presupuesto del proyecto">
+      </div>
+      <div class="modal-actions" style="display:flex; justify-content:flex-end; gap:12px;">
+        <button type="button" class="btn secondary" id="cancelar-modal-presupuesto" style="background:#f5f5f5; color:#666; border:1px solid #ddd; padding:10px 20px; border-radius:6px; cursor:pointer;">Cancelar</button>
+        <button type="submit" class="btn primary" style="background:#28a745; color:#fff; border:none; padding:10px 24px; border-radius:6px; font-weight:600; cursor:pointer;">Asignar presupuesto</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Liberar Proyecto -->
+<div id="modal-liberar-proyecto" class="modal" style="display:none;">
+  <div class="modal-content modal-proyecto" style="max-width:550px; min-width:500px; padding:32px 32px 24px 32px; border-radius:18px; box-shadow:0 4px 24px rgba(0,59,92,0.12); position:relative;">
+    <button id="close-modal-liberar" class="modal-close" style="position:absolute; top:18px; right:18px; background:none; border:none; font-size:1.5em; cursor:pointer; color:#666;">
+      <i class="ri-close-line"></i>
+    </button>
+    <h2 class="modal-title" style="font-family:Montserrat,sans-serif; font-size:1.8rem; color:#003B5C; margin-bottom:8px;">Liberar proyecto</h2>
+    <div class="modal-title-line" style="height:4px; background:#FF8F00; border-radius:2px; margin-bottom:24px;"></div>
+    
+    <!-- Información del proyecto -->
+    <div style="background:#fff3cd; padding:16px; border-radius:8px; margin-bottom:20px; border-left:4px solid #FF8F00; border:1px solid #ffeaa7;">
+      <h4 style="color:#003B5C; margin:0 0 12px 0;">Proyecto: <span id="liberar-proyecto-nombre" style="font-weight:normal;"></span></h4>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:0.9em; color:#666;">
+        <p style="margin:0;">Cliente: <span id="liberar-cliente"></span></p>
+        <p style="margin:0;">Responsable: <span id="liberar-responsable"></span></p>
+        <p style="margin:0; grid-column:span 2;">Responsable Viáticos: <span id="liberar-responsable-viaticos"></span></p>
+      </div>
+    </div>
+
+    <!-- Advertencia -->
+    <div style="background:#f8d7da; padding:16px; border-radius:8px; margin-bottom:24px; border-left:4px solid #dc3545; border:1px solid #f5c6cb;">
+      <p style="margin:0; color:#721c24; font-weight:600; font-size:0.95em;">
+        <i class="ri-warning-line" style="margin-right:8px;"></i>
+        Al liberar este proyecto se eliminarán todas las asignaciones relacionadas. Esta acción no se puede deshacer.
+      </p>
+    </div>
+
+    <!-- Checkbox de confirmación -->
+    <div style="margin-bottom:24px;">
+      <label style="display:flex; align-items:center; cursor:pointer; font-size:0.95em;">
+        <input type="checkbox" id="confirmar-liberacion" style="margin-right:12px; transform:scale(1.2);">
+        <span style="color:#003B5C;">Confirmo que entiendo las consecuencias de esta acción</span>
+      </label>
+    </div>
+
+    <div class="modal-actions" style="display:flex; justify-content:flex-end; gap:12px;">
+      <button type="button" class="btn secondary" id="cancelar-liberar-proyecto" style="background:#f5f5f5; color:#666; border:1px solid #ddd; padding:10px 20px; border-radius:6px; cursor:pointer;">Cancelar</button>
+      <button type="button" class="btn danger" id="confirmar-liberar-proyecto" disabled style="background:#dc3545; color:#fff; border:none; padding:10px 24px; border-radius:6px; font-weight:600; cursor:pointer; opacity:0.5;">Liberar proyecto</button>
+    </div>
+  </div>
+</div>
+
+<!-- Agregar antes del cierre de </body> -->
     <script src="../../Js/menu.js"></script>
    <script type="module" src="../../Js/correo.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>

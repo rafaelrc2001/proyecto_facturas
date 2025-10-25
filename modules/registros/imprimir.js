@@ -38,7 +38,259 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!verificarSesion()) return;
   await cargarProyectosNombres();
   await cargarRegistrosSupabase();
+  
+  // Configurar eventos de filtros
+  configurarEventosFiltros();
+  
+  // Mostrar todos los registros inicialmente
+  mostrarTablasPorProyecto();
 });
+
+// Nueva función para configurar todos los eventos de filtros
+function configurarEventosFiltros() {
+  // Configurar autocompletado de proyectos
+  configurarAutocompletadoProyecto();
+  
+  // Configurar filtros de fecha
+  configurarFiltrosFecha();
+}
+
+// Función para configurar autocompletado de proyectos
+function configurarAutocompletadoProyecto() {
+  const proyectoInput = document.getElementById('imprimir-proyecto-autocomplete');
+  const autocompleteList = document.getElementById('imprimir-autocomplete-list');
+
+  if (!proyectoInput || !autocompleteList) return;
+
+  proyectoInput.addEventListener('input', function() {
+    const valor = this.value.trim().toLowerCase();
+    autocompleteList.innerHTML = '';
+    
+    if (!valor) {
+      aplicarFiltrosCombinados(); // Aplicar filtros sin proyecto específico
+      return;
+    }
+    
+    const sugerencias = proyectosNombres.filter(n => n.toLowerCase().includes(valor));
+    sugerencias.forEach(nombre => {
+      const div = document.createElement('div');
+      div.textContent = nombre;
+      div.onclick = function() {
+        proyectoInput.value = nombre;
+        autocompleteList.innerHTML = '';
+        aplicarFiltrosCombinados(); // Aplicar filtros con proyecto seleccionado
+      };
+      autocompleteList.appendChild(div);
+    });
+  });
+
+  // Ocultar autocompletado al hacer clic fuera
+  document.addEventListener('click', function(e) {
+    if (!autocompleteList.contains(e.target) && e.target !== proyectoInput) {
+      autocompleteList.innerHTML = '';
+    }
+  });
+}
+
+// Función para configurar filtros de fecha
+function configurarFiltrosFecha() {
+  const fechaDesde = document.getElementById('fecha-desde');
+  const fechaHasta = document.getElementById('fecha-hasta');
+  const limpiarFechas = document.getElementById('limpiar-fechas');
+
+  if (!fechaDesde || !fechaHasta || !limpiarFechas) {
+    console.warn('Elementos de filtro de fecha no encontrados');
+    return;
+  }
+
+  // Eventos para aplicar filtros cuando cambien las fechas
+  fechaDesde.addEventListener('change', aplicarFiltrosCombinados);
+  fechaHasta.addEventListener('change', aplicarFiltrosCombinados);
+  
+  // Evento para limpiar filtros de fecha
+  limpiarFechas.addEventListener('click', () => {
+    fechaDesde.value = '';
+    fechaHasta.value = '';
+    aplicarFiltrosCombinados();
+  });
+}
+
+// Nueva función que aplica TODOS los filtros combinados
+function aplicarFiltrosCombinados() {
+  const fechaDesde = document.getElementById('fecha-desde')?.value || '';
+  const fechaHasta = document.getElementById('fecha-hasta')?.value || '';
+  const proyectoSeleccionado = document.getElementById('imprimir-proyecto-autocomplete')?.value || '';
+
+  let registrosFiltrados = [...registrosOriginales];
+
+  // FILTRO 1: Por proyecto (si hay uno seleccionado)
+  if (proyectoSeleccionado) {
+    const proyecto = proyectosInfo.find(p => p.nombre === proyectoSeleccionado);
+    if (proyecto) {
+      registrosFiltrados = registrosFiltrados.filter(r => 
+        String(r.id_proyecto) === String(proyecto.id_proyecto)
+      );
+    }
+  }
+
+  // FILTRO 2: Por rango de fechas de cargo
+  if (fechaDesde || fechaHasta) {
+    registrosFiltrados = registrosFiltrados.filter(registro => {
+      if (!registro.fecha_cargo) return false;
+      
+      const fechaCargo = new Date(registro.fecha_cargo);
+      let cumpleFiltro = true;
+
+      if (fechaDesde) {
+        const desde = new Date(fechaDesde);
+        desde.setHours(0, 0, 0, 0); // Inicio del día
+        cumpleFiltro = cumpleFiltro && fechaCargo >= desde;
+      }
+
+      if (fechaHasta) {
+        const hasta = new Date(fechaHasta);
+        hasta.setHours(23, 59, 59, 999); // Final del día
+        cumpleFiltro = cumpleFiltro && fechaCargo <= hasta;
+      }
+
+      return cumpleFiltro;
+    });
+  }
+
+  // Mostrar registros filtrados
+  mostrarTablasFiltradas(registrosFiltrados, proyectoSeleccionado);
+}
+
+// Función para mostrar tablas con registros filtrados
+function mostrarTablasFiltradas(registrosFiltrados, nombreProyecto) {
+  const container = document.getElementById('imprimir-table-container');
+  container.innerHTML = '';
+
+  // Mostrar información del proyecto
+  const infoContainer = document.getElementById('imprimir-proyecto-info');
+  infoContainer.innerHTML = '';
+
+  let proyecto = null;
+
+  if (nombreProyecto) {
+    proyecto = proyectosInfo.find(p => p.nombre === nombreProyecto);
+    if (proyecto) {
+      infoContainer.innerHTML = `
+        <h2 style="text-align:center; color:#FF6F00; margin-bottom:18px;">Listado de Facturas y Tickets</h2>
+        <hr style="border:1px solid #FF6F00; margin-bottom:18px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
+          <div style="flex:1;">
+            <table style="font-size:1em;">
+              <tr>
+                <td><strong>NOMBRE DEL PROYECTO:</strong></td>
+                <td>${proyecto.nombre || ''}</td>
+              </tr>
+              <tr>
+                <td><strong>CLIENTE:</strong></td>
+                <td>${proyecto.cliente || ''}</td>
+              </tr>
+              <tr>
+                <td><strong>UBICACIÓN DE LA OBRA:</strong></td>
+                <td>${proyecto.ubicacion || ''}</td>
+              </tr>
+              <tr>
+                <td><strong>RESPONSABLE DEL PROYECTO:</strong></td>
+                <td>${proyecto.responsable || ''}</td>
+              </tr>
+            </table>
+          </div>
+          <div style="flex:0 0 180px; text-align:right;">
+            <img src="../../img/inxite.png" alt="Logo Inxite" style="max-width:160px;">
+          </div>
+        </div>
+      `;
+    }
+  } else {
+    infoContainer.innerHTML = `
+      <h2 style="text-align:center; color:#FF6F00; margin-bottom:18px;">Listado de Facturas y Tickets</h2>
+      <hr style="border:1px solid #FF6F00; margin-bottom:18px;">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
+        <div style="flex:1;"></div>
+        <div style="flex:0 0 180px; text-align:right;">
+          <img src="../../img/inxite.png" alt="Logo Inxite" style="max-width:160px;">
+        </div>
+      </div>
+    `;
+  }
+
+  let totalRegistros = 0;
+
+  tiposPago.forEach(tipo => {
+    const tipoNormalizado = tipo.replace(/\s+/g, ' ').trim().toLowerCase();
+    const registrosPorTipo = registrosFiltrados.filter(r =>
+      r.pago && r.pago.replace(/\s+/g, ' ').trim().toLowerCase() === tipoNormalizado
+    );
+    
+    if (registrosPorTipo.length > 0) {
+      totalRegistros += registrosPorTipo.length;
+      let tablaHTML = `
+        <h4 class="imprimir-titulo-tipo">${tipo}</h4>
+        <table class="imprimir-subtabla">
+          <thead>
+            <tr>
+              <th>Fecha de cargo</th>
+              <th>Fecha de Facturación</th>
+              <th>Tipo</th>
+              <th>Folio</th>
+              <th>Establecimiento</th>
+              <th>Importe</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      let totalImporte = 0;
+      registrosPorTipo.forEach(reg => {
+        tablaHTML += `
+          <tr>
+            <td>${formatearFecha(reg.fecha_cargo) || ''}</td>
+            <td>${formatearFecha(reg.fecha_facturacion) || ''}</td>
+            <td>${reg.tipo || ''}</td>
+            <td>${reg.folio || ''}</td>
+            <td>${reg.establecimiento || ''}</td>
+            <td>${formatoMoneda(reg.importe) || ''}</td>
+          </tr>
+        `;
+        totalImporte += Number(reg.importe) || 0;
+      });
+      tablaHTML += `
+        </tbody>
+        </table>
+        <div class="imprimir-total">Total: ${formatoMoneda(totalImporte)}</div>
+      `;
+      container.innerHTML += tablaHTML;
+    }
+  });
+
+  // Total general
+  const totalGeneral = registrosFiltrados.reduce((acc, reg) => acc + (Number(reg.importe) || 0), 0);
+  container.innerHTML += `
+    <div class="imprimir-total-general" style="font-weight:bold; color:#FF6F00; margin-top:24px; font-size:1.2em;">
+      Total general de importes: ${formatoMoneda(totalGeneral)}
+    </div>
+  `;
+
+  // Agregar respuestas si existen
+  container.innerHTML += respuestasHTML;
+
+  // Actualizar contador
+  const contadorElement = document.getElementById('imprimir-contador-registros');
+  if (contadorElement) {
+    contadorElement.textContent = `Registros mostrados: ${totalRegistros}`;
+  }
+}
+
+// Actualizar la función mostrarTablasPorProyecto existente para usar la nueva lógica
+function mostrarTablasPorProyecto(nombreProyecto = '') {
+  if (nombreProyecto) {
+    document.getElementById('imprimir-proyecto-autocomplete').value = nombreProyecto;
+  }
+  aplicarFiltrosCombinados();
+}
 
 // Cargar nombres de proyectos
 async function cargarProyectosNombres() {
@@ -81,170 +333,6 @@ async function cargarRegistrosSupabase() {
   const { data } = await supabase.from('registro').select('*');
   registrosOriginales = data || [];
   mostrarTablasPorProyecto(""); // Muestra todo al inicio
-}
-
-// Autocompletado de proyectos
-const proyectoInput = document.getElementById('imprimir-proyecto-autocomplete');
-const autocompleteList = document.getElementById('imprimir-autocomplete-list');
-
-proyectoInput.addEventListener('input', function() {
-  const valor = this.value.trim().toLowerCase();
-  autocompleteList.innerHTML = '';
-  if (!valor) {
-    mostrarTablasPorProyecto("");
-    return;
-  }
-  const sugerencias = proyectosNombres.filter(n => n.toLowerCase().includes(valor));
-  sugerencias.forEach(nombre => {
-    const div = document.createElement('div');
-    div.textContent = nombre;
-    div.onclick = function() {
-      proyectoInput.value = nombre;
-      autocompleteList.innerHTML = '';
-      mostrarTablasPorProyecto(nombre);
-    };
-    autocompleteList.appendChild(div);
-  });
-});
-
-// Oculta el autocompletado si se hace clic fuera
-document.addEventListener('click', function(e) {
-  if (!autocompleteList.contains(e.target) && e.target !== proyectoInput) {
-    autocompleteList.innerHTML = '';
-  }
-});
-
-// Renderiza las tablas separadas por tipo de pago
-function mostrarTablasPorProyecto(nombreProyecto) {
-  const container = document.getElementById('imprimir-table-container');
-  container.innerHTML = '';
-
-  // Mostrar información del proyecto arriba de la tabla
-  const infoContainer = document.getElementById('imprimir-proyecto-info');
-  infoContainer.innerHTML = '';
-
-  let registrosFiltrados = registrosOriginales;
-  let proyecto = null;
-
-  if (nombreProyecto) {
-    proyecto = proyectosInfo.find(p => p.nombre === nombreProyecto);
-    console.log('Proyecto seleccionado:', proyecto);
-    if (proyecto) {
-      registrosFiltrados = registrosOriginales.filter(r => r.id_proyecto === proyecto.id_proyecto);
-
-      // Mostrar datos del proyecto (sin fechas de inicio y terminación)
-      infoContainer.innerHTML = `
-  <h2 style="text-align:center; color:#FF6F00; margin-bottom:18px;">Listado de Facturas y Tickets</h2>
-  <hr style="border:1px solid #FF6F00; margin-bottom:18px;">
- 
-      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
-    <div style="flex:1;">
-      <table style="font-size:1em;">
-        <tr>
-          <td><strong>NOMBRE DEL PROYECTO:</strong></td>
-          <td>${proyecto.nombre || ''}</td>
-        </tr>
-        <tr>
-          <td><strong>CLIENTE:</strong></td>
-          <td>${proyecto.cliente || ''}</td>
-        </tr>
-        <tr>
-          <td><strong>UBICACIÓN DE LA OBRA:</strong></td>
-          <td>${proyecto.ubicación || ''}</td>
-        </tr>
-         <tr>
-          <td><strong>RESPONSABLE DEL PROYECTO:</strong></td>
-          <td>${proyecto.responsable || ''}</td>
-        </tr>
-      </table>
-    </div>
-    <div style="flex:0 0 180px; text-align:right;">
-      <img src="../../img/inxite.png" alt="Logo Inxite" style="max-width:160px;">
-    </div>
-  </div>
-       `;
-    } else {
-      registrosFiltrados = [];
-      infoContainer.innerHTML = '';
-    }
-  } else {
-    infoContainer.innerHTML = `
-      <h2 style="text-align:center; color:#FF6F00; margin-bottom:18px;">Listado de Facturas y Tickets</h2>
-      <hr style="border:1px solid #FF6F00; margin-bottom:18px;">
-      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
-        <div style="flex:1;">
-             </div>
-        <div style="flex:0 0 180px; text-align:right;">
-          <img src="../../img/inxite.png" alt="Logo Inxite" style="max-width:160px;">
-        </div>
-      </div>
-    `;
-  }
-
-  let totalRegistros = 0;
-
-  tiposPago.forEach(tipo => {
-    const tipoNormalizado = tipo.replace(/\s+/g, ' ').trim().toLowerCase();
-    const registrosPorTipo = registrosFiltrados.filter(r =>
-      r.pago && r.pago.replace(/\s+/g, ' ').trim().toLowerCase() === tipoNormalizado
-    );
-    if (registrosPorTipo.length > 0) {
-      totalRegistros += registrosPorTipo.length;
-      let tablaHTML = `
-        <h4 class="imprimir-titulo-tipo">${tipo}</h4>
-        <table class="imprimir-subtabla">
-          <thead>
-            <tr>
-              <th>Fecha de cargo</th>
-              <th>Fecha de Facturación</th>
-              <th>Tipo</th>
-              <th>Folio</th>
-              <th>Establecimiento</th>
-              <th>Importe</th>
-            </tr>
-          </thead>
-          <tbody>
-      `;
-      let totalImporte = 0;
-      registrosPorTipo.forEach(reg => {
-        tablaHTML += `
-          <tr>
-            <td>${reg.fecha_cargo || ''}</td>
-            <td>${reg.fecha_facturacion || ''}</td>
-            <td>${reg.tipo || ''}</td>
-            <td>${reg.folio || ''}</td>
-            <td>${reg.establecimiento || ''}</td>
-            <td>${formatoMoneda(reg.importe) || ''}</td>
-          </tr>
-        `;
-        totalImporte += Number(reg.importe) || 0;
-      });
-      tablaHTML += `
-    </tbody>
-  </table>
-  <div class="imprimir-total">Total: ${formatoMoneda(totalImporte)}</div>
-      `;
-      container.innerHTML += tablaHTML;
-    }
-  });
-
-  // Suma total de todos los importes mostrados
-  const totalGeneral = registrosFiltrados.reduce((acc, reg) => acc + (Number(reg.importe) || 0), 0);
-
-  // Muestra el total general debajo de todas las tablas
-  container.innerHTML += `
-    <div class="imprimir-total-general" style="font-weight:bold; color:#FF6F00; margin-top:24px; font-size:1.2em;">
-      Total general de importes: ${formatoMoneda(totalGeneral)}
-    </div>
-  `;
-
-  
-
-
-container.innerHTML += respuestasHTML;
-
-  // Actualiza el contador de registros
-  document.getElementById('imprimir-contador-registros').textContent = `Registros mostrados: ${totalRegistros}`;
 }
 
 // Función para formatear fechas

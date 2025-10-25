@@ -141,6 +141,94 @@ document.addEventListener('DOMContentLoaded', function() {
   const closeModal = document.getElementById('close-modal-nuevo');
   const cancelarModal = document.getElementById('cancelar-modal-nuevo');
 
+
+
+  //los nuevos modales
+
+
+  // 🔥 AGREGAR ESTAS LÍNEAS AQUÍ:
+
+  // EVENT LISTENERS PARA LOS MODALES DE PRESUPUESTO Y LIBERAR
+  
+  // Modal asignar presupuesto - Botón X
+  const closePresupuesto = document.getElementById('close-modal-presupuesto');
+  if (closePresupuesto) {
+    closePresupuesto.addEventListener('click', function() {
+      console.log('Cerrando modal presupuesto con X');
+      document.getElementById('modal-asignar-presupuesto').style.display = 'none';
+    });
+  }
+
+  // Modal asignar presupuesto - Botón Cancelar
+  const cancelarPresupuesto = document.getElementById('cancelar-modal-presupuesto');
+  if (cancelarPresupuesto) {
+    cancelarPresupuesto.addEventListener('click', function() {
+      console.log('Cerrando modal presupuesto con Cancelar');
+      document.getElementById('modal-asignar-presupuesto').style.display = 'none';
+    });
+  }
+
+  // Modal liberar proyecto - Botón X
+  const closeLiberar = document.getElementById('close-modal-liberar');
+  if (closeLiberar) {
+    closeLiberar.addEventListener('click', function() {
+      console.log('Cerrando modal liberar con X');
+      document.getElementById('modal-liberar-proyecto').style.display = 'none';
+    });
+  }
+
+  // Modal liberar proyecto - Botón Cancelar
+  const cancelarLiberar = document.getElementById('cancelar-liberar-proyecto');
+  if (cancelarLiberar) {
+    cancelarLiberar.addEventListener('click', function() {
+      console.log('Cerrando modal liberar con Cancelar');
+      document.getElementById('modal-liberar-proyecto').style.display = 'none';
+    });
+  }
+
+  // Funcionalidad del checkbox del modal liberar
+  const confirmarCheckbox = document.getElementById('confirmar-liberacion');
+  const btnConfirmarLiberar = document.getElementById('confirmar-liberar-proyecto');
+  if (confirmarCheckbox && btnConfirmarLiberar) {
+    confirmarCheckbox.addEventListener('change', function() {
+      if (this.checked) {
+        btnConfirmarLiberar.disabled = false;
+        btnConfirmarLiberar.style.opacity = '1';
+      } else {
+        btnConfirmarLiberar.disabled = true;
+        btnConfirmarLiberar.style.opacity = '0.5';
+      }
+    });
+  }
+
+  // Cerrar modales al hacer click fuera
+  window.addEventListener('click', function(e) {
+    const modalPresupuesto = document.getElementById('modal-asignar-presupuesto');
+    const modalLiberar = document.getElementById('modal-liberar-proyecto');
+    
+    if (e.target === modalPresupuesto) {
+      console.log('Cerrando modal presupuesto por click fuera');
+      modalPresupuesto.style.display = 'none';
+    }
+    
+    if (e.target === modalLiberar) {
+      console.log('Cerrando modal liberar por click fuera');
+      modalLiberar.style.display = 'none';
+    }
+  });
+
+  // 🔥 FIN DE LAS LÍNEAS AGREGADAS
+
+ 
+
+
+
+//hasta aca
+
+
+
+
+
   btnNuevo.addEventListener('click', function() {
     modal.style.display = 'flex';
   });
@@ -435,10 +523,13 @@ function mostrarProyectosPaginados(proyectos) {
         <td>${responsableProyecto}</td>
         <td>${responsableViaticos}</td>
         <td>
-          <div class="acciones-btns">
-            <button class="btn-accion btn-editar" title="Editar" data-index="${i + inicio}"><i class="ri-edit-2-line"></i></button>
-            <button class="btn-accion btn-eliminar" title="Eliminar" data-index="${i + inicio}"><i class="ri-delete-bin-line"></i></button>
-          </div>
+      
+       <div class="acciones-btns">
+  <button class="btn-accion btn-editar" title="Editar" data-index="${i + inicio}"><i class="ri-edit-2-line"></i></button>
+  <button class="btn-accion btn-eliminar" title="Eliminar" data-index="${i + inicio}"><i class="ri-delete-bin-line"></i></button>
+  <button class="btn-accion btn-asignar-presupuesto" title="Asignar presupuesto" data-index="${i + inicio}" style="background: #276080; border-color: #276080; color: white;"><i class="ri-money-dollar-circle-line"></i></button>
+  <button class="btn-accion btn-liberar" title="Liberar proyecto" data-index="${i + inicio}" style="background: #FF8F00; border-color: #FF8F00; color: white;"><i class="ri-user-unfollow-line"></i></button>
+</div>
         </td>
       </tr>
     `;
@@ -447,7 +538,7 @@ function mostrarProyectosPaginados(proyectos) {
   document.getElementById('contador-registros').textContent = `Registros Totales: ${proyectos.length}`;
   renderizarPaginacionProyectos(totalPaginas);
 
-  // ASIGNA LOS EVENTOS DESPUÉS DE RENDERIZAR LA TABLA
+  // ASIGNA TODOS LOS EVENTOS DESPUÉS DE RENDERIZAR LA TABLA
   document.querySelectorAll('.btn-editar').forEach(btn => {
     btn.onclick = function() {
       const index = this.getAttribute('data-index');
@@ -483,6 +574,61 @@ function mostrarProyectosPaginados(proyectos) {
           alert('Proyecto eliminado correctamente');
           cargarProyectos();
         }
+      }
+    };
+  });
+
+  // AGREGAR ESTOS EVENT LISTENERS AQUÍ:
+  document.querySelectorAll('.btn-asignar-presupuesto').forEach(btn => {
+    btn.onclick = function() {
+      console.log('Click en asignar presupuesto'); // Para debug
+      const index = this.getAttribute('data-index');
+      const proyecto = proyectosData[index];
+      
+      // Mostrar modal simple por ahora
+      const modal = document.getElementById('modal-asignar-presupuesto');
+      if (modal) {
+        modal.style.display = 'flex';
+        
+        // Llenar información del proyecto
+        document.getElementById('presupuesto-proyecto-nombre').textContent = proyecto.nombre || 'Sin nombre';
+        document.getElementById('presupuesto-cliente').textContent = proyecto.cliente || 'Sin cliente';
+        
+        // Guardar el ID del proyecto para cuando se envíe el formulario
+        document.getElementById('form-asignar-presupuesto').dataset.proyectoId = proyecto.id_proyecto;
+      } else {
+        alert('Modal no encontrado. Verifica que el HTML esté agregado.');
+      }
+    };
+  });
+
+  document.querySelectorAll('.btn-liberar').forEach(btn => {
+    btn.onclick = function() {
+      console.log('Click en liberar proyecto'); // Para debug
+      const index = this.getAttribute('data-index');
+      const proyecto = proyectosData[index];
+      
+      // Mostrar modal simple por ahora
+      const modal = document.getElementById('modal-liberar-proyecto');
+      if (modal) {
+        modal.style.display = 'flex';
+        
+        // Llenar información del proyecto
+        document.getElementById('liberar-proyecto-nombre').textContent = proyecto.nombre || 'Sin nombre';
+        document.getElementById('liberar-cliente').textContent = proyecto.cliente || 'Sin cliente';
+        document.getElementById('liberar-responsable').textContent = proyecto.asignacion?.trabajador?.nombre || 'Sin asignar';
+        document.getElementById('liberar-responsable-viaticos').textContent = proyecto.asignacion?.responsable_viaticos?.nombre || 'Sin asignar';
+        
+        // Guardar información del proyecto para cuando se confirme
+        modal.dataset.proyectoId = proyecto.id_proyecto;
+        modal.dataset.proyectoNombre = proyecto.nombre || 'Sin nombre';
+        
+        // Resetear el checkbox
+        document.getElementById('confirmar-liberacion').checked = false;
+        document.getElementById('confirmar-liberar-proyecto').disabled = true;
+        document.getElementById('confirmar-liberar-proyecto').style.opacity = '0.5';
+      } else {
+        alert('Modal no encontrado. Verifica que el HTML esté agregado.');
       }
     };
   });

@@ -490,3 +490,103 @@
 #modalPreguntas .modal-close:hover i {
   color: #FF6F00;
 }
+
+
+
+
+.filtros-fecha {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-left: 16px;
+}
+
+.filtro-fecha-grupo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.filtro-fecha-grupo label {
+  font-size: 0.9em;
+  color: #276080;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.filtro-fecha-grupo input[type="date"] {
+  padding: 8px 12px;
+  border: 1.5px solid #ececec;
+  border-radius: 6px;
+  font-size: 0.95em;
+  background: white;
+  cursor: pointer;
+}
+
+.filtro-fecha-grupo input[type="date"]:focus {
+  outline: none;
+  border-color: #FF6F00;
+  box-shadow: 0 0 0 2px rgba(255, 111, 0, 0.1);
+}
+
+#limpiar-fechas {
+  padding: 8px 12px;
+  background: #f7f8f6;
+  border: 1.5px solid #ececec;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #276080;
+  transition: all 0.2s;
+}
+
+#limpiar-fechas:hover {
+  background: #e9ecef;
+  border-color: #adb5bd;
+}
+
+@media (max-width: 768px) {
+  .filtros-fecha {
+    flex-wrap: wrap;
+    margin-left: 0;
+    margin-top: 12px;
+  }
+  
+  .filtro-fecha-grupo {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
+
+
+#limpiar-fechas {
+  padding: 8px 12px;
+  background: #fff;
+  border: 1.5px solid #e74c3c;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #e74c3c;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 40px;
+}
+
+#limpiar-fechas:hover {
+  background: #e74c3c;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(231, 76, 60, 0.2);
+}
+
+#limpiar-fechas:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(231, 76, 60, 0.2);
+}
+
+#limpiar-fechas i {
+  font-size: 1.1em;
+}
+
