@@ -53,3 +53,29 @@ export async function actualizarPresupuestoProyecto(id_proyecto, nuevoPresupuest
     })
     .eq('id_proyecto', id_proyecto);
 }
+
+// 🔥 NUEVA FUNCIÓN PARA LIBERAR PROYECTO:
+export async function liberarProyecto(id_proyecto) {
+  try {
+    // 1. Primero eliminar todas las asignaciones relacionadas
+    const { error: errorAsignaciones } = await supabase
+      .from('asignar_proyecto')
+      .delete()
+      .eq('id_proyecto', id_proyecto);
+
+    if (errorAsignaciones) {
+      return { error: errorAsignaciones };
+    }
+
+    // 2. Luego actualizar la columna liberar a true
+    const { data, error } = await supabase
+      .from('proyecto')
+      .update({ liberar: true })
+      .eq('id_proyecto', id_proyecto);
+
+    return { data, error };
+  } catch (ex) {
+    console.error('Error en liberarProyecto:', ex);
+    return { error: ex };
+  }
+}

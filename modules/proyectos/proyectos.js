@@ -1,5 +1,5 @@
 import { supabase } from '../../supabase/db.js';
-import { insertarProyecto, obtenerProyectos, eliminarProyecto, actualizarProyecto, actualizarPresupuestoProyecto } from '../../supabase/proyecto.js';
+import { insertarProyecto, obtenerProyectos, eliminarProyecto, actualizarProyecto, actualizarPresupuestoProyecto, liberarProyecto } from '../../supabase/proyecto.js';
 import { obtenerTrabajadores } from '../../supabase/trabajador.js';
 import { asignarProyectoATrabajador } from '../../supabase/asignar_proyecto.js';
 import { enviarDatosAsignacion } from '../../Js/correo.js';
@@ -560,6 +560,66 @@ document.addEventListener('DOMContentLoaded', () => {
         alert('Ocurrió un error inesperado al asignar.');
       } finally {
         if (submitBtn) submitBtn.disabled = false;
+      }
+    });
+  }
+
+  // 🔥 AGREGAR ESTE EVENT LISTENER PARA EL BOTÓN DE CONFIRMAR LIBERACIÓN:
+  
+  // Event listener para confirmar liberación del proyecto
+  const btnConfirmarLiberar = document.getElementById('confirmar-liberar-proyecto');
+  if (btnConfirmarLiberar && !btnConfirmarLiberar.dataset.bound) {
+    btnConfirmarLiberar.dataset.bound = '1';
+    btnConfirmarLiberar.addEventListener('click', async function() {
+      const modal = document.getElementById('modal-liberar-proyecto');
+      const proyectoId = modal.dataset.proyectoId;
+      const proyectoNombre = modal.dataset.proyectoNombre;
+      
+      if (!proyectoId) {
+        alert('Error: No se encontró el ID del proyecto');
+        return;
+      }
+      
+      console.log(`Liberando proyecto ID: ${proyectoId}`); // Para debug
+      
+      // Confirmar una vez más
+      if (!confirm(`¿Estás completamente seguro de liberar el proyecto "${proyectoNombre}"?\n\nEsta acción eliminará todas las asignaciones y no se puede deshacer.`)) {
+        return;
+      }
+      
+      try {
+        // Deshabilitar el botón mientras procesa
+        this.disabled = true;
+        this.textContent = 'Liberando...';
+        
+        const { error } = await liberarProyecto(proyectoId);
+        
+        if (error) {
+          console.error('Error al liberar proyecto:', error);
+          alert('Error al liberar proyecto: ' + error.message);
+        } else {
+          console.log('Proyecto liberado exitosamente'); // Para debug
+          alert('Proyecto liberado correctamente. Se han eliminado todas las asignaciones relacionadas.');
+          
+          // Cerrar modal
+          modal.style.display = 'none';
+          
+          // Resetear el checkbox y botón
+          document.getElementById('confirmar-liberacion').checked = false;
+          this.disabled = true;
+          this.style.opacity = '0.5';
+          this.textContent = 'Liberar proyecto';
+          
+          // Recargar proyectos para ver los cambios
+          cargarProyectos();
+        }
+      } catch (ex) {
+        console.error('Error inesperado al liberar proyecto:', ex);
+        alert('Ocurrió un error inesperado al liberar el proyecto');
+      } finally {
+        // Reactivar el botón
+        this.disabled = false;
+        this.textContent = 'Liberar proyecto';
       }
     });
   }
