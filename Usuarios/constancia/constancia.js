@@ -1,10 +1,16 @@
+// 🔥 AGREGAR IMPORT DE SUPABASE AL INICIO
+import { supabase } from '../../supabase/db.js';
+
 let archivoSeleccionado = null;
 
-// Verificación de sesión
+// 🔥 VERIFICACIÓN DE SESIÓN PARA USUARIO (no admin)
 function verificarSesion() {
-  const adminAutenticado = localStorage.getItem('projectidadmin');
-  if (adminAutenticado !== '1') {
-    document.body.innerHTML = '<div style="position:fixed; top:0; left:0; width:100%; height:100%; background:#fff; z-index:99999; display:flex; align-items:center; justify-content:center; font-family:Arial;"><div style="text-align:center;"><h2 style="color:#003B5C;">Acceso Denegado</h2><p>No tienes permisos para acceder a esta sección</p></div></div>';
+  const idTrabajador = localStorage.getItem('id_trabajador');
+  if (!idTrabajador) {
+    document.body.innerHTML = '<div style="position:fixed; top:0; left:0; width:100%; height:100%; background:#fff; z-index:99999; display:flex; align-items:center; justify-content:center; font-family:Arial;"><div style="text-align:center;"><h2 style="color:#003B5C;">Acceso Denegado</h2><p>Debes iniciar sesión como trabajador</p></div></div>';
+    setTimeout(() => {
+      window.location.href = '/tickets/';
+    }, 2000);
     return false;
   }
   return true;
@@ -19,190 +25,48 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function inicializarEventos() {
-  // Botones para abrir modal
-  document.getElementById('btn-subir-constancia')?.addEventListener('click', abrirModalSubida);
-  document.getElementById('btn-subir-inicial')?.addEventListener('click', abrirModalSubida);
-  
-  // Modal eventos
-  document.getElementById('cerrar-modal-constancia')?.addEventListener('click', cerrarModal);
-  document.getElementById('cancelar-subida')?.addEventListener('click', cerrarModal);
-  document.getElementById('confirmar-subida')?.addEventListener('click', subirConstancia);
-  
-  // File input
-  const fileInput = document.getElementById('file-input');
-  fileInput?.addEventListener('change', manejarSeleccionArchivo);
-  
-  // Drag & Drop
-  const uploadArea = document.getElementById('upload-area');
-  uploadArea?.addEventListener('dragover', manejarDragOver);
-  uploadArea?.addEventListener('dragleave', manejarDragLeave);
-  uploadArea?.addEventListener('drop', manejarDrop);
-  uploadArea?.addEventListener('click', () => fileInput?.click());
-  
-  // Botones de acciones
+  // 🔥 SOLO BOTÓN DE DESCARGA (sin subir ni eliminar)
   document.getElementById('btn-descargar')?.addEventListener('click', descargarConstancia);
-  document.getElementById('btn-eliminar')?.addEventListener('click', eliminarConstancia);
-  
-  // Cerrar modal al hacer clic fuera
-  document.getElementById('modal-subir-constancia')?.addEventListener('click', function(e) {
-    if (e.target === this) cerrarModal();
-  });
 }
 
-function abrirModalSubida() {
-  document.getElementById('modal-subir-constancia').style.display = 'flex';
-  limpiarFormulario();
-}
-
-function cerrarModal() {
-  document.getElementById('modal-subir-constancia').style.display = 'none';
-  limpiarFormulario();
-}
-
-function limpiarFormulario() {
-  archivoSeleccionado = null;
-  document.getElementById('file-input').value = '';
-  document.getElementById('file-info').style.display = 'none';
-  document.getElementById('confirmar-subida').disabled = true;
-  
-  const uploadArea = document.getElementById('upload-area');
-  uploadArea.style.borderColor = '#ddd';
-  uploadArea.style.background = '#fafafa';
-}
-
-function manejarDragOver(e) {
-  e.preventDefault();
-  const uploadArea = e.currentTarget;
-  uploadArea.style.borderColor = '#FF6F00';
-  uploadArea.style.background = '#fff8f0';
-}
-
-function manejarDragLeave(e) {
-  e.preventDefault();
-  const uploadArea = e.currentTarget;
-  uploadArea.style.borderColor = '#ddd';
-  uploadArea.style.background = '#fafafa';
-}
-
-function manejarDrop(e) {
-  e.preventDefault();
-  const uploadArea = e.currentTarget;
-  uploadArea.style.borderColor = '#ddd';
-  uploadArea.style.background = '#fafafa';
-  
-  const files = e.dataTransfer.files;
-  if (files.length > 0) {
-    procesarArchivo(files[0]);
-  }
-}
-
-function manejarSeleccionArchivo(e) {
-  const file = e.target.files[0];
-  if (file) {
-    procesarArchivo(file);
-  }
-}
-
-function procesarArchivo(file) {
-  // Validar que sea PDF
-  if (file.type !== 'application/pdf') {
-    mostrarAlerta('Error', 'Solo se permiten archivos PDF', 'error');
-    return;
-  }
-  
-  // Validar tamaño (máximo 10MB)
-  if (file.size > 10 * 1024 * 1024) {
-    mostrarAlerta('Error', 'El archivo no puede ser mayor a 10MB', 'error');
-    return;
-  }
-  
-  archivoSeleccionado = file;
-  mostrarInfoArchivo(file);
-  
-  // Habilitar botón con estilos
-  const btnConfirmar = document.getElementById('confirmar-subida');
-  btnConfirmar.disabled = false;
-  btnConfirmar.style.opacity = '1';
-  btnConfirmar.style.cursor = 'pointer';
-  btnConfirmar.onmouseover = function() { this.style.background = '#e55f00'; };
-  btnConfirmar.onmouseout = function() { this.style.background = '#FF6F00'; };
-}
-
-function mostrarInfoArchivo(file) {
-  const fileInfo = document.getElementById('file-info');
-  const fileName = document.getElementById('selected-file-name');
-  const fileSize = document.getElementById('selected-file-size');
-  
-  fileName.textContent = file.name;
-  fileSize.textContent = `Tamaño: ${formatearTamaño(file.size)}`;
-  fileInfo.style.display = 'block';
-}
-
-function formatearTamaño(bytes) {
-  if (bytes === 0) return '0 Bytes';
-  const k = 1024;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-}
-
-async function subirConstancia() {
-  if (!archivoSeleccionado) return;
-  
+// 🔥 FUNCIÓN MODIFICADA PARA CARGAR DESDE SUPABASE
+async function verificarConstanciaExistente() {
   try {
-    // Mostrar loading
-    const btnConfirmar = document.getElementById('confirmar-subida');
-    const textoOriginal = btnConfirmar.innerHTML;
-    btnConfirmar.innerHTML = '<i class="ri-loader-4-line" style="animation: spin 1s linear infinite;"></i> Subiendo...';
-    btnConfirmar.disabled = true;
-    
-    // Convertir archivo a base64 para almacenar en localStorage
-    const base64 = await convertirABase64(archivoSeleccionado);
-    
-    const constanciaData = {
-      nombre: archivoSeleccionado.name,
-      tamaño: archivoSeleccionado.size,
-      tipo: archivoSeleccionado.type,
-      fechaCarga: new Date().toISOString(),
-      contenido: base64
-    };
-    
-    // Guardar en localStorage
-    localStorage.setItem('constancia_fiscal', JSON.stringify(constanciaData));
-    
-    setTimeout(() => {
-      mostrarAlerta('Éxito', 'Constancia subida correctamente', 'success');
-      cerrarModal();
-      mostrarConstancia(constanciaData);
-    }, 1000);
-    
-  } catch (error) {
-    console.error('Error al subir constancia:', error);
-    mostrarAlerta('Error', 'Error al subir la constancia', 'error');
-  }
-}
+    const { data, error } = await supabase
+      .from('constancia_fiscal')
+      .select('*')
+      .eq('id', 1)
+      .single();
 
-function convertirABase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = error => reject(error);
-  });
-}
-
-function verificarConstanciaExistente() {
-  const constanciaGuardada = localStorage.getItem('constancia_fiscal');
-  
-  if (constanciaGuardada) {
-    try {
-      const constanciaData = JSON.parse(constanciaGuardada);
-      mostrarConstancia(constanciaData);
-    } catch (error) {
+    if (error && error.code !== 'PGRST116') { // PGRST116 = no encontrado
       console.error('Error al cargar constancia:', error);
       mostrarEstadoSinConstancia();
+      return;
     }
-  } else {
+
+    if (data) {
+      console.log('Constancia encontrada:', data);
+      
+      // Obtener URL pública del archivo
+      const { data: urlData } = supabase.storage
+        .from('constancias-fiscales')
+        .getPublicUrl(data.ruta_storage);
+
+      const constanciaData = {
+        nombre: data.nombre_archivo,
+        tamaño: data.tamaño_archivo,
+        tipo: data.tipo_archivo,
+        fechaCarga: data.fecha_carga,
+        contenido: urlData.publicUrl // URL pública del archivo
+      };
+      
+      mostrarConstancia(constanciaData);
+    } else {
+      console.log('No hay constancia guardada');
+      mostrarEstadoSinConstancia();
+    }
+  } catch (error) {
+    console.error('Error al verificar constancia:', error);
     mostrarEstadoSinConstancia();
   }
 }
@@ -224,7 +88,7 @@ function mostrarConstancia(constanciaData) {
     minute: '2-digit'
   });
   
-  // Cargar PDF en iframe
+  // Cargar PDF en iframe usando la URL pública
   const iframe = document.getElementById('pdf-iframe');
   iframe.src = constanciaData.contenido;
 }
@@ -234,33 +98,47 @@ function mostrarEstadoSinConstancia() {
   document.getElementById('no-constancia').style.display = 'block';
 }
 
-function descargarConstancia() {
-  const constanciaGuardada = localStorage.getItem('constancia_fiscal');
-  
-  if (constanciaGuardada) {
-    try {
-      const constanciaData = JSON.parse(constanciaGuardada);
-      
-      const link = document.createElement('a');
-      link.href = constanciaData.contenido;
-      link.download = constanciaData.nombre;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      mostrarAlerta('Éxito', 'Constancia descargada correctamente', 'success');
-    } catch (error) {
+// 🔥 FUNCIÓN MODIFICADA PARA DESCARGAR DESDE SUPABASE
+async function descargarConstancia() {
+  try {
+    // Obtener metadatos
+    const { data: metadata, error: dbError } = await supabase
+      .from('constancia_fiscal')
+      .select('*')
+      .eq('id', 1)
+      .single();
+
+    if (dbError || !metadata) {
+      mostrarAlerta('Error', 'No se encontró la constancia', 'error');
+      return;
+    }
+
+    // Descargar desde Storage
+    const { data, error } = await supabase.storage
+      .from('constancias-fiscales')
+      .download(metadata.ruta_storage);
+
+    if (error) {
       console.error('Error al descargar:', error);
       mostrarAlerta('Error', 'Error al descargar la constancia', 'error');
+      return;
     }
-  }
-}
 
-function eliminarConstancia() {
-  if (confirm('¿Estás seguro de que deseas eliminar la constancia? Esta acción no se puede deshacer.')) {
-    localStorage.removeItem('constancia_fiscal');
-    mostrarEstadoSinConstancia();
-    mostrarAlerta('Éxito', 'Constancia eliminada correctamente', 'success');
+    // Crear enlace de descarga
+    const url = window.URL.createObjectURL(data);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = metadata.nombre_archivo;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+
+    mostrarAlerta('Éxito', 'Constancia descargada correctamente', 'success');
+  } catch (error) {
+    console.error('Error al descargar constancia:', error);
+    mostrarAlerta('Error', 'Error al descargar la constancia', 'error');
   }
 }
 

@@ -1,3 +1,5 @@
+import { supabase } from '../../supabase/db.js';
+
 let archivoSeleccionado = null;
 
 // Verificación de sesión
@@ -14,39 +16,73 @@ function verificarSesion() {
 document.addEventListener('DOMContentLoaded', function() {
   if (!verificarSesion()) return;
   
-  inicializarEventos();
-  verificarConstanciaExistente();
+  // Solo inicializar una vez
+  if (!window.constanciaInicializada) {
+    inicializarEventos();
+    verificarConstanciaExistente();
+    window.constanciaInicializada = true;
+  }
 });
 
 function inicializarEventos() {
-  // Botones para abrir modal
-  document.getElementById('btn-subir-constancia')?.addEventListener('click', abrirModalSubida);
-  document.getElementById('btn-subir-inicial')?.addEventListener('click', abrirModalSubida);
+  // 🔥 REMOVER LISTENERS EXISTENTES ANTES DE AGREGAR NUEVOS
+  const btnSubirConstancia = document.getElementById('btn-subir-constancia');
+  const btnSubirInicial = document.getElementById('btn-subir-inicial');
+  const cerrarModalBtn = document.getElementById('cerrar-modal-constancia');
+  const cancelarBtn = document.getElementById('cancelar-subida');
+  const confirmarBtn = document.getElementById('confirmar-subida');
+  const fileInput = document.getElementById('file-input');
+  const uploadArea = document.getElementById('upload-area');
+  
+  // Limpiar event listeners existentes
+  if (btnSubirConstancia) {
+    btnSubirConstancia.replaceWith(btnSubirConstancia.cloneNode(true));
+    document.getElementById('btn-subir-constancia').addEventListener('click', abrirModalSubida);
+  }
+  
+  if (btnSubirInicial) {
+    btnSubirInicial.replaceWith(btnSubirInicial.cloneNode(true));
+    document.getElementById('btn-subir-inicial').addEventListener('click', abrirModalSubida);
+  }
   
   // Modal eventos
-  document.getElementById('cerrar-modal-constancia')?.addEventListener('click', cerrarModal);
-  document.getElementById('cancelar-subida')?.addEventListener('click', cerrarModal);
-  document.getElementById('confirmar-subida')?.addEventListener('click', subirConstancia);
+  cerrarModalBtn?.addEventListener('click', cerrarModal);
+  cancelarBtn?.addEventListener('click', cerrarModal);
+  
+  if (confirmarBtn) {
+    confirmarBtn.replaceWith(confirmarBtn.cloneNode(true));
+    document.getElementById('confirmar-subida').addEventListener('click', subirConstancia);
+  }
   
   // File input
-  const fileInput = document.getElementById('file-input');
-  fileInput?.addEventListener('change', manejarSeleccionArchivo);
+  if (fileInput) {
+    fileInput.replaceWith(fileInput.cloneNode(true));
+    document.getElementById('file-input').addEventListener('change', manejarSeleccionArchivo);
+  }
   
-  // Drag & Drop
-  const uploadArea = document.getElementById('upload-area');
-  uploadArea?.addEventListener('dragover', manejarDragOver);
-  uploadArea?.addEventListener('dragleave', manejarDragLeave);
-  uploadArea?.addEventListener('drop', manejarDrop);
-  uploadArea?.addEventListener('click', () => fileInput?.click());
-  
-  // Botones de acciones
-  document.getElementById('btn-descargar')?.addEventListener('click', descargarConstancia);
-  document.getElementById('btn-eliminar')?.addEventListener('click', eliminarConstancia);
+  // 🔥 UPLOAD AREA - SOLO UN LISTENER
+  if (uploadArea) {
+    uploadArea.replaceWith(uploadArea.cloneNode(true));
+    const newUploadArea = document.getElementById('upload-area');
+    
+    newUploadArea.addEventListener('dragover', manejarDragOver);
+    newUploadArea.addEventListener('dragleave', manejarDragLeave);
+    newUploadArea.addEventListener('drop', manejarDrop);
+    
+    // 🔥 SOLO UN CLICK LISTENER AQUÍ
+    newUploadArea.addEventListener('click', () => {
+      document.getElementById('file-input').click();
+    });
+  }
   
   // Cerrar modal al hacer clic fuera
-  document.getElementById('modal-subir-constancia')?.addEventListener('click', function(e) {
-    if (e.target === this) cerrarModal();
-  });
+  const modal = document.getElementById('modal-subir-constancia');
+  if (modal) {
+    modal.replaceWith(modal.cloneNode(true));
+    document.getElementById('modal-subir-constancia').addEventListener('click', function(e) {
+      if (e.target === this) cerrarModal();
+    });
+  }
 }
 
 function abrirModalSubida() {
@@ -146,6 +182,7 @@ function formatearTamaño(bytes) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
+// 🔥 FUNCIÓN MODIFICADA PARA USAR SUPABASE STORAGE
 async function subirConstancia() {
   if (!archivoSeleccionado) return;
   
@@ -156,53 +193,122 @@ async function subirConstancia() {
     btnConfirmar.innerHTML = '<i class="ri-loader-4-line" style="animation: spin 1s linear infinite;"></i> Subiendo...';
     btnConfirmar.disabled = true;
     
-    // Convertir archivo a base64 para almacenar en localStorage
-    const base64 = await convertirABase64(archivoSeleccionado);
+    // Generar nombre único para el archivo
+    const nombreArchivo = `constancia-fiscal-${Date.now()}.pdf`;
     
-    const constanciaData = {
-      nombre: archivoSeleccionado.name,
-      tamaño: archivoSeleccionado.size,
-      tipo: archivoSeleccionado.type,
-      fechaCarga: new Date().toISOString(),
-      contenido: base64
-    };
+    console.log('Subiendo archivo a Storage:', nombreArchivo);
     
-    // Guardar en localStorage
-    localStorage.setItem('constancia_fiscal', JSON.stringify(constanciaData));
+    // 🔥 SUBIR ARCHIVO A SUPABASE STORAGE
+    const { data: storageData, error: storageError } = await supabase.storage
+      .from('constancias-fiscales')
+      .upload(nombreArchivo, archivoSeleccionado, {
+        cacheControl: '3600',
+        upsert: true
+      });
+
+    if (storageError) {
+      console.error('Error al subir a Storage:', storageError);
+      mostrarAlerta('Error', 'Error al subir la constancia: ' + storageError.message, 'error');
+      
+      // Restaurar botón
+      btnConfirmar.innerHTML = textoOriginal;
+      btnConfirmar.disabled = false;
+      return;
+    }
+
+    console.log('Archivo subido exitosamente:', storageData);
+
+    // 🔥 GUARDAR METADATOS EN LA TABLA
+    const { data: dbData, error: dbError } = await supabase
+      .from('constancia_fiscal')
+      .upsert([{
+        id: 1,
+        nombre_archivo: archivoSeleccionado.name,
+        tamaño_archivo: archivoSeleccionado.size,
+        tipo_archivo: archivoSeleccionado.type,
+        ruta_storage: storageData.path,
+        fecha_carga: new Date().toISOString()
+      }], {
+        onConflict: 'id'
+      });
+
+    if (dbError) {
+      console.error('Error al guardar metadatos:', dbError);
+      mostrarAlerta('Error', 'Error al guardar información: ' + dbError.message, 'error');
+      
+      // Restaurar botón
+      btnConfirmar.innerHTML = textoOriginal;
+      btnConfirmar.disabled = false;
+      return;
+    }
+
+    console.log('Metadatos guardados:', dbData);
     
     setTimeout(() => {
+      btnConfirmar.innerHTML = textoOriginal;
+      btnConfirmar.disabled = false;
       mostrarAlerta('Éxito', 'Constancia subida correctamente', 'success');
       cerrarModal();
-      mostrarConstancia(constanciaData);
+      verificarConstanciaExistente(); // Recargar desde Supabase
     }, 1000);
     
   } catch (error) {
-    console.error('Error al subir constancia:', error);
-    mostrarAlerta('Error', 'Error al subir la constancia', 'error');
+    console.error('Error general al subir constancia:', error);
+    mostrarAlerta('Error', 'Error al subir la constancia: ' + error.message, 'error');
+    
+    // Restaurar botón
+    const btnConfirmar = document.getElementById('confirmar-subida');
+    btnConfirmar.innerHTML = '<i class="ri-upload-2-line"></i> Confirmar';
+    btnConfirmar.disabled = false;
   }
 }
 
-function convertirABase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = error => reject(error);
-  });
-}
+// 🔥 FUNCIÓN ALTERNATIVA: Leer directo de Storage
+async function verificarConstanciaExistente() {
+  try {
+    console.log('🔍 Buscando archivos en Storage...');
+    
+    // Listar archivos en el bucket
+    const { data: files, error } = await supabase.storage
+      .from('constancias-fiscales')
+      .list('', {
+        limit: 1,
+        sortBy: { column: 'created_at', order: 'desc' }
+      });
 
-function verificarConstanciaExistente() {
-  const constanciaGuardada = localStorage.getItem('constancia_fiscal');
-  
-  if (constanciaGuardada) {
-    try {
-      const constanciaData = JSON.parse(constanciaGuardada);
+    console.log('📊 Archivos encontrados:', files, error);
+
+    if (error) {
+      console.error('❌ Error al listar archivos:', error);
+      mostrarEstadoSinConstancia();
+      return;
+    }
+
+    if (files && files.length > 0) {
+      const archivo = files[0];
+      console.log('✅ Archivo encontrado:', archivo);
+      
+      // Obtener URL pública
+      const { data: urlData } = supabase.storage
+        .from('constancias-fiscales')
+        .getPublicUrl(archivo.name);
+
+      const constanciaData = {
+        nombre: archivo.name,
+        tamaño: archivo.metadata?.size || 0,
+        tipo: archivo.metadata?.mimetype || 'application/pdf',
+        fechaCarga: archivo.created_at,
+        contenido: urlData.publicUrl
+      };
+      
+      console.log('📄 Datos a mostrar:', constanciaData);
       mostrarConstancia(constanciaData);
-    } catch (error) {
-      console.error('Error al cargar constancia:', error);
+    } else {
+      console.log('❌ No hay archivos en Storage');
       mostrarEstadoSinConstancia();
     }
-  } else {
+  } catch (error) {
+    console.error('💥 Error general:', error);
     mostrarEstadoSinConstancia();
   }
 }
@@ -224,7 +330,7 @@ function mostrarConstancia(constanciaData) {
     minute: '2-digit'
   });
   
-  // Cargar PDF en iframe
+  // Cargar PDF en iframe usando la URL pública
   const iframe = document.getElementById('pdf-iframe');
   iframe.src = constanciaData.contenido;
 }
@@ -234,33 +340,86 @@ function mostrarEstadoSinConstancia() {
   document.getElementById('no-constancia').style.display = 'block';
 }
 
-function descargarConstancia() {
-  const constanciaGuardada = localStorage.getItem('constancia_fiscal');
-  
-  if (constanciaGuardada) {
-    try {
-      const constanciaData = JSON.parse(constanciaGuardada);
-      
-      const link = document.createElement('a');
-      link.href = constanciaData.contenido;
-      link.download = constanciaData.nombre;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      mostrarAlerta('Éxito', 'Constancia descargada correctamente', 'success');
-    } catch (error) {
+// 🔥 FUNCIÓN MODIFICADA PARA DESCARGAR DESDE SUPABASE
+async function descargarConstancia() {
+  try {
+    // Obtener metadatos
+    const { data: metadata, error: dbError } = await supabase
+      .from('constancia_fiscal')
+      .select('*')
+      .eq('id', 1)
+      .single();
+
+    if (dbError || !metadata) {
+      mostrarAlerta('Error', 'No se encontró la constancia', 'error');
+      return;
+    }
+
+    // Descargar desde Storage
+    const { data, error } = await supabase.storage
+      .from('constancias-fiscales')
+      .download(metadata.ruta_storage);
+
+    if (error) {
       console.error('Error al descargar:', error);
       mostrarAlerta('Error', 'Error al descargar la constancia', 'error');
+      return;
     }
+
+    // Crear enlace de descarga
+    const url = window.URL.createObjectURL(data);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = url;
+    a.download = metadata.nombre_archivo;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+
+    mostrarAlerta('Éxito', 'Constancia descargada correctamente', 'success');
+  } catch (error) {
+    console.error('Error al descargar constancia:', error);
+    mostrarAlerta('Error', 'Error al descargar la constancia', 'error');
   }
 }
 
-function eliminarConstancia() {
+// 🔥 FUNCIÓN MODIFICADA PARA ELIMINAR DE SUPABASE
+async function eliminarConstancia() {
   if (confirm('¿Estás seguro de que deseas eliminar la constancia? Esta acción no se puede deshacer.')) {
-    localStorage.removeItem('constancia_fiscal');
-    mostrarEstadoSinConstancia();
-    mostrarAlerta('Éxito', 'Constancia eliminada correctamente', 'success');
+    try {
+      // Obtener ruta del archivo
+      const { data: metadata } = await supabase
+        .from('constancia_fiscal')
+        .select('ruta_storage')
+        .eq('id', 1)
+        .single();
+
+      if (metadata && metadata.ruta_storage) {
+        // Eliminar archivo de Storage
+        await supabase.storage
+          .from('constancias-fiscales')
+          .remove([metadata.ruta_storage]);
+      }
+
+      // Eliminar metadatos de la tabla
+      const { error } = await supabase
+        .from('constancia_fiscal')
+        .delete()
+        .eq('id', 1);
+
+      if (error) {
+        console.error('Error al eliminar:', error);
+        mostrarAlerta('Error', 'Error al eliminar la constancia', 'error');
+        return;
+      }
+
+      mostrarEstadoSinConstancia();
+      mostrarAlerta('Éxito', 'Constancia eliminada correctamente', 'success');
+    } catch (error) {
+      console.error('Error al eliminar constancia:', error);
+      mostrarAlerta('Error', 'Error al eliminar la constancia', 'error');
+    }
   }
 }
 
