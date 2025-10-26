@@ -308,7 +308,7 @@
 
     <form id="form-asignar-presupuesto">
       <div class="modal-form-group" style="margin-bottom:24px;">
-        <label for="presupuesto-actual" style="font-weight:600; color:#276080; margin-bottom:8px; display:block;">Presupuesto ($USD)</label>
+        <label for="presupuesto-actual" style="font-weight:600; color:#276080; margin-bottom:8px; display:block;">Presupuesto</label>
         <input type="number" id="presupuesto-actual" name="presupuesto" step="0.01" min="0" required
                style="width:100%; padding:12px; border:1.5px solid #ececec; border-radius:8px; background:#fff; font-size:1.1em; outline:none; transition:border 0.2s;"
                placeholder="Ingresa el presupuesto del proyecto">
@@ -344,7 +344,7 @@
     <div style="background:#fff3cd; padding:16px; border-radius:8px; margin-bottom:24px; border-left:4px solid #FF8F00; border:1px solid #ffeaa7;">
       <p style="margin:0; color:#856404; font-weight:600; font-size:0.95em;">
         <i class="ri-information-line" style="margin-right:8px;"></i>
-        Al liberar este proyecto se marcará como liberado y no aparecerá en la lista principal de proyectos activos.
+        Al liberar este proyecto se marcará como liberado y no aparecerá en la lista principal de proyectos activos del usuario.
       </p>
     </div>
 
@@ -388,11 +388,11 @@
           <input type="text" id="cliente" name="cliente" required>
         </div>
         <div class="modal-form-group">
-          <label for="nombre">Nombre del proyecto</label>
+          <label for="nombre">Id</label>
           <input type="text" id="nombre" name="nombre" required>
         </div>
         <div class="modal-form-group">
-          <label for="descripcion">Descripción</label>
+          <label for="descripcion">Nombre</label>
           <textarea id="descripcion" name="descripcion" rows="2"></textarea>
         </div>
         <div class="modal-form-group">
@@ -431,8 +431,12 @@
           <input type="text" id="editar-cliente" name="cliente" required />
         </div>
         <div class="modal-form-group">
-          <label for="editar-nombre">Nombre</label>
+          <label for="editar-nombre">Id</label>
           <input type="text" id="editar-nombre" name="nombre" required />
+        </div>
+        <div class="modal-form-group">
+          <label for="descripcion">Nombre</label>
+          <textarea id="descripcion" name="descripcion" rows="2"></textarea>
         </div>
         <div class="modal-form-group">
           <label for="editar-ubicacion">Ubicación</label>

@@ -102,6 +102,7 @@ async function cargarProyectos() {
       const form = document.getElementById('form-editar-proyecto');
       form.cliente.value = proyecto.cliente || '';
       form.nombre.value = proyecto.nombre || '';
+      form.descripcion.value = proyecto.descripción || ''; //
       form.ubicacion.value = proyecto.ubicación || '';
       form.fecha_inicio.value = proyecto.fecha_inicio || '';
       form.fecha_final.value = proyecto.fecha_final || '';
@@ -346,6 +347,7 @@ document.addEventListener('DOMContentLoaded', function() {
       form.cliente.value = proyecto.cliente || '';
       form.nombre.value = proyecto.nombre || '';
       form.ubicacion.value = proyecto.ubicación || '';
+      form.descripcion.value = proyecto.descripción || ''; // 🔥 ESTA LÍNEA
       form.fecha_inicio.value = proyecto.fecha_inicio || '';
       form.fecha_final.value = proyecto.fecha_final || '';
     //  form.responsable.value = proyecto.responsable || '';
@@ -950,12 +952,13 @@ document.getElementById('form-editar-proyecto').addEventListener('submit', async
 
   const cliente = e.target.cliente.value;
   const nombre = e.target.nombre.value;
+  const descripción = e.target.descripcion.value; // 🔥 AGREGAR ESTA LÍNEA
   const ubicación = e.target.ubicacion.value;
   const fecha_inicio = e.target.fecha_inicio.value;
   const fecha_final = e.target.fecha_final.value;
   // const descripción = e.target.descripcion.value;
 
-  const { error } = await actualizarProyecto(id, { cliente, nombre, /*descripción,*/ ubicación, fecha_inicio, fecha_final });
+  const { error } = await actualizarProyecto(id, { cliente, nombre, descripción, ubicación, fecha_inicio, fecha_final });
   if (error) {
     alert('Error al actualizar: ' + error.message);
   } else {

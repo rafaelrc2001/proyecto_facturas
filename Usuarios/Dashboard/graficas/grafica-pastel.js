@@ -29,7 +29,8 @@ async function cargarPastelDesdeSupabase(projectId = null) {
           .from('proyecto')
           .select('id_proyecto')
           .in('id_proyecto', ids)
-          .eq('visibilidad', true);
+          .eq('visibilidad', true)
+          .eq('liberar', false);
         if (visErr) { console.error('[pastel] error proyectos visibles:', visErr); return; }
         const visibleIds = (visibleProjs || []).map(p => Number(p.id_proyecto));
         if (!visibleIds.length) {

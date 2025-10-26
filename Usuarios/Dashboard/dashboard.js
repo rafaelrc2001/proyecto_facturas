@@ -58,16 +58,32 @@ let projectsList = [];  // ['Proyecto X', ...]
 async function cargarDatosDashboard() {
   try {
     const idTrabajador = getIdTrabajador();
-
-    // Si es trabajador (no admin) usamos los proyectos asignados y visibles
+    
     if (idTrabajador && !isAdmin()) {
-      // obtener proyectos asignados
-      const { data: asigns, error: asignErr } = await supabase
+      // 🔥 AGREGAR FILTRO DE LIBERAR = FALSE
+      const { data: asignaciones, error: errorAsign } = await supabase
         .from('asignar_proyecto')
-        .select('id_proyecto')
-        .eq('id_trabajador', Number(idTrabajador));
-      if (asignErr) { console.error('Error cargando asignaciones:', asignErr); registrosOriginales = []; return; }
-      const ids = (asigns || []).map(a => Number(a.id_proyecto));
+        .select(`
+          id_proyecto,
+          proyecto!inner(
+            id_proyecto,
+            cliente,
+            nombre,
+            descripción,
+            ubicación,
+            presupuesto,
+            fecha_inicio,
+            fecha_final,
+            visibilidad,
+            liberar
+          )
+        `)
+        .eq('id_trabajador', idTrabajador)
+        .eq('proyecto.visibilidad', true)
+        .eq('proyecto.liberar', false);  // 🔥 AGREGAR ESTA LÍNEA
+
+      if (errorAsign) { console.error('Error cargando asignaciones:', errorAsign); registrosOriginales = []; return; }
+      const ids = (asignaciones || []).map(a => Number(a.id_proyecto));
       if (!ids.length) { registrosOriginales = []; return; }
 
       // filtrar solo proyectos visibles entre los asignados
@@ -75,7 +91,8 @@ async function cargarDatosDashboard() {
         .from('proyecto')
         .select('id_proyecto')
         .in('id_proyecto', ids)
-        .eq('visibilidad', true);
+        .eq('visibilidad', true)
+        .eq('liberar', false);
       if (visErr) { console.error('Error cargando proyectos visibles:', visErr); registrosOriginales = []; return; }
       const visibleIds = (visibleProjs || []).map(p => Number(p.id_proyecto));
       if (!visibleIds.length) { registrosOriginales = []; return; }
@@ -398,7 +415,8 @@ async function cargarKPIsSupabase(projectId = null) {
         .from('proyecto')
         .select('presupuesto')
         .eq('id_proyecto', projectId)
-        .eq('visibilidad', true);
+        .eq('visibilidad', true)
+        .eq('liberar', false);
     } else if (idTrabajador && !isAdmin()) {
       const { data: asigns, error: asignErr } = await supabase
         .from('asignar_proyecto')
@@ -418,14 +436,16 @@ async function cargarKPIsSupabase(projectId = null) {
             .from('proyecto')
             .select('presupuesto')
             .in('id_proyecto', ids)
-            .eq('visibilidad', true);
+            .eq('visibilidad', true)
+            .eq('liberar', false);
         }
       }
     } else {
       queryPresupuestos = supabase
         .from('proyecto')
         .select('presupuesto')
-        .eq('visibilidad', true);
+        .eq('visibilidad', true)
+        .eq('liberar', false);
     }
 
     // Ejecutar consulta de presupuestos
@@ -478,7 +498,8 @@ async function cargarKPIsSupabase(projectId = null) {
         .from('proyecto')
         .select('id_proyecto')
         .in('id_proyecto', ids)
-        .eq('visibilidad', true);
+        .eq('visibilidad', true)
+        .eq('liberar', false);
       if (visErr) { 
         console.error('[KPIs] error proyectos visibles:', visErr); 
         calcularYSetearKPIs([], totalPresupuestos); 
@@ -546,14 +567,16 @@ async function cargarProyectosSupabase() {
         .from('proyecto')
         .select('id_proyecto, nombre')
         .in('id_proyecto', ids)
-        .eq('visibilidad', true);
+        .eq('visibilidad', true)
+        .eq('liberar', false);
       if (error) { console.error('Error cargando proyectos:', error); return; }
       proyectos = data || [];
     } else {
       const { data, error } = await supabase
         .from('proyecto')
         .select('id_proyecto, nombre')
-        .eq('visibilidad', true);
+        .eq('visibilidad', true)
+        .eq('liberar', false);
       if (error) { console.error('Error cargando proyectos:', error); return; }
       proyectos = data || [];
     }

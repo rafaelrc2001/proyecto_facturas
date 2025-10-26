@@ -53,7 +53,8 @@ async function cargarProyectos() {
         .from('proyecto')
         .select('*')
         .in('id_proyecto', ids)
-        .eq('visibilidad', true);
+        .eq('visibilidad', true)
+        .eq('liberar', false);
       if (error) throw error;
       proyectos = data || [];
     } else {
@@ -61,7 +62,8 @@ async function cargarProyectos() {
       const { data, error } = await supabase
         .from('proyecto')
         .select('*')
-        .eq('visibilidad', true);
+        .eq('visibilidad', true)
+        .eq('liberar', false);
       if (error) throw error;
       proyectos = data || [];
     }

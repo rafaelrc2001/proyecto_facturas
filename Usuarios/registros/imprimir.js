@@ -427,7 +427,9 @@ async function cargarProyectosNombres() {
     const { data: trabajadoresData } = await supabase
       .from('trabajador')
       .select('id_trabajador, nombre')
-      .eq('visibilidad', true);
+      .eq('visibilidad', true)
+      .eq('liberar', false)
+      ;
     const trabajadores = trabajadoresData || [];
     const trabajadorMap = {};
     trabajadores.forEach(t => { trabajadorMap[String(t.id_trabajador)] = t.nombre || ''; });
@@ -484,7 +486,8 @@ async function cargarRegistrosSupabase() {
         .from('proyecto')
         .select('id_proyecto')
         .in('id_proyecto', ids)
-        .eq('visibilidad', true);
+        .eq('visibilidad', true)
+        .eq('liberar', false);
 
       if (visErr) throw visErr;
       const visibleIds = (visibleProjs || []).map(p => p.id_proyecto);

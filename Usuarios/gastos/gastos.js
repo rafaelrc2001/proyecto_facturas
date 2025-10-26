@@ -110,7 +110,8 @@ async function cargarGastos(projectId = undefined) {
         .from('proyecto')
         .select('id_proyecto')
         .in('id_proyecto', ids)
-        .eq('visibilidad', true);
+        .eq('visibilidad', true)
+        .eq('liberar', false);
 
       if (visErr) {
         console.error('[gastos] error al consultar proyectos visibles:', visErr);
@@ -303,7 +304,8 @@ async function cargarProyectosInfo() {
         .from('proyecto')
         .select('id_proyecto, nombre')
         .in('id_proyecto', ids)
-        .eq('visibilidad', true);
+        .eq('visibilidad', true)
+        .eq('liberar', false);;
       proyectosInfo = data || [];
     } else {
       const { data } = await supabase.from('proyecto').select('id_proyecto, nombre').eq('visibilidad', true);

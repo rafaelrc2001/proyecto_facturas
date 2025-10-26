@@ -629,7 +629,9 @@ async function cargarPagoChartDesdeSupabase(projectId = null) {
           .from('proyecto')
           .select('id_proyecto')
           .in('id_proyecto', ids)
-          .eq('visibilidad', true);
+          .eq('visibilidad', true)
+          .eq('liberar', false);
+
         if (visErr) { console.error('[barra] error proyectos visibles:', visErr); return; }
         const visibleIds = (visibleProjs || []).map(p => Number(p.id_proyecto));
         if (!visibleIds.length) { console.warn('[barra] no hay proyectos visibles asignados'); return; }
