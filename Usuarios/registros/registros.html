@@ -55,6 +55,12 @@
                   <span>Gastos</span>
                 </a>
             </li>
+             <li >
+              <a href="../constancia/constancia.html">
+               <i class="ri-file-shield-2-line"></i>
+                <span>Constancia</span>
+              </a>
+            </li>
             <li >
                 <a href="../proyectos/proyectos.html">
                   <i class="ri-folder-2-line"></i>
@@ -153,6 +159,21 @@
                     <div class="autocomplete-container" id="imprimir-autocomplete-container">
                       <input type="text" id="imprimir-proyecto-autocomplete" placeholder="Filtrar por proyecto..." autocomplete="off" />
                       <div id="imprimir-autocomplete-list" class="autocomplete-list"></div>
+                    </div>
+                    
+                    <!-- 🔥 AGREGAR ESTOS FILTROS DE FECHA AQUÍ -->
+                    <div class="filtros-fecha" style="display: flex; gap: 12px; align-items: center; margin-left: 16px;">
+                      <div class="filtro-fecha-grupo">
+                        <label for="fecha-desde" style="font-size: 0.9em; color: #276080; font-weight: 600; margin-right: 6px;">Desde:</label>
+                        <input type="date" id="fecha-desde" style="padding: 8px 12px; border: 1.5px solid #ececec; border-radius: 6px; font-size: 0.95em;">
+                      </div>
+                      <div class="filtro-fecha-grupo">
+                        <label for="fecha-hasta" style="font-size: 0.9em; color: #276080; font-weight: 600; margin-right: 6px;">Hasta:</label>
+                        <input type="date" id="fecha-hasta" style="padding: 8px 12px; border: 1.5px solid #ececec; border-radius: 6px; font-size: 0.95em;">
+                      </div>
+                      <button id="limpiar-fechas" style="padding: 8px 12px; background: #f7f8f6; border: 1.5px solid #ececec; border-radius: 6px; cursor: pointer; color: #276080;" title="Limpiar filtros de fecha">
+                        <i class="ri-close-line"></i>
+                      </button>
                     </div>
                   </div>
                   <button class="btn primary" id="imprimir-descargar-csv">
