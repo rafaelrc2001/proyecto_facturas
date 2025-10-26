@@ -437,12 +437,26 @@ function formatearFecha(fecha) {
 
 // Genera el HTML de impresión
 function generarHTMLImpresion(registros, proyecto) {
+  // 🔥 OBTENER LAS FECHAS SELECCIONADAS
+  const fechaDesde = document.getElementById('fecha-desde')?.value || '';
+  const fechaHasta = document.getElementById('fecha-hasta')?.value || '';
+  
+  // 🔥 CREAR TEXTO DE RANGO DE FECHAS
+  let rangoFechas = '';
+  if (fechaDesde && fechaHasta) {
+    rangoFechas = `Del ${formatearFecha(fechaDesde)} al ${formatearFecha(fechaHasta)}`;
+  } else if (fechaDesde) {
+    rangoFechas = `Desde el ${formatearFecha(fechaDesde)}`;
+  } else if (fechaHasta) {
+    rangoFechas = `Hasta el ${formatearFecha(fechaHasta)}`;
+  }
+
   let html = `
     <div style="font-family:Montserrat,Roboto,sans-serif; color:#003B5C; padding:24px;">
       <div style="display:flex; align-items:center; gap:12px; margin-bottom:24px;">
-
-      <div>
+        <div>
           <h2 style="margin:0; font-size:1.5em;">Registros de Facturas y Tickets</h2>
+          ${rangoFechas ? `<p style="font-size:1.1em; color:#276080; font-weight:600; margin:8px 0;">${rangoFechas}</p>` : ''}
           <div style="font-size:1em; color:#276080;">Sistema INXITE / Gestión de Gastos</div>
         </div>
       </div>

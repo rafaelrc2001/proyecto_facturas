@@ -385,51 +385,138 @@ function actualizarGraficaEstablecimientosTipo(registros) {
 async function cargarKPIsSupabase(projectId = null) {
   try {
     const idTrabajador = getIdTrabajador();
+    
+    // Variables para almacenar los totales
+    let totalPresupuestos = 0;
+    let totalGastos = 0;
 
-    // Si se pide projectId explícito lo usamos inmediatamente
+    // 🔥 CONSULTA PARA OBTENER PRESUPUESTOS (Total Viáticos)
+    let queryPresupuestos;
+    
+    if (projectId) {
+      queryPresupuestos = supabase
+        .from('proyecto')
+        .select('presupuesto')
+        .eq('id_proyecto', projectId)
+        .eq('visibilidad', true);
+    } else if (idTrabajador && !isAdmin()) {
+      const { data: asigns, error: asignErr } = await supabase
+        .from('asignar_proyecto')
+        .select('id_proyecto')
+        .eq('id_trabajador', Number(idTrabajador));
+      
+      if (asignErr) { 
+        console.error('[KPIs] error asigns:', asignErr); 
+        setTextById('tickets-Viaticos', 'Error');
+        setTextById('tickets-viaticos-restantes', 'Error');
+      } else {
+        const ids = (asigns || []).map(a => Number(a.id_proyecto));
+        if (ids.length === 0) {
+          setTextById('tickets-Viaticos', formatCurrency(0));
+        } else {
+          queryPresupuestos = supabase
+            .from('proyecto')
+            .select('presupuesto')
+            .in('id_proyecto', ids)
+            .eq('visibilidad', true);
+        }
+      }
+    } else {
+      queryPresupuestos = supabase
+        .from('proyecto')
+        .select('presupuesto')
+        .eq('visibilidad', true);
+    }
+
+    // Ejecutar consulta de presupuestos
+    if (queryPresupuestos) {
+      const { data: presupuestosData, error: presupuestosError } = await queryPresupuestos;
+      
+      if (presupuestosError) {
+        console.error('[KPIs] error obteniendo presupuestos:', presupuestosError);
+        setTextById('tickets-Viaticos', 'Error');
+        setTextById('tickets-viaticos-restantes', 'Error');
+      } else {
+        totalPresupuestos = (presupuestosData || []).reduce((sum, proyecto) => {
+          return sum + (Number(proyecto.presupuesto) || 0);
+        }, 0);
+        
+        setTextById('tickets-Viaticos', formatCurrency(totalPresupuestos));
+        console.log('[KPIs] Total presupuestos:', totalPresupuestos);
+      }
+    }
+
+    // 🔥 LÓGICA PARA OBTENER GASTOS Y CALCULAR VIÁTICOS RESTANTES
     if (projectId) {
       const { data, error } = await supabase.from('registro').select('importe, tipo').eq('id_proyecto', projectId);
-      if (error) { console.error('[KPIs] error de Supabase:', error); calcularYSetearKPIs([]); return; }
-      calcularYSetearKPIs(data || []);
+      if (error) { 
+        console.error('[KPIs] error de Supabase:', error); 
+        calcularYSetearKPIs([], totalPresupuestos); 
+        return; 
+      }
+      calcularYSetearKPIs(data || [], totalPresupuestos);
       return;
     }
 
-    // Si es trabajador y no admin, limitar a proyectos asignados y visibles
     if (idTrabajador && !isAdmin()) {
       const { data: asigns, error: asignErr } = await supabase
         .from('asignar_proyecto')
         .select('id_proyecto')
         .eq('id_trabajador', Number(idTrabajador));
-      if (asignErr) { console.error('[KPIs] error asigns:', asignErr); calcularYSetearKPIs([]); return; }
+      if (asignErr) { 
+        console.error('[KPIs] error asigns:', asignErr); 
+        calcularYSetearKPIs([], totalPresupuestos); 
+        return; 
+      }
       const ids = (asigns || []).map(a => Number(a.id_proyecto));
-      if (!ids.length) { calcularYSetearKPIs([]); return; }
+      if (!ids.length) { 
+        calcularYSetearKPIs([], totalPresupuestos); 
+        return; 
+      }
 
       const { data: visibleProjs, error: visErr } = await supabase
         .from('proyecto')
         .select('id_proyecto')
         .in('id_proyecto', ids)
         .eq('visibilidad', true);
-      if (visErr) { console.error('[KPIs] error proyectos visibles:', visErr); calcularYSetearKPIs([]); return; }
+      if (visErr) { 
+        console.error('[KPIs] error proyectos visibles:', visErr); 
+        calcularYSetearKPIs([], totalPresupuestos); 
+        return; 
+      }
       const visibleIds = (visibleProjs || []).map(p => Number(p.id_proyecto));
-      if (!visibleIds.length) { calcularYSetearKPIs([]); return; }
+      if (!visibleIds.length) { 
+        calcularYSetearKPIs([], totalPresupuestos); 
+        return; 
+      }
 
       const { data, error } = await supabase
         .from('registro')
         .select('importe, tipo')
         .in('id_proyecto', visibleIds);
 
-      if (error) { console.error('[KPIs] error de Supabase:', error); calcularYSetearKPIs([]); return; }
-      calcularYSetearKPIs(data || []);
+      if (error) { 
+        console.error('[KPIs] error de Supabase:', error); 
+        calcularYSetearKPIs([], totalPresupuestos); 
+        return; 
+      }
+      calcularYSetearKPIs(data || [], totalPresupuestos);
       return;
     }
 
     // Caso admin / sin filtro: traer todo
     const { data, error } = await supabase.from('registro').select('importe, tipo');
-    if (error) { console.error('[KPIs] error de Supabase:', error); calcularYSetearKPIs([]); return; }
-    calcularYSetearKPIs(data || []);
+    if (error) { 
+      console.error('[KPIs] error de Supabase:', error); 
+      calcularYSetearKPIs([], totalPresupuestos); 
+      return; 
+    }
+    calcularYSetearKPIs(data || [], totalPresupuestos);
   } catch (err) {
     console.error('[KPIs] excepción:', err);
-    calcularYSetearKPIs([]);
+    calcularYSetearKPIs([], 0);
+    setTextById('tickets-Viaticos', 'Error');
+    setTextById('tickets-viaticos-restantes', 'Error');
   }
 }
 
@@ -671,13 +758,19 @@ function setTextById(id, text) {
   if (el) el.textContent = text;
 }
 
-function calcularYSetearKPIs(data) {
-  console.log('[KPIs] calcularYSetearKPIs recibidos:', (data || []).length, data?.slice(0,5));
+function calcularYSetearKPIs(data, totalPresupuestos = 0) {
+  console.log('[KPIs] calcularYSetearKPIs recibidos:', (data || []).length, 'presupuestos:', totalPresupuestos);
+  
   if (!data || data.length === 0) {
-    // indicar explícito en DOM para no dejar guiones vacíos
+    // Si no hay gastos registrados
     setTextById('total-gastos', formatCurrency(0));
     setTextById('facturas-gastos', formatCurrency(0));
     setTextById('tickets-gastos', formatCurrency(0));
+    
+    // 🔥 CALCULAR VIÁTICOS RESTANTES: Total Viáticos - Total de Gastos (0)
+    const viaticosRestantes = totalPresupuestos - 0;
+    setTextById('tickets-viaticos-restantes', formatCurrency(viaticosRestantes));
+    
     return;
   }
 
@@ -692,7 +785,21 @@ function calcularYSetearKPIs(data) {
   });
 
   const totalSinFacturar = total - totalFacturas;
+
+  // 🔥 CALCULAR VIÁTICOS RESTANTES: Total Viáticos - Total de Gastos
+  const viaticosRestantes = totalPresupuestos - total;
+
+  // Actualizar todos los KPIs
   setTextById('total-gastos', formatCurrency(total));
   setTextById('facturas-gastos', formatCurrency(totalFacturas));
   setTextById('tickets-gastos', formatCurrency(totalSinFacturar));
+  setTextById('tickets-viaticos-restantes', formatCurrency(viaticosRestantes));
+
+  console.log('[KPIs] actualizados:', { 
+    total, 
+    totalFacturas, 
+    totalSinFacturar, 
+    totalPresupuestos, 
+    viaticosRestantes 
+  });
 }

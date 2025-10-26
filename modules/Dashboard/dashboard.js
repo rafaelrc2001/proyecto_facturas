@@ -367,9 +367,12 @@ async function cargarKPIsSupabase(projectId = null) {
       setTextById('total-gastos', 'Error');
       setTextById('facturas-gastos', 'Error');
       setTextById('tickets-gastos', 'Error');
+      setTextById('tickets-Viaticos', 'Error');
+      setTextById('tickets-viaticos-restantes', 'Error');
       return;
     }
 
+    // Consulta de registros
     let query = supabase.from('registro').select('importe, tipo');
     if (projectId) query = query.eq('id_proyecto', projectId);
 
@@ -381,7 +384,30 @@ async function cargarKPIsSupabase(projectId = null) {
       setTextById('total-gastos', 'Error');
       setTextById('facturas-gastos', 'Error');
       setTextById('tickets-gastos', 'Error');
+      setTextById('tickets-Viaticos', 'Error');
+      setTextById('tickets-viaticos-restantes', 'Error');
       return;
+    }
+
+    // 🔥 CONSULTA PARA TOTAL DE PRESUPUESTOS (Total Viáticos)
+    let queryPresupuestos = supabase.from('proyecto').select('presupuesto').eq('visibilidad', true);
+    if (projectId) queryPresupuestos = queryPresupuestos.eq('id_proyecto', projectId);
+
+    const { data: presupuestosData, error: presupuestosError } = await queryPresupuestos;
+    
+    let totalPresupuestos = 0;
+    if (presupuestosError) {
+      console.error('[KPIs] error obteniendo presupuestos:', presupuestosError);
+      setTextById('tickets-Viaticos', 'Error');
+      setTextById('tickets-viaticos-restantes', 'Error');
+    } else {
+      // Calcular total de presupuestos
+      totalPresupuestos = (presupuestosData || []).reduce((sum, proyecto) => {
+        return sum + (Number(proyecto.presupuesto) || 0);
+      }, 0);
+      
+      setTextById('tickets-Viaticos', formatCurrency(totalPresupuestos));
+      console.log('[KPIs] Total presupuestos:', totalPresupuestos);
     }
 
     if (!data || data.length === 0) {
@@ -389,10 +415,13 @@ async function cargarKPIsSupabase(projectId = null) {
       setTextById('total-gastos', '-');
       setTextById('facturas-gastos', '-');
       setTextById('tickets-gastos', '-');
+      // 🔥 CALCULAR VIÁTICOS RESTANTES AUNQUE NO HAYA GASTOS
+      const viaticosRestantes = totalPresupuestos - 0; // 0 gastos
+      setTextById('tickets-viaticos-restantes', formatCurrency(viaticosRestantes));
       return;
     }
 
-    // Nueva lógica: "Sin facturar" = suma de todo lo que NO sea factura
+    // Calcular totales de gastos
     let total = 0;
     let totalFacturas = 0;
 
@@ -407,17 +436,30 @@ async function cargarKPIsSupabase(projectId = null) {
 
     const totalSinFacturar = total - totalFacturas;
 
+    // 🔥 CALCULAR VIÁTICOS RESTANTES: Total Viáticos - Total de Gastos
+    const viaticosRestantes = totalPresupuestos - total;
+
+    // Actualizar todos los KPIs
     setTextById('total-gastos', formatCurrency(total));
     setTextById('facturas-gastos', formatCurrency(totalFacturas));
     setTextById('tickets-gastos', formatCurrency(totalSinFacturar));
+    setTextById('tickets-viaticos-restantes', formatCurrency(viaticosRestantes));
 
-    console.log('[KPIs] actualizados:', { total, totalFacturas, totalSinFacturar });
+    console.log('[KPIs] actualizados:', { 
+      total, 
+      totalFacturas, 
+      totalSinFacturar, 
+      totalPresupuestos, 
+      viaticosRestantes 
+    });
 
   } catch (err) {
     console.error('[KPIs] excepción:', err);
     setTextById('total-gastos', 'Error');
     setTextById('facturas-gastos', 'Error');
     setTextById('tickets-gastos', 'Error');
+    setTextById('tickets-Viaticos', 'Error');
+    setTextById('tickets-viaticos-restantes', 'Error');
   }
 }
 

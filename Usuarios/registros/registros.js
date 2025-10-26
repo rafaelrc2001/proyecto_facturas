@@ -469,12 +469,26 @@ function formatearFecha(fecha) {
 
 // Genera el HTML de impresión
 function generarHTMLImpresion(registros, proyecto) {
+  // 🔥 OBTENER LAS FECHAS SELECCIONADAS (si existen en esta vista)
+  const fechaDesde = document.getElementById('fecha-desde')?.value || '';
+  const fechaHasta = document.getElementById('fecha-hasta')?.value || '';
+  
+  // 🔥 CREAR TEXTO DE RANGO DE FECHAS
+  let rangoFechas = '';
+  if (fechaDesde && fechaHasta) {
+    rangoFechas = `Del ${formatearFecha(fechaDesde)} al ${formatearFecha(fechaHasta)}`;
+  } else if (fechaDesde) {
+    rangoFechas = `Desde el ${formatearFecha(fechaDesde)}`;
+  } else if (fechaHasta) {
+    rangoFechas = `Hasta el ${formatearFecha(fechaHasta)}`;
+  }
+
   let html = `
     <div style="font-family:Montserrat,Roboto,sans-serif; color:#003B5C; padding:24px;">
       <div style="display:flex; align-items:center; gap:12px; margin-bottom:24px;">
-
-      <div>
+        <div>
           <h2 style="margin:0; font-size:1.5em;">Registros de Facturas y Tickets</h2>
+          ${rangoFechas ? `<p style="font-size:1.1em; color:#276080; font-weight:600; margin:8px 0;">${rangoFechas}</p>` : ''}
           <div style="font-size:1em; color:#276080;">Sistema INXITE / Gestión de Gastos</div>
         </div>
       </div>
@@ -482,7 +496,7 @@ function generarHTMLImpresion(registros, proyecto) {
         <table style="margin-bottom:24px; border-collapse:collapse;">
           <tr><td><strong>PROYECTO:</strong></td><td>${proyecto.nombre || ''}</td></tr>
           <tr><td><strong>CLIENTE:</strong></td><td>${proyecto.cliente || ''}</td></tr>
-          <tr><td><strong>UBICACIÓN:</strong></td><td>${proyecto.ubicación || ''}</td></tr> <!-- 🔥 CON TILDE -->
+          <tr><td><strong>UBICACIÓN:</strong></td><td>${proyecto.ubicación || ''}</td></tr>
           <tr><td><strong>INICIO:</strong></td><td>${formatearFecha(proyecto.fecha_inicio)}</td></tr>
           <tr><td><strong>TERMINACIÓN:</strong></td><td>${formatearFecha(proyecto.fecha_final)}</td></tr>
         </table>

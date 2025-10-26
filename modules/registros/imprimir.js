@@ -230,11 +230,26 @@ function mostrarTablasFiltradas(registrosFiltrados, nombreProyecto) {
 
   let proyecto = null;
 
+  // 🔥 OBTENER LAS FECHAS SELECCIONADAS
+  const fechaDesde = document.getElementById('fecha-desde')?.value || '';
+  const fechaHasta = document.getElementById('fecha-hasta')?.value || '';
+  
+  // 🔥 CREAR TEXTO DE RANGO DE FECHAS
+  let rangoFechas = '';
+  if (fechaDesde && fechaHasta) {
+    rangoFechas = `Del ${formatearFecha(fechaDesde)} al ${formatearFecha(fechaHasta)}`;
+  } else if (fechaDesde) {
+    rangoFechas = `Desde el ${formatearFecha(fechaDesde)}`;
+  } else if (fechaHasta) {
+    rangoFechas = `Hasta el ${formatearFecha(fechaHasta)}`;
+  }
+
   if (nombreProyecto) {
     proyecto = proyectosInfo.find(p => p.nombre === nombreProyecto);
     if (proyecto) {
       infoContainer.innerHTML = `
         <h2 style="text-align:center; color:#FF6F00; margin-bottom:18px;">Listado de Facturas y Tickets</h2>
+        ${rangoFechas ? `<p style="text-align:center; font-size:1.1em; color:#276080; font-weight:600; margin-bottom:18px;">${rangoFechas}</p>` : ''}
         <hr style="border:1px solid #FF6F00; margin-bottom:18px;">
         <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
           <div style="flex:1;">
@@ -266,6 +281,7 @@ function mostrarTablasFiltradas(registrosFiltrados, nombreProyecto) {
   } else {
     infoContainer.innerHTML = `
       <h2 style="text-align:center; color:#FF6F00; margin-bottom:18px;">Listado de Facturas y Tickets</h2>
+      ${rangoFechas ? `<p style="text-align:center; font-size:1.1em; color:#276080; font-weight:600; margin-bottom:18px;">${rangoFechas}</p>` : ''}
       <hr style="border:1px solid #FF6F00; margin-bottom:18px;">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
         <div style="flex:1;"></div>
@@ -432,12 +448,26 @@ document.getElementById('formPreguntas').addEventListener('submit', function(e) 
   respuestasPreguntas.respuesta2 = e.target.respuesta2.value;
   document.getElementById('modalPreguntas').style.display = 'none';
 
-  // Genera el documento de impresión incluyendo las respuestas al final
+  // 🔥 OBTENER LAS FECHAS PARA LA IMPRESIÓN
+  const fechaDesde = document.getElementById('fecha-desde')?.value || '';
+  const fechaHasta = document.getElementById('fecha-hasta')?.value || '';
+  
+  let rangoFechas = '';
+  if (fechaDesde && fechaHasta) {
+    rangoFechas = `Del ${formatearFecha(fechaDesde)} al ${formatearFecha(fechaHasta)}`;
+  } else if (fechaDesde) {
+    rangoFechas = `Desde el ${formatearFecha(fechaDesde)}`;
+  } else if (fechaHasta) {
+    rangoFechas = `Hasta el ${formatearFecha(fechaHasta)}`;
+  }
+
+  // Genera el documento de impresión incluyendo las fechas y respuestas al final
   const infoContents = document.getElementById('imprimir-proyecto-info').innerHTML;
   const tableContents = document.getElementById('imprimir-table-container').innerHTML;
   const respuestasHTML = `
     <div style="margin-top:32px; font-size:1.1em;">
-      <strong>Vehiculo Utilizado:</strong> ${respuestasPreguntas.respuesta1}<br>
+      ${rangoFechas ? `<div style="margin-bottom:12px;"><strong>Periodo:</strong> ${rangoFechas}</div>` : ''}
+      <strong>Vehículo Utilizado:</strong> ${respuestasPreguntas.respuesta1}<br>
       <strong>Personal que viaticó:</strong> ${respuestasPreguntas.respuesta2}
     </div>
   `;
