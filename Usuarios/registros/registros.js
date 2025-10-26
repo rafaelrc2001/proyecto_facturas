@@ -1,50 +1,4 @@
 import { supabase } from '../../supabase/db.js';
-import { getIdTrabajador, isAdmin } from '../../supabase/auth.js';
-
-// Añadir: verificación rápida de sesión de trabajador (overlay blanco si no hay id)
-function verificarSesionTrabajador() {
-  const id = getIdTrabajador();
-  // considera null/undefined/'' como no autenticado
-  const noAuth = id === null || id === undefined || String(id).trim() === '';
-  const existing = document.getElementById('login-warning-user');
-
-  if (noAuth) {
-    if (!existing) {
-      const overlay = document.createElement('div');
-      overlay.id = 'login-warning-user';
-      overlay.style.cssText = [
-        'position:fixed',
-        'inset:0',
-        'background:#fff',
-        'z-index:2147483647',
-        'display:flex',
-        'align-items:center',
-        'justify-content:center',
-        'font-size:20px',
-        'color:#000',
-        'padding:20px'
-      ].join(';');
-      overlay.textContent = 'Por favor inicie sesión';
-      document.body.appendChild(overlay);
-      document.documentElement.style.overflow = 'hidden';
-      document.body.style.overflow = 'hidden';
-    }
-    return false;
-  }
-
-  // si ahora está autenticado, quitar overlay si existe
-  if (existing) {
-    existing.remove();
-    document.documentElement.style.overflow = '';
-    document.body.style.overflow = '';
-  }
-  return true;
-}
-
-// Listener precoz que muestra la pantalla blanca si no está autenticado
-document.addEventListener('DOMContentLoaded', () => {
-  verificarSesionTrabajador();
-});
 
 let registroEditando = null;
 let proyectosNombres = [];
@@ -59,22 +13,36 @@ let respuestasPreguntas = {};
 
 // Obtén los nombres de proyectos al cargar la página
 async function cargarProyectosNombres() {
-  // usa helper auth importado arriba
-  const idTrabajador = getIdTrabajador();
+  const idTrabajadorRaw = localStorage.getItem('id_trabajador');
+  const idTrabajador = idTrabajadorRaw ? Number(idTrabajadorRaw) : null;
+  const userRaw = localStorage.getItem('user');
+
+  if (!userRaw) {
+    proyectosInfo = [];
+    proyectosNombres = [];
+    return;
+  }
+
+  const user = JSON.parse(userRaw || '{}');
+
   try {
-    if (idTrabajador && !isAdmin()) {
-      // obtiene proyectos asignados a este trabajador
+    // 🔥 CAMBIO: Si es trabajador, solo sus proyectos asignados
+    if (idTrabajador && user.role === 'trabajador') {
+      // Obtener proyectos asignados a este trabajador
       const { data: asigns, error: asignErr } = await supabase
         .from('asignar_proyecto')
         .select('id_proyecto')
-        .eq('id_trabajador', Number(idTrabajador));
+        .eq('id_trabajador', idTrabajador);
+      
       if (asignErr) throw asignErr;
+      
       const ids = (asigns || []).map(a => a.id_proyecto);
       if (ids.length === 0) {
         proyectosInfo = [];
         proyectosNombres = [];
         return;
       }
+      
       const { data } = await supabase
         .from('proyecto')
         .select('id_proyecto, nombre, cliente, ubicación, fecha_inicio, fecha_final')
@@ -82,185 +50,33 @@ async function cargarProyectosNombres() {
         .eq('visibilidad', true);
       proyectosInfo = data || [];
     } else {
+      // Admin: todos los proyectos
       const { data } = await supabase
         .from('proyecto')
         .select('id_proyecto, nombre, cliente, ubicación, fecha_inicio, fecha_final')
         .eq('visibilidad', true);
       proyectosInfo = data || [];
     }
+    
+    proyectosNombres = proyectosInfo.map(p => p.nombre);
   } catch (err) {
     console.error('Error cargando proyectos:', err);
     proyectosInfo = [];
+    proyectosNombres = [];
   }
-  proyectosNombres = proyectosInfo.map(p => p.nombre);
 }
-document.addEventListener('DOMContentLoaded', cargarProyectosNombres);
+document.addEventListener('DOMContentLoaded', () => {
+  if (!verificarSesion()) return;
+  cargarProyectosNombres();
+});
 
-async function cargarRegistros(projectId = undefined) {
-  // Si caller pidió explícitamente "no resultados"
-  if (projectId === null) {
-    registrosOriginales = [];
-    paginaActual = 1;
-    mostrarRegistrosPaginados(registrosOriginales);
-    return;
-  }
-
-  // Si no hay usuario autenticado => no mostrar nada
-  const userRaw = localStorage.getItem('user');
-  if (!userRaw) {
-    registrosOriginales = [];
-    mostrarRegistrosPaginados(registrosOriginales);
-    return;
-  }
-
-  // NUEVO: si no hay id_trabajador -> NO mostrar registros (como en gastos)
-  const idTrabajador = getIdTrabajador();
-  if (idTrabajador === null) {
-    console.log('[registros] no hay id_trabajador -> no mostrar registros por seguridad');
-    registrosOriginales = [];
-    paginaActual = 1;
-    mostrarRegistrosPaginados(registrosOriginales);
-    return;
-  }
-
-  // Consulta base (ajusta según parámetro projectId)
-  let query = supabase
+async function cargarRegistrosSupabase() {
+  const { data, error } = await supabase
     .from('registro')
-    .select('*')
-    .order('fecha', { ascending: false });
-
-  if (typeof projectId === 'number') {
-    query = query.eq('id_proyecto', Number(projectId));
-  }
-
-  if (idTrabajador && !isAdmin()) {
-    query = query.eq('id_trabajador', idTrabajador);
-  }
-
-  const { data, error } = await query;
-  if (error) {
-    console.error('Error cargando registros:', error);
-    registrosOriginales = [];
-    mostrarRegistrosPaginados(registrosOriginales);
-    return;
-  }
-
+    .select('*');
   registrosOriginales = data || [];
   paginaActual = 1;
   mostrarRegistrosPaginados(registrosOriginales);
-}
-
-async function cargarRegistrosSupabase(projectId = undefined) {
-  console.log('[registros] iniciar cargarRegistrosSupabase, projectId=', projectId);
-
-  // sentinel null -> retornar vacío inmediato
-  if (projectId === null) {
-    registrosOriginales = [];
-    paginaActual = 1;
-    mostrarRegistrosPaginados(registrosOriginales);
-    return;
-  }
-
-  // Si no hay usuario autenticado => no mostrar nada
-  const userRaw = localStorage.getItem('user');
-  if (!userRaw) {
-    registrosOriginales = [];
-    mostrarRegistrosPaginados(registrosOriginales);
-    return;
-  }
-
-  // NUEVO: usar helper y bloquear cuando no exista id_trabajador
-  const idTrabajador = getIdTrabajador();
-  if (idTrabajador === null) {
-    console.log('[registros] no hay id_trabajador -> no mostrar registros (supabase)');
-    registrosOriginales = [];
-    paginaActual = 1;
-    mostrarRegistrosPaginados(registrosOriginales);
-    return;
-  }
-
-  // resto de la función (mantén la lógica existente)
-  const idRaw = localStorage.getItem('id_trabajador');
-  const idTrab = idRaw ? Number(idRaw) : null;
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
-  const isTrabajador = !!(idTrab && user && user.role === 'trabajador');
-
-  console.log('[registros] localStorage id_trabajador:', idRaw, '=> Number:', idTrab, 'user:', user, 'isTrabajador:', isTrabajador);
-
-  try {
-    // Si es trabajador: obtener proyectos asignados y luego registros solo para esos proyectos
-    if (isTrabajador) {
-      const { data: asigns, error: asignErr } = await supabase
-        .from('asignar_proyecto')
-        .select('id_proyecto')
-        .eq('id_trabajador', idTrabajador);
-
-      if (asignErr) {
-        console.error('[registros] error al consultar asignar_proyecto:', asignErr);
-        throw asignErr;
-      }
-
-      const ids = (asigns || []).map(a => a.id_proyecto);
-      console.log('[registros] proyectos asignados (ids):', ids);
-
-      if (!ids || ids.length === 0) {
-        console.log('[registros] no hay proyectos asignados -> mostrar nada');
-        registrosOriginales = [];
-        mostrarRegistrosPaginados(registrosOriginales);
-        return;
-      }
-
-      const { data, error } = await supabase
-        .from('registro')
-        .select('*')
-        .in('id_proyecto', ids)
-        .order('fecha_cargo', { ascending: false });
-
-      if (error) {
-        console.error('[registros] error al consultar registro filtrado:', error);
-        throw error;
-      }
-
-      console.log('[registros] registros filtrados por proyectos asignados, total:', (data || []).length);
-      registrosOriginales = data || [];
-      mostrarRegistrosPaginados(registrosOriginales);
-      return;
-    }
-
-    // Fallback / admin: traer sólo registros de proyectos con visibilidad = true
-    const { data: proyectosVisibles, error: proyectosErr } = await supabase
-      .from('proyecto')
-      .select('id_proyecto')
-      .eq('visibilidad', true);
-
-    if (proyectosErr) {
-      console.error('[registros] error cargando proyectos visibles:', proyectosErr);
-      throw proyectosErr;
-    }
-
-    const proyectosVisiblesIds = (proyectosVisibles || []).map(p => p.id_proyecto);
-    if (!proyectosVisiblesIds.length) {
-      registrosOriginales = [];
-      mostrarRegistrosPaginados(registrosOriginales);
-      return;
-    }
-
-    const { data, error } = await supabase
-      .from('registro')
-      .select('*')
-      .in('id_proyecto', proyectosVisiblesIds)
-      .order('fecha_cargo', { ascending: false });
-
-    if (error) {
-      console.error('[registros] error fallback todos los registros filtrados:', error);
-      throw error;
-    }
-
-    registrosOriginales = data || [];
-    mostrarRegistrosPaginados(registrosOriginales);
-  } catch (err) {
-    console.error('[registros] excepción cargarRegistrosSupabase:', err);
-  }
 }
 
 function mostrarRegistros(data) {
@@ -347,23 +163,23 @@ function mostrarRegistros(data) {
 
   // Contadores
   const total = data.length;
-  const tickets = data.filter(r => r.tipo && r.tipo.toLowerCase() === 'ticket').length;
-  const facturas = data.filter(r => r.tipo && r.tipo.toLowerCase() === 'factura').length;
+  const cfdi = data.filter(r => r.tipo && r.tipo.toLowerCase() === 'cfdi').length;
+  const sinComprobante = data.filter(r => r.tipo && r.tipo.toLowerCase() === 'sin comprobante(ticket o nota)').length;
 
   document.getElementById('total-count').textContent = total;
-  document.getElementById('tickets-count').textContent = tickets;
-  document.getElementById('facturas-count').textContent = facturas;
+  document.getElementById('cfdi-count').textContent = cfdi;
+  document.getElementById('sin-comprobante-count').textContent = sinComprobante;
   document.getElementById('contador-registros').textContent = `Registros Totales: ${data.length}`;
 }
 
 function actualizarContadores() {
   const total = registrosFiltrados.length;
-  const tickets = registrosFiltrados.filter(r => r.tipo && r.tipo.toLowerCase() === 'ticket').length;
-  const facturas = registrosFiltrados.filter(r => r.tipo && r.tipo.toLowerCase() === 'factura').length;
+  const cfdi = registrosFiltrados.filter(r => r.tipo && r.tipo.toLowerCase() === 'cfdi').length;
+  const sinComprobante = registrosFiltrados.filter(r => r.tipo && r.tipo.toLowerCase() === 'sin comprobante(ticket o nota)').length;
 
   document.getElementById('contador-total').textContent = total;
-  document.getElementById('contador-tickets').textContent = tickets;
-  document.getElementById('contador-facturas').textContent = facturas;
+  document.getElementById('contador-cfdi').textContent = cfdi;
+  document.getElementById('contador-sin-comprobante').textContent = sinComprobante;
 }
 
 function mostrarRegistrosPaginados(registros) {
@@ -383,8 +199,8 @@ function mostrarRegistrosPaginados(registros) {
 
   // Actualiza los contadores con el total filtrado
   document.getElementById('total-count').textContent = registros.length;
-  document.getElementById('tickets-count').textContent = registros.filter(r => r.tipo && r.tipo.toLowerCase() === 'ticket').length;
-  document.getElementById('facturas-count').textContent = registros.filter(r => r.tipo && r.tipo.toLowerCase() === 'factura').length;
+  document.getElementById('cfdi-count').textContent = registros.filter(r => r.tipo && r.tipo.toLowerCase() === 'cfdi').length;
+  document.getElementById('sin-comprobante-count').textContent = registros.filter(r => r.tipo && r.tipo.toLowerCase() === 'sin comprobante(ticket o nota)').length;
 
   document.getElementById('contador-registros').textContent = `Registros Totales: ${registros.length}`;
   renderizarPaginacion(totalPaginas);
@@ -441,82 +257,72 @@ function renderizarPaginacion(totalPaginas) {
 
 
 // Filtro por folio, establecimiento e importe
-const registroSearchEl = document.getElementById('registro-search');
-if (registroSearchEl) {
-  registroSearchEl.addEventListener('input', function() {
-    const valor = this.value.trim().toLowerCase();
-    const filtrados = registrosOriginales.filter(r =>
-      (r.pago && r.pago.toLowerCase().includes(valor)) || // Tipo de pago
-      (r.establecimiento && r.establecimiento.toLowerCase().includes(valor)) || // Establecimiento
-      (r.folio && r.folio.toLowerCase().includes(valor)) || // Folio
-      (proyectosInfo.find(p => p.id_proyecto === r.id_proyecto && p.nombre.toLowerCase().includes(valor))) // Proyecto
-    );
-    paginaActual = 1;
-    mostrarRegistrosPaginados(filtrados);
-  });
-}
+document.getElementById('registro-search').addEventListener('input', function() {
+  const valor = this.value.trim().toLowerCase();
+  const filtrados = registrosOriginales.filter(r =>
+    (r.pago && r.pago.toLowerCase().includes(valor)) || // Tipo de pago
+    (r.establecimiento && r.establecimiento.toLowerCase().includes(valor)) || // Establecimiento
+    (r.folio && r.folio.toLowerCase().includes(valor)) || // Folio
+    (proyectosInfo.find(p => p.id_proyecto === r.id_proyecto && p.nombre.toLowerCase().includes(valor))) // Proyecto
+  );
+  paginaActual = 1;
+  mostrarRegistrosPaginados(filtrados);
+});
 
 // Autocompletado
 const proyectoInput = document.getElementById('proyecto-autocomplete');
 const autocompleteList = document.getElementById('autocomplete-list');
 
-if (proyectoInput && autocompleteList) {
-  proyectoInput.addEventListener('input', function() {
-    const valor = this.value.trim().toLowerCase();
-    autocompleteList.innerHTML = '';
-    if (!valor) {
-      paginaActual = 1;
-      mostrarRegistrosPaginados(registrosOriginales);
-      return;
-    }
-    const sugerencias = proyectosNombres.filter(n => n.toLowerCase().includes(valor));
-    sugerencias.forEach(nombre => {
-      const div = document.createElement('div');
-      div.textContent = nombre;
-      div.onclick = function() {
-        proyectoInput.value = nombre;
-        autocompleteList.innerHTML = '';
-        filtrarPorProyecto(nombre);
-      };
-      autocompleteList.appendChild(div);
-    });
-  });
-
-  // Opcional: Oculta el autocompletado si se hace clic fuera
-  document.addEventListener('click', function(e) {
-    if (!autocompleteList.contains(e.target) && e.target !== proyectoInput) {
+proyectoInput.addEventListener('input', function() {
+  const valor = this.value.trim().toLowerCase();
+  autocompleteList.innerHTML = '';
+  if (!valor) {
+    paginaActual = 1;
+    mostrarRegistrosPaginados(registrosOriginales);
+    return;
+  }
+  const sugerencias = proyectosNombres.filter(n => n.toLowerCase().includes(valor));
+  sugerencias.forEach(nombre => {
+    const div = document.createElement('div');
+    div.textContent = nombre;
+    div.onclick = function() {
+      proyectoInput.value = nombre;
       autocompleteList.innerHTML = '';
-    }
+      filtrarPorProyecto(nombre);
+    };
+    autocompleteList.appendChild(div);
   });
+});
+
+// Filtrar registros por nombre de proyecto
+function filtrarPorProyecto(nombreProyecto) {
+  const filtrados = registrosOriginales.filter(r =>
+    proyectosInfo.find(p => p.id_proyecto === r.id_proyecto && p.nombre === nombreProyecto)
+  );
+  paginaActual = 1;
+  mostrarRegistrosPaginados(filtrados);
 }
 
-// Editar proyecto - autocompletado (solo si existe)
-const editarProyectoInput = document.getElementById('editar-proyecto-autocomplete');
-const editarAutocompleteList = document.getElementById('editar-autocomplete-list');
+// Opcional: Oculta el autocompletado si se hace clic fuera
+document.addEventListener('click', function(e) {
+  if (!autocompleteList.contains(e.target) && e.target !== proyectoInput) {
+    autocompleteList.innerHTML = '';
+  }
+});
 
-if (editarProyectoInput && editarAutocompleteList) {
-  editarProyectoInput.addEventListener('input', function() {
-    const valor = this.value.trim().toLowerCase();
-    editarAutocompleteList.innerHTML = '';
-    if (!valor) return;
-    const sugerencias = proyectosNombres.filter(n => n.toLowerCase().includes(valor));
-    sugerencias.forEach(nombre => {
-      const div = document.createElement('div');
-      div.textContent = nombre;
-      div.onclick = function() {
-        editarProyectoInput.value = nombre;
-        editarAutocompleteList.innerHTML = '';
-      };
-      editarAutocompleteList.appendChild(div);
-    });
-  });
+document.addEventListener('DOMContentLoaded', () => {
+  if (!verificarSesion()) return;
+  cargarRegistrosSupabase();
+});
 
-  document.addEventListener('click', function(e) {
-    if (!editarAutocompleteList.contains(e.target) && e.target !== editarProyectoInput) {
-      editarAutocompleteList.innerHTML = '';
-    }
-  });
-}
+document.getElementById('descargar-csv').addEventListener('click', function() {
+  //window.location.href = '/proyecto_facturas/modules/impresion/imprimir.html';
+  window.location.href = '../impresion/imprimir.html';
+});
+
+document.getElementById('descargar-btn').addEventListener('click', function() {
+  document.getElementById('modalPreguntas').style.display = 'flex';
+});
 
 // Guardar cambios al editar
 document.getElementById('form-editar-gasto').onsubmit = async function(e) {
@@ -573,6 +379,33 @@ function obtenerNombreProyecto(id_proyecto) {
   return proyecto ? proyecto.nombre : '';
 }
 
+const editarProyectoInput = document.getElementById('editar-proyecto-autocomplete');
+const editarAutocompleteList = document.getElementById('editar-autocomplete-list');
+
+// Al escribir en el input, muestra sugerencias de todos los proyectos
+editarProyectoInput.addEventListener('input', function() {
+  const valor = this.value.trim().toLowerCase();
+  editarAutocompleteList.innerHTML = '';
+  if (!valor) return;
+  const sugerencias = proyectosNombres.filter(n => n.toLowerCase().includes(valor));
+  sugerencias.forEach(nombre => {
+    const div = document.createElement('div');
+    div.textContent = nombre;
+    div.onclick = function() {
+      editarProyectoInput.value = nombre;
+      editarAutocompleteList.innerHTML = '';
+    };
+    editarAutocompleteList.appendChild(div);
+  });
+});
+
+// Opcional: Oculta el autocompletado si se hace clic fuera
+document.addEventListener('click', function(e) {
+  if (!editarAutocompleteList.contains(e.target) && e.target !== editarProyectoInput) {
+    editarAutocompleteList.innerHTML = '';
+  }
+});
+
 function normalizarPago(str) {
   return (str || '')
     .replace(/[\s\r\n\t]+/g, ' ') // reemplaza espacios, saltos de línea, tabulaciones por un solo espacio
@@ -581,15 +414,16 @@ function normalizarPago(str) {
     .toLowerCase();
 }
 
-const tiposPago = [
-  "Pagos con tarjeta facturados.",
-  "Pagos con tarjeta tickets",
-  "Pagos con efectivo retiro tarjeta facturados.",
-  "Pagos con efectivo retiro tarjeta tickets.",
-  "Pagos efectivo retiro tarjeta sin comprobante",
-  "Pagos efectivo (caja) tickets",
-  "Pago efectivo (caja) sin comprobante",
-  "Pago con efectivo (caja) facturado." // <-- NUEVO
+// Array de tipos de pago actualizados
+const TIPOS_PAGO = [
+  "PAGO EDENRED CON CFDI",
+  "PAGO EDENRED SIN COMPROBANTE", 
+  "RETIRO EDENRED CFDI",
+  "RETIBO EDENRED SIN COMPROBANTE",
+  "PAGO EFECTIVO CAJA CFDI",
+  "PAGO EFECTIVO CAJA SIN COMPROBANTE",
+  "PAGO TARJETA PERSONAL CON CFDI",
+  "PAGO TARJETA PERSONAL SIN COMPROBANTE"
 ];
 
 // Formatea fecha igual que imprimir.js
@@ -627,9 +461,9 @@ function generarHTMLImpresion(registros, proyecto) {
   `;
 
   let totalRegistros = 0;
-  const tiposPagoNormalizados = tiposPago.map(normalizarPago);
+  const tiposPagoNormalizados = TIPOS_PAGO.map(normalizarPago);
 
-  tiposPago.forEach(tipo => {
+  TIPOS_PAGO.forEach(tipo => {
     const tipoNormalizado = normalizarPago(tipo);
     const registrosPorTipo = registros.filter(r =>
       normalizarPago(r.pago) === tipoNormalizado
@@ -725,58 +559,65 @@ function generarHTMLImpresion(registros, proyecto) {
 }
 
 // Evento para el botón de imprimir (flecha)
-const imprimirBtn = document.querySelector('.table-footer .btn') || document.getElementById('imprimir-descargar-csv');
-if (imprimirBtn) {
-  imprimirBtn.addEventListener('click', async function() {
-    // Usa los registros filtrados actualmente
-    let registros = registrosFiltrados.length ? registrosFiltrados : registrosOriginales;
+document.querySelector('.table-footer .btn').addEventListener('click', async function() {
+  // Usa los registros filtrados actualmente
+  let registros = registrosFiltrados.length ? registrosFiltrados : registrosOriginales;
 
-    // Si hay filtro de proyecto, busca el proyecto
-    let nombreProyecto = document.getElementById('proyecto-autocomplete').value.trim();
-    let proyecto = null;
-    if (nombreProyecto) {
-      proyecto = proyectosInfo.find(p => p.nombre === nombreProyecto);
-      registros = registros.filter(r => proyecto && r.id_proyecto === proyecto.id_proyecto);
-    }
+  // Si hay filtro de proyecto, busca el proyecto
+  let nombreProyecto = document.getElementById('proyecto-autocomplete').value.trim();
+  let proyecto = null;
+  if (nombreProyecto) {
+    proyecto = proyectosInfo.find(p => p.nombre === nombreProyecto);
+    registros = registros.filter(r => proyecto && r.id_proyecto === proyecto.id_proyecto);
+  }
 
-    // Genera el HTML de impresión
-    const htmlImpresion = generarHTMLImpresion(registros, proyecto);
+  // Genera el HTML de impresión
+  const htmlImpresion = generarHTMLImpresion(registros, proyecto);
 
-    // Inserta en el área oculta
-    const printArea = document.getElementById('print-area');
-    if (printArea) printArea.innerHTML = htmlImpresion;
+  // Inserta en el área oculta
+  const printArea = document.getElementById('print-area');
+  printArea.innerHTML = htmlImpresion;
 
-    // Imprime solo el área generada
-    const ventana = window.open('', '', 'width=900,height=700');
-    if (!ventana) {
-      alert('No se pudo abrir la ventana de impresión. Revisa las ventanas emergentes del navegador.');
-      return;
-    }
-    ventana.document.write(`
-      <html>
-        <head>
-          <title>Imprimir Registros</title>
-          <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
-          <style>
-            body { font-family:Montserrat,Roboto,sans-serif; color:#003B5C; }
-            table { border-collapse:collapse; width:100%; }
-            th, td { border:1px solid #ececec; padding:6px; }
-            th { background:#ececec; }
-            h2, h3 { color:#003B5C; }
-          </style>
-        </head>
-        <body>
-          ${htmlImpresion}
-        </body>
-      </html>
-    `);
-    ventana.document.close();
-    ventana.focus();
-    ventana.print();
-    ventana.close();
-  });
-} else {
-  console.warn('Botón de imprimir no encontrado en el DOM.');
+  // Imprime solo el área generada
+  const ventana = window.open('', '', 'width=900,height=700');
+  ventana.document.write(`
+    <html>
+      <head>
+        <title>Imprimir Registros</title>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600&family=Roboto:wght@400;500&display=swap" rel="stylesheet" />
+        <style>
+          body { font-family:Montserrat,Roboto,sans-serif; color:#003B5C; }
+          table { border-collapse:collapse; width:100%; }
+          th, td { border:1px solid #ececec; padding:6px; }
+          th { background:#ececec; }
+          h2, h3 { color:#003B5C; }
+        </style>
+      </head>
+      <body>
+        ${htmlImpresion}
+      </body>
+    </html>
+  `);
+  ventana.document.close();
+  ventana.focus();
+  ventana.print();
+  ventana.close();
+});
+
+// Agregar función: verifica session solo por projectidadmin === '1'
+function verificarSesion() {
+  const projectidadmin = localStorage.getItem('projectidadmin');
+  if (!projectidadmin || projectidadmin !== '1') {
+    const body = document.body;
+    Array.from(body.children).forEach(el => el.style.display = 'none');
+    const aviso = document.createElement('div');
+    aviso.id = 'login-warning';
+    aviso.style.cssText = 'display:flex;align-items:center;justify-content:center;height:100vh;padding:1rem;font-size:1.25rem;';
+    aviso.textContent = 'Por favor inicie sesión';
+    body.appendChild(aviso);
+    return false;
+  }
+  return true;
 }
 
 // Ejemplo para dashboard.js
