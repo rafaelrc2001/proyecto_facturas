@@ -29,8 +29,11 @@ function verificarSesion() {
 }
 
 async function cargarProyectos() {
-  // 1. Obtén todos los proyectos
-  const { data: proyectos, error: errorProyectos } = await obtenerProyectos();
+  // 1. Obtén todos los proyectos - ASEGURÁNDONOS DE TRAER EL CAMPO 'liberar'
+  const { data: proyectos, error: errorProyectos } = await supabase
+    .from('proyecto')
+    .select('*, liberar')  // 🔥 AGREGAR 'liberar' aquí
+    .eq('visibilidad', true);
   
   // 2. Obtén todas las asignaciones con trabajadores (corregir la consulta)
   const { data: asignaciones, error: errorAsignaciones } = await supabase
@@ -291,8 +294,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 //hasta aca
-
-
 
 
 
@@ -660,6 +661,7 @@ function mostrarProyectosPaginados(proyectos) {
            <td style="font-weight: 700; color: #28a745; text-align: center; background: #f8fff9;">${presupuestoTotal}</td>
         <td>${responsableProyecto}</td>
         <td>${responsableViaticos}</td>
+        <td>${proyecto.liberar ? 'Sí' : 'No'}</td>
         <td>
       
        <div class="acciones-btns">

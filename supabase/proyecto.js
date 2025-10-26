@@ -6,11 +6,13 @@ export async function insertarProyecto({ cliente, nombre, descripción, ubicaci�
     .insert([{ cliente, nombre, descripción, ubicación, fecha_inicio, fecha_final }]);
 }
 
+// 🔥 ACTUALIZAR: Agregar filtro por liberar = false
 export async function obtenerProyectos() {
   return await supabase
     .from('proyecto')
     .select('*')
-    .eq('visibilidad', true); // Solo los visibles
+    .eq('visibilidad', true)    // Solo los visibles
+    .eq('liberar', false);      // Y que NO estén liberados
 }
 
 export async function eliminarProyecto(id) {
@@ -54,20 +56,10 @@ export async function actualizarPresupuestoProyecto(id_proyecto, nuevoPresupuest
     .eq('id_proyecto', id_proyecto);
 }
 
-// 🔥 NUEVA FUNCIÓN PARA LIBERAR PROYECTO:
+// 🔥 FUNCIÓN PARA LIBERAR PROYECTO (CORREGIDA):
 export async function liberarProyecto(id_proyecto) {
   try {
-    // 1. Primero eliminar todas las asignaciones relacionadas
-    const { error: errorAsignaciones } = await supabase
-      .from('asignar_proyecto')
-      .delete()
-      .eq('id_proyecto', id_proyecto);
-
-    if (errorAsignaciones) {
-      return { error: errorAsignaciones };
-    }
-
-    // 2. Luego actualizar la columna liberar a true
+    // Solo actualizar la columna liberar a true, SIN eliminar asignaciones
     const { data, error } = await supabase
       .from('proyecto')
       .update({ liberar: true })
@@ -78,4 +70,21 @@ export async function liberarProyecto(id_proyecto) {
     console.error('Error en liberarProyecto:', ex);
     return { error: ex };
   }
+}
+
+// 🔥 NUEVA FUNCIÓN: Obtener proyectos liberados (para admin)
+export async function obtenerProyectosLiberados() {
+  return await supabase
+    .from('proyecto')
+    .select('*')
+    .eq('visibilidad', true)    // Solo los visibles
+    .eq('liberar', true);       // Pero que SÍ estén liberados
+}
+
+// 🔥 NUEVA FUNCIÓN: Restaurar proyecto liberado
+export async function restaurarProyecto(id_proyecto) {
+  return await supabase
+    .from('proyecto')
+    .update({ liberar: false })
+    .eq('id_proyecto', id_proyecto);
 }

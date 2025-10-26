@@ -249,7 +249,7 @@ function mostrarTablasFiltradas(registrosFiltrados, nombreProyecto) {
               </tr>
               <tr>
                 <td><strong>UBICACIÓN DE LA OBRA:</strong></td>
-                <td>${proyecto.ubicacion || ''}</td>
+                <td>${proyecto.ubicación || ''}</td>
               </tr>
               <tr>
                 <td><strong>RESPONSABLE DEL PROYECTO:</strong></td>

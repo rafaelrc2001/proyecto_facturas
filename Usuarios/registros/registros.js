@@ -13,6 +13,7 @@ let respuestasPreguntas = {};
 let vehiculos = [];
 
 // Obtén los nombres de proyectos al cargar la página
+// 🔥 ACTUALIZAR: Cargar proyectos considerando liberación
 async function cargarProyectosNombres() {
   const idTrabajadorRaw = localStorage.getItem('id_trabajador');
   const idTrabajador = idTrabajadorRaw ? Number(idTrabajadorRaw) : null;
@@ -27,9 +28,10 @@ async function cargarProyectosNombres() {
   const user = JSON.parse(userRaw || '{}');
 
   try {
-    // 🔥 CAMBIO: Si es trabajador, solo sus proyectos asignados
+    let proyectos = [];
+
     if (idTrabajador && user.role === 'trabajador') {
-      // Obtener proyectos asignados a este trabajador
+      // Para trabajadores: solo proyectos asignados, visibles y NO liberados
       const { data: asigns, error: asignErr } = await supabase
         .from('asignar_proyecto')
         .select('id_proyecto')
@@ -44,22 +46,27 @@ async function cargarProyectosNombres() {
         return;
       }
       
+      // 🔥 CAMBIAR: usar 'ubicación' con tilde
       const { data } = await supabase
         .from('proyecto')
-        .select('id_proyecto, nombre, cliente, ubicación, fecha_inicio, fecha_final')
+        .select('id_proyecto, nombre, cliente, ubicación, fecha_inicio, fecha_final') // 🔥 CON TILDE
         .in('id_proyecto', ids)
-        .eq('visibilidad', true);
-      proyectosInfo = data || [];
+        .eq('visibilidad', true)
+        .eq('liberar', false);
+      proyectos = data || [];
     } else {
-      // Admin: todos los proyectos
+      // 🔥 CAMBIAR: usar 'ubicación' con tilde
       const { data } = await supabase
         .from('proyecto')
-        .select('id_proyecto, nombre, cliente, ubicación, fecha_inicio, fecha_final')
-        .eq('visibilidad', true);
-      proyectosInfo = data || [];
+        .select('id_proyecto, nombre, cliente, ubicación, fecha_inicio, fecha_final') // 🔥 CON TILDE
+        .eq('visibilidad', true)
+        .eq('liberar', false);
+      proyectos = data || [];
     }
-    
-    proyectosNombres = proyectosInfo.map(p => p.nombre);
+
+    // Resto del código igual...
+    proyectosInfo = proyectos;
+    proyectosNombres = proyectosInfo.map(p => p.nombre).filter(n => n);
   } catch (err) {
     console.error('Error cargando proyectos:', err);
     proyectosInfo = [];
@@ -475,7 +482,7 @@ function generarHTMLImpresion(registros, proyecto) {
         <table style="margin-bottom:24px; border-collapse:collapse;">
           <tr><td><strong>PROYECTO:</strong></td><td>${proyecto.nombre || ''}</td></tr>
           <tr><td><strong>CLIENTE:</strong></td><td>${proyecto.cliente || ''}</td></tr>
-          <tr><td><strong>UBICACIÓN:</strong></td><td>${proyecto.ubicación || ''}</td></tr>
+          <tr><td><strong>UBICACIÓN:</strong></td><td>${proyecto.ubicación || ''}</td></tr> <!-- 🔥 CON TILDE -->
           <tr><td><strong>INICIO:</strong></td><td>${formatearFecha(proyecto.fecha_inicio)}</td></tr>
           <tr><td><strong>TERMINACIÓN:</strong></td><td>${formatearFecha(proyecto.fecha_final)}</td></tr>
         </table>

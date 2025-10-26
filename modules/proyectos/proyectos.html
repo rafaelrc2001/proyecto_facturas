@@ -213,6 +213,7 @@
         <th style="text-align:center;">Presupuesto Total</th>
         <th style="text-align:center;">Responsable Proyecto</th>
         <th style="text-align:center;">Responsable Viáticos</th>
+        <th style="text-align:center;">Liberado</th>
         <th style="text-align:center;">Acciones</th>
         </tr>
       </thead>
@@ -330,7 +331,7 @@
     <div class="modal-title-line" style="height:4px; background:#FF8F00; border-radius:2px; margin-bottom:24px;"></div>
     
     <!-- Información del proyecto -->
-    <div style="background:#fff3cd; padding:16px; border-radius:8px; margin-bottom:20px; border-left:4px solid #FF8F00; border:1px solid #ffeaa7;">
+    <div style="background:#fff3cd; padding:16px; border-radius:8px; margin-bottom:24px; border-left:4px solid #FF8F00; border:1px solid #ffeaa7;">
       <h4 style="color:#003B5C; margin:0 0 12px 0;">Proyecto: <span id="liberar-proyecto-nombre" style="font-weight:normal;"></span></h4>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:0.9em; color:#666;">
         <p style="margin:0;">Cliente: <span id="liberar-cliente"></span></p>
@@ -340,10 +341,10 @@
     </div>
 
     <!-- Advertencia -->
-    <div style="background:#f8d7da; padding:16px; border-radius:8px; margin-bottom:24px; border-left:4px solid #dc3545; border:1px solid #f5c6cb;">
-      <p style="margin:0; color:#721c24; font-weight:600; font-size:0.95em;">
-        <i class="ri-warning-line" style="margin-right:8px;"></i>
-        Al liberar este proyecto se eliminarán todas las asignaciones relacionadas. Esta acción no se puede deshacer.
+    <div style="background:#fff3cd; padding:16px; border-radius:8px; margin-bottom:24px; border-left:4px solid #FF8F00; border:1px solid #ffeaa7;">
+      <p style="margin:0; color:#856404; font-weight:600; font-size:0.95em;">
+        <i class="ri-information-line" style="margin-right:8px;"></i>
+        Al liberar este proyecto se marcará como liberado y no aparecerá en la lista principal de proyectos activos.
       </p>
     </div>
 
@@ -351,7 +352,7 @@
     <div style="margin-bottom:24px;">
       <label style="display:flex; align-items:center; cursor:pointer; font-size:0.95em;">
         <input type="checkbox" id="confirmar-liberacion" style="margin-right:12px; transform:scale(1.2);">
-        <span style="color:#003B5C;">Confirmo que entiendo las consecuencias de esta acción</span>
+        <span style="color:#003B5C;">Confirmo que deseo liberar este proyecto</span>
       </label>
     </div>
 

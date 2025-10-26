@@ -243,7 +243,7 @@ function mostrarTablasFiltradas(registrosFiltrados, nombreProyecto) {
               </tr>
               <tr>
                 <td><strong>UBICACIÓN DE LA OBRA:</strong></td>
-                <td>${proyecto.ubicacion || ''}</td>
+                <td>${proyecto.ubicación || ''}</td> <!-- 🔥 CON TILDE -->
               </tr>
               <tr>
                 <td><strong>RESPONSABLE DEL PROYECTO:</strong></td>
@@ -361,9 +361,8 @@ async function cargarProyectosNombres() {
   try {
     let proyectos = [];
 
-    // 🔥 CAMBIO PRINCIPAL: Si es trabajador, solo mostrar proyectos asignados
     if (idTrabajador && user.role === 'trabajador') {
-      // Obtener proyectos asignados a este trabajador
+      // Para trabajadores: solo proyectos asignados, visibles y NO liberados
       const { data: asigns, error: asignErr } = await supabase
         .from('asignar_proyecto')
         .select('id_proyecto')
@@ -378,19 +377,21 @@ async function cargarProyectosNombres() {
         return;
       }
       
-      // Obtener solo los proyectos asignados
+      // 🔥 CAMBIAR: usar 'ubicación' con tilde
       const { data } = await supabase
         .from('proyecto')
-        .select('id_proyecto, nombre, cliente, ubicación, fecha_inicio, fecha_final')
+        .select('id_proyecto, nombre, cliente, ubicación, fecha_inicio, fecha_final') // 🔥 CON TILDE
         .in('id_proyecto', ids)
-        .eq('visibilidad', true);
+        .eq('visibilidad', true)
+        .eq('liberar', false);
       proyectos = data || [];
     } else {
-      // Admin: ver todos los proyectos
+      // 🔥 CAMBIAR: usar 'ubicación' con tilde
       const { data } = await supabase
         .from('proyecto')
-        .select('id_proyecto, nombre, cliente, ubicación, fecha_inicio, fecha_final')
-        .eq('visibilidad', true);
+        .select('id_proyecto, nombre, cliente, ubicación, fecha_inicio, fecha_final') // 🔥 CON TILDE
+        .eq('visibilidad', true)
+        .eq('liberar', false);
       proyectos = data || [];
     }
 

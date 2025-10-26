@@ -9,7 +9,7 @@ let vehiculos = []; // 🔥 AGREGAR ESTA VARIABLE
 
 // Obtén los nombres de proyectos al cargar la página
 async function cargarProyectosNombres() {
-  const { data } = await supabase.from('proyecto').select('id_proyecto, nombre');
+  const { data } = await supabase.from('proyecto').select('id_proyecto, nombre, cliente, ubicación, fecha_inicio, fecha_final');
   proyectosInfo = data || [];
   proyectosNombres = proyectosInfo.map(p => p.nombre);
 }
@@ -200,7 +200,6 @@ function mostrarRegistrosPaginados(registros) {
   document.getElementById('sin-comprobante-count').textContent = registros.filter(r => r.tipo && r.tipo.toLowerCase() === 'sin comprobante(ticket o nota)').length;
 
   document.getElementById('contador-registros').textContent = `Registros Totales: ${registros.length}`;
-  renderizarPaginacion(totalPaginas);
 }
 
 function renderizarPaginacion(totalPaginas) {

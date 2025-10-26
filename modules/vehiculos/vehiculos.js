@@ -1,5 +1,5 @@
 import { createVehiculo, updateVehiculo, deleteVehiculo, fetchVehiculos } from '../../supabase/vehiculo.js';
-import { supabase } from '../../supabase/db.js'; // <-- agregado
+import { supabase } from '../../supabase/db.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const btnNuevo = document.querySelector('.btn-nuevo');
@@ -9,16 +9,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('form-nuevo-proyecto');
   const tableBody = document.getElementById('table-body');
   const contador = document.getElementById('contador-registros');
+  const inputBuscar = document.querySelector('.input-buscar');
 
-  // --- Nuevo: elementos del modal de editar ---
+  // --- elementos del modal de editar ---
   const editModal = document.getElementById('modal-editar-vehiculo');
   const editForm = document.getElementById('form-editar-vehiculo');
   const closeEditBtn = document.getElementById('close-modal-editar');
   const cancelEditBtn = document.getElementById('cancelar-modal-editar');
-  // --- Fin de elementos del modal de editar ---
 
   if (!btnNuevo || !modal || !form || !tableBody) return;
-  // Permite continuar si no existe el modal de editar; lo comprobamos luego
+
+  let vehiculosOriginales = []; // Almacenar todos los vehículos
+  let vehiculosFiltrados = []; // Almacenar vehículos filtrados
 
   const abrirModal = () => { modal.style.display = 'block'; modal.querySelector('input,textarea')?.focus(); };
   const cerrarModal = () => { modal.style.display = 'none'; form.reset(); };
@@ -27,13 +29,9 @@ document.addEventListener('DOMContentLoaded', () => {
   closeBtn?.addEventListener('click', cerrarModal);
   cancelarBtn?.addEventListener('click', cerrarModal);
 
-  // Cerrar al hacer click fuera del contenido
   modal.addEventListener('click', (e) => { if (e.target === modal) cerrarModal(); });
-
-  // Cerrar con ESC
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') cerrarModal(); });
 
-  // --- funciones abrir/cerrar para modal editar ---
   const abrirEditModal = () => { if (editModal) { editModal.style.display = 'block'; editForm?.querySelector('input')?.focus(); } };
   const cerrarEditModal = () => { if (editModal) { editModal.style.display = 'none'; editForm?.reset(); delete editForm?.dataset?.editingId; } };
 
@@ -44,7 +42,13 @@ document.addEventListener('DOMContentLoaded', () => {
   function actualizarContador() {
     if (!contador) return;
     const rows = tableBody.querySelectorAll('tr').length;
-    contador.textContent = `${rows} vehículo(s)`;
+    const total = vehiculosOriginales.length;
+    
+    if (rows === total) {
+      contador.textContent = `${total} vehículo(s)`;
+    } else {
+      contador.textContent = `${rows} de ${total} vehículo(s)`;
+    }
   }
 
   function renderRow(rowData) {
@@ -65,19 +69,65 @@ document.addEventListener('DOMContentLoaded', () => {
         </div>
       </td>
     `;
-    tableBody.prepend(tr);
+    return tr;
   }
 
-  // Cargar datos iniciales desde Supabase (si está disponible)
+  // 🔥 NUEVA FUNCIÓN: Mostrar vehículos en la tabla
+  function mostrarVehiculos(vehiculos) {
+    tableBody.innerHTML = '';
+    vehiculos.forEach(vehiculo => {
+      const row = renderRow(vehiculo);
+      tableBody.appendChild(row);
+    });
+    actualizarContador();
+  }
+
+  // 🔥 NUEVA FUNCIÓN: Filtrar vehículos por marca
+  function filtrarVehiculos(termino) {
+    if (!termino.trim()) {
+      // Si no hay término de búsqueda, mostrar todos
+      vehiculosFiltrados = [...vehiculosOriginales];
+    } else {
+      // Filtrar por marca (case insensitive)
+      const terminoLower = termino.toLowerCase();
+      vehiculosFiltrados = vehiculosOriginales.filter(vehiculo => {
+        const marca = (vehiculo.marca || '').toLowerCase();
+        return marca.includes(terminoLower);
+      });
+    }
+    
+    mostrarVehiculos(vehiculosFiltrados);
+  }
+
+  // 🔥 AGREGAR EVENT LISTENER PARA EL BUSCADOR:
+  if (inputBuscar) {
+    inputBuscar.addEventListener('input', function(e) {
+      const termino = e.target.value;
+      filtrarVehiculos(termino);
+    });
+
+    inputBuscar.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        e.target.value = '';
+        filtrarVehiculos('');
+      }
+    });
+  }
+
+  // 🔥 ACTUALIZAR función loadInitial:
   (async function loadInitial() {
     try {
       if (typeof supabase !== 'undefined') {
         const rows = await fetchVehiculos();
-        rows.forEach(r => renderRow(r));
-        actualizarContador();
+        vehiculosOriginales = rows || [];
+        vehiculosFiltrados = [...vehiculosOriginales];
+        mostrarVehiculos(vehiculosFiltrados);
       }
     } catch (err) {
       console.warn('No se pudieron cargar vehículos desde Supabase:', err);
+      vehiculosOriginales = [];
+      vehiculosFiltrados = [];
+      actualizarContador();
     }
   })();
 
@@ -94,15 +144,16 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       let rowData;
       if (typeof supabase !== 'undefined') {
-        // Inserta en Supabase via wrapper
         rowData = await createVehiculo({ modelo, marca, placas });
       } else {
-        // Modo local (sin supabase)
         rowData = { modelo, marca, placas };
       }
 
-      renderRow(rowData);
-      actualizarContador();
+      // 🔥 ACTUALIZAR: Agregar al array original y refiltrar
+      vehiculosOriginales.unshift(rowData);
+      const termino = inputBuscar ? inputBuscar.value : '';
+      filtrarVehiculos(termino);
+      
       cerrarModal();
     } catch (err) {
       console.error('Error guardando vehículo:', err);
@@ -119,21 +170,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const row = btn.closest('tr');
     if (!row) return;
 
-    // Eliminar (usa la clase y data-id como en trabajador)
     if (btn.classList.contains('btn-eliminar')) {
       const id = btn.getAttribute('data-id') || row.dataset.id;
       if (!id) {
-        // modo local: eliminar fila
         row.remove();
         actualizarContador();
         return;
       }
 
-      // eliminar en servidor
       try {
         await deleteVehiculo(id);
-        row.remove();
-        actualizarContador();
+        
+        // 🔥 ACTUALIZAR: Remover del array original y refiltrar
+        vehiculosOriginales = vehiculosOriginales.filter(v => String(v.id) !== String(id));
+        const termino = inputBuscar ? inputBuscar.value : '';
+        filtrarVehiculos(termino);
+        
       } catch (err) {
         console.error('Error eliminando en servidor:', err);
         alert('Error eliminando en servidor. Revisa la consola.');
@@ -141,7 +193,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // --- Editar: abrir modal de editar en lugar de reutilizar el form "nuevo" ---
     if (btn.classList.contains('btn-editar')) {
       const id = btn.getAttribute('data-id') || row.dataset.id || '';
       const cols = row.querySelectorAll('td');
@@ -153,17 +204,14 @@ document.addEventListener('DOMContentLoaded', () => {
         editForm.dataset.editingId = id;
         abrirEditModal();
       } else {
-        // Fallback: abrir modal nuevo con los valores (antiguo comportamiento)
         form.querySelector('#vehiculo-modelo').value = cols[0]?.textContent?.trim() || '';
         form.querySelector('#vehiculo-marca').value = cols[1]?.textContent?.trim() || '';
         form.querySelector('#vehiculo-placas').value = cols[2]?.textContent?.trim() || '';
         abrirModal();
-        // mantén el override original solo si editForm no existe (no tocar aquí)
       }
     }
   });
 
-  // --- Manejar envío del formulario de editar ---
   if (editForm) {
     editForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -185,14 +233,20 @@ document.addEventListener('DOMContentLoaded', () => {
           updated = { modelo, marca, placas };
         }
 
-        // actualizar fila DOM si existe
-        const row = tableBody.querySelector(`tr[data-id="${id}"]`);
-        if (row) {
-          const cols = row.querySelectorAll('td');
-          cols[0].textContent = updated?.modelo ?? modelo;
-          cols[1].textContent = updated?.marca ?? marca;
-          cols[2].textContent = updated?.placas ?? placas;
+        // 🔥 ACTUALIZAR: También actualizar en el array original
+        const index = vehiculosOriginales.findIndex(v => String(v.id) === String(id));
+        if (index !== -1) {
+          vehiculosOriginales[index] = { 
+            ...vehiculosOriginales[index], 
+            modelo: updated?.modelo ?? modelo,
+            marca: updated?.marca ?? marca,
+            placas: updated?.placas ?? placas
+          };
         }
+
+        // Re-aplicar filtro actual
+        const termino = inputBuscar ? inputBuscar.value : '';
+        filtrarVehiculos(termino);
 
         cerrarEditModal();
       } catch (err) {
