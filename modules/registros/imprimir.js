@@ -16,6 +16,63 @@ let proyectosInfo = [];
 let proyectosNombres = [];
 let registrosOriginales = [];
 let respuestasHTML = '';
+// 🔥 AGREGAR ESTA VARIABLE:
+let vehiculos = [];
+
+// 🔥 NUEVA FUNCIÓN: Cargar vehículos desde la base de datos
+async function cargarVehiculos() {
+  try {
+    const { data, error } = await supabase
+      .from('vehiculo')  // Usar 'vehiculo' según tu tabla
+      .select('id, marca, modelo, placas')
+      .order('marca');
+
+    if (error) {
+      console.error('Error al cargar vehículos:', error);
+      vehiculos = [];
+      return;
+    }
+
+    vehiculos = data || [];
+    console.log(`Vehículos cargados: ${vehiculos.length}`);
+    
+    // Llenar el select de vehículos
+    llenarSelectVehiculos();
+  } catch (error) {
+    console.error('Error inesperado al cargar vehículos:', error);
+    vehiculos = [];
+  }
+}
+
+// 🔥 NUEVA FUNCIÓN: Llenar el select con los vehículos
+function llenarSelectVehiculos() {
+  const selectVehiculo = document.getElementById('respuesta1');
+  if (!selectVehiculo) {
+    console.warn('Select de vehículos no encontrado (ID: respuesta1)');
+    return;
+  }
+
+  // Limpiar opciones existentes
+  selectVehiculo.innerHTML = '<option value="" disabled selected>Selecciona un vehículo</option>';
+
+  // Si no hay vehículos, mostrar mensaje
+  if (vehiculos.length === 0) {
+    const option = document.createElement('option');
+    option.value = "";
+    option.textContent = "No hay vehículos disponibles";
+    option.disabled = true;
+    selectVehiculo.appendChild(option);
+    return;
+  }
+
+  // Agregar cada vehículo como opción
+  vehiculos.forEach(vehiculo => {
+    const option = document.createElement('option');
+    option.value = `${vehiculo.marca} ${vehiculo.modelo} - ${vehiculo.placas}`;
+    option.textContent = `${vehiculo.marca} ${vehiculo.modelo} - ${vehiculo.placas}`;
+    selectVehiculo.appendChild(option);
+  });
+}
 
 // Agregar función: verifica session solo por projectidadmin === '1'
 function verificarSesion() {
@@ -38,6 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!verificarSesion()) return;
   await cargarProyectosNombres();
   await cargarRegistrosSupabase();
+  await cargarVehiculos(); // 🔥 AGREGAR ESTA LÍNEA
   
   // Configurar eventos de filtros
   configurarEventosFiltros();

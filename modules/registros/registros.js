@@ -3,13 +3,9 @@ import { supabase } from '../../supabase/db.js';
 let registroEditando = null;
 let proyectosNombres = [];
 let registrosOriginales = [];
-let proyectosInfo = []; // [{ id_proyecto, nombre }]
-
-const REGISTROS_POR_PAGINA = 7;
-let paginaActual = 1;
-let registrosFiltrados = []; // Para guardar el resultado del filtro
+let proyectosInfo = [];
 let respuestasPreguntas = {};
-
+let vehiculos = []; // 🔥 AGREGAR ESTA VARIABLE
 
 // Obtén los nombres de proyectos al cargar la página
 async function cargarProyectosNombres() {
@@ -29,6 +25,55 @@ async function cargarRegistrosSupabase() {
   registrosOriginales = data || [];
   paginaActual = 1;
   mostrarRegistrosPaginados(registrosOriginales);
+}
+
+// 🔥 NUEVA FUNCIÓN: Cargar vehículos
+async function cargarVehiculos() {
+  try {
+    const { data, error } = await supabase
+      .from('vehiculo')
+      .select('id, marca, modelo, placas')
+      .order('marca');
+
+    if (error) {
+      console.error('Error al cargar vehículos:', error);
+      vehiculos = [];
+      return;
+    }
+
+    vehiculos = data || [];
+    console.log(`Vehículos cargados: ${vehiculos.length}`);
+    
+    // Llenar el select si existe
+    llenarSelectVehiculos();
+  } catch (error) {
+    console.error('Error inesperado al cargar vehículos:', error);
+    vehiculos = [];
+  }
+}
+
+// 🔥 NUEVA FUNCIÓN: Llenar el select con los vehículos
+function llenarSelectVehiculos() {
+  const selectVehiculo = document.getElementById('respuesta1');
+  if (!selectVehiculo) return;
+
+  selectVehiculo.innerHTML = '<option value="" disabled selected>Selecciona un vehículo</option>';
+
+  if (vehiculos.length === 0) {
+    const option = document.createElement('option');
+    option.value = "";
+    option.textContent = "No hay vehículos disponibles";
+    option.disabled = true;
+    selectVehiculo.appendChild(option);
+    return;
+  }
+
+  vehiculos.forEach(vehiculo => {
+    const option = document.createElement('option');
+    option.value = `${vehiculo.marca} ${vehiculo.modelo} - ${vehiculo.placas}`;
+    option.textContent = `${vehiculo.marca} ${vehiculo.modelo} - ${vehiculo.placas}`;
+    selectVehiculo.appendChild(option);
+  });
 }
 
 function mostrarRegistros(data) {
@@ -265,6 +310,7 @@ document.addEventListener('click', function(e) {
 document.addEventListener('DOMContentLoaded', () => {
   if (!verificarSesion()) return;
   cargarRegistrosSupabase();
+  cargarVehiculos(); // 🔥 AGREGAR ESTA LÍNEA
 });
 
 document.getElementById('descargar-csv').addEventListener('click', function() {

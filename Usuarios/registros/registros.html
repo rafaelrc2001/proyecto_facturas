@@ -337,9 +337,12 @@
     <form id="formPreguntas">
       <div class="modal-form-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:24px 32px; margin-bottom:24px;">
         <div class="modal-form-group" style="display:flex; flex-direction:column;">
-          <label for="respuesta1" style="font-weight:600; color:#276080; margin-bottom:6px;">Vehículo Utilizado</label>
-          <input type="text" id="respuesta1" name="respuesta1"  style="padding:10px 12px; border:1.5px solid #ececec; border-radius:8px; background:#f7f8f6; font-size:1em;">
-        </div>
+  <label for="respuesta1" style="font-weight:600; color:#276080; margin-bottom:6px;">Vehículo Utilizado</label>
+  <select id="respuesta1" name="respuesta1" style="padding:10px 12px; border:1.5px solid #ececec; border-radius:8px; background:#f7f8f6; font-size:1em;">
+    <option value="" disabled selected>Selecciona un vehículo</option>
+    <!-- Las opciones se llenarán dinámicamente -->
+  </select>
+</div>
         <div class="modal-form-group" style="display:flex; flex-direction:column;">
           <label for="respuesta2" style="font-weight:600; color:#276080; margin-bottom:6px;">Personal que viaticó</label>
           <input type="text" id="respuesta2" name="respuesta2"  style="padding:10px 12px; border:1.5px solid #ececec; border-radius:8px; background:#f7f8f6; font-size:1em;">

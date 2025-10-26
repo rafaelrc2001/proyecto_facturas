@@ -10,6 +10,7 @@ let paginaActual = 1;
 let registrosFiltrados = []; // Para guardar el resultado del filtro
 let respuestasPreguntas = {};
 
+let vehiculos = [];
 
 // Obtén los nombres de proyectos al cargar la página
 async function cargarProyectosNombres() {
@@ -310,9 +311,30 @@ document.addEventListener('click', function(e) {
   }
 });
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
   if (!verificarSesion()) return;
+  cargarProyectosNombres();
   cargarRegistrosSupabase();
+  cargarVehiculos(); // 🔥 ASEGURAR QUE ESTA LÍNEA ESTÉ AQUÍ
+
+  // 🔥 AGREGAR ESTOS EVENT LISTENERS PARA FECHAS si los necesitas:
+  const fechaDesde = document.getElementById('fecha-desde');
+  const fechaHasta = document.getElementById('fecha-hasta');
+  const limpiarFechas = document.getElementById('limpiar-fechas');
+
+  if (fechaDesde && fechaHasta && limpiarFechas) {
+    fechaDesde.addEventListener('change', filtrarRegistrosPorFecha);
+    fechaHasta.addEventListener('change', filtrarRegistrosPorFecha);
+    
+    limpiarFechas.addEventListener('click', () => {
+      fechaDesde.value = '';
+      fechaHasta.value = '';
+      mostrarRegistrosPaginados(registrosOriginales);
+    });
+  }
+
+  // Configurar autocompletado principal
+  configurarAutocompletadoPrincipal();
 });
 
 document.getElementById('descargar-csv').addEventListener('click', function() {
@@ -629,6 +651,125 @@ if (user) {
     document.querySelector('.name').textContent = user.nombre;
     document.querySelector('.role').textContent = user.puesto;
 }
+
+// 🔥 AGREGAR ESTA FUNCIÓN en registros.js:
+function configurarAutocompletadoPrincipal() {
+  const proyectoInput = document.getElementById('imprimir-proyecto-autocomplete');
+  const autocompleteList = document.getElementById('imprimir-autocomplete-list');
+
+  if (!proyectoInput || !autocompleteList) {
+    console.warn('Elementos de autocompletado no encontrados');
+    return;
+  }
+
+  proyectoInput.addEventListener('input', function() {
+    const valor = this.value.trim().toLowerCase();
+    autocompleteList.innerHTML = '';
+    
+    if (!valor) {
+      // Si no hay texto, mostrar todos los registros
+      mostrarRegistrosPaginados(registrosOriginales);
+      return;
+    }
+    
+    // Mostrar sugerencias
+    const sugerencias = proyectosNombres.filter(n => n.toLowerCase().includes(valor));
+    sugerencias.forEach(nombre => {
+      const div = document.createElement('div');
+      div.textContent = nombre;
+      div.style.cssText = 'padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #eee;';
+      div.addEventListener('mouseenter', function() {
+        this.style.backgroundColor = '#f0f0f0';
+      });
+      div.addEventListener('mouseleave', function() {
+        this.style.backgroundColor = '';
+      });
+      div.onclick = function() {
+        proyectoInput.value = nombre;
+        autocompleteList.innerHTML = '';
+        filtrarPorProyecto(nombre);
+      };
+      autocompleteList.appendChild(div);
+    });
+  });
+
+  // Ocultar autocompletado al hacer clic fuera
+  document.addEventListener('click', function(e) {
+    if (!autocompleteList.contains(e.target) && e.target !== proyectoInput) {
+      autocompleteList.innerHTML = '';
+    }
+  });
+}
+
+// Cargar vehículos
+async function cargarVehiculos() {
+  try {
+    const { data, error } = await supabase
+      .from('vehiculo')               // <- usar 'vehiculo' (singular)
+      .select('id, marca, modelo, placas')
+      .order('marca');
+
+    if (error) {
+      console.error('Error al cargar vehículos:', error);
+      vehiculos = [];
+      return;
+    }
+
+    vehiculos = data || [];
+    console.log(`Vehículos cargados: ${vehiculos.length}`);
+    llenarSelectVehiculos();
+  } catch (err) {
+    console.error('Error inesperado al cargar vehículos:', err);
+    vehiculos = [];
+  }
+}
+
+function llenarSelectVehiculos() {
+  const selectVehiculo = document.getElementById('respuesta1');
+  if (!selectVehiculo) return;
+  selectVehiculo.innerHTML = '<option value="" disabled selected>Selecciona un vehículo</option>';
+  if (vehiculos.length === 0) {
+    const o = document.createElement('option'); o.value = ""; o.textContent = "No hay vehículos disponibles"; o.disabled = true; selectVehiculo.appendChild(o); return;
+  }
+  vehiculos.forEach(v => {
+    const option = document.createElement('option');
+    option.value = `${v.marca} ${v.modelo} - ${v.placas}`;
+    option.textContent = `${v.marca} ${v.modelo} - ${v.placas}`;
+    selectVehiculo.appendChild(option);
+  });
+}
+
+// DOMContentLoaded: verificar elementos antes de agregar listeners
+document.addEventListener('DOMContentLoaded', function() {
+  if (!verificarSesion()) return;
+
+  cargarProyectosNombres();
+  cargarRegistrosSupabase();
+  cargarVehiculos();
+
+  const fechaDesde = document.getElementById('fecha-desde');
+  const fechaHasta = document.getElementById('fecha-hasta');
+  const limpiarFechas = document.getElementById('limpiar-fechas');
+
+  if (fechaDesde && fechaHasta && limpiarFechas) {
+    fechaDesde.addEventListener('change', filtrarRegistrosPorFecha);
+    fechaHasta.addEventListener('change', filtrarRegistrosPorFecha);
+    limpiarFechas.addEventListener('click', () => {
+      fechaDesde.value = '';
+      fechaHasta.value = '';
+      mostrarRegistrosPaginados(registrosOriginales);
+    });
+  } else {
+    console.warn('Elementos de filtro de fecha no presentes en esta vista.');
+  }
+
+  // proteger autocompletado si no existe
+  setTimeout(() => {
+    if (document.getElementById('imprimir-proyecto-autocomplete')) {
+      configurarAutocompletadoPrincipal();
+    }
+  }, 100);
+});
 
 
 

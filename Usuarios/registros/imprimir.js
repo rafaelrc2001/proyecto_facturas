@@ -16,6 +16,57 @@ let proyectosInfo = [];
 let proyectosNombres = [];
 let registrosOriginales = [];
 let respuestasHTML = '';
+// 🔥 AGREGAR ESTA VARIABLE:
+let vehiculos = [];
+
+// 🔥 NUEVA FUNCIÓN: Cargar vehículos desde la base de datos
+async function cargarVehiculos() {
+  try {
+    const { data, error } = await supabase
+      .from('vehiculo')               // <- usar 'vehiculo' (singular)
+      .select('id, marca, modelo, placas')
+      .order('marca');
+
+    if (error) {
+      console.error('Error al cargar vehículos:', error);
+      vehiculos = [];
+      return;
+    }
+
+    vehiculos = data || [];
+    console.log(`Vehículos cargados: ${vehiculos.length}`);
+    llenarSelectVehiculos();
+  } catch (err) {
+    console.error('Error inesperado al cargar vehículos:', err);
+    vehiculos = [];
+  }
+}
+
+function llenarSelectVehiculos() {
+  const selectVehiculo = document.getElementById('respuesta1');
+  if (!selectVehiculo) {
+    console.warn('Select de vehículos no encontrado (ID: respuesta1)');
+    return;
+  }
+
+  selectVehiculo.innerHTML = '<option value="" disabled selected>Selecciona un vehículo</option>';
+
+  if (vehiculos.length === 0) {
+    const option = document.createElement('option');
+    option.value = "";
+    option.textContent = "No hay vehículos disponibles";
+    option.disabled = true;
+    selectVehiculo.appendChild(option);
+    return;
+  }
+
+  vehiculos.forEach(v => {
+    const option = document.createElement('option');
+    option.value = `${v.marca} ${v.modelo} - ${v.placas}`;
+    option.textContent = `${v.marca} ${v.modelo} - ${v.placas}`;
+    selectVehiculo.appendChild(option);
+  });
+}
 
 // Agregar función: verifica session solo por projectidadmin === '1'
 function verificarSesion() {
@@ -38,6 +89,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!verificarSesion()) return;
   await cargarProyectosNombres();
   await cargarRegistrosSupabase();
+  await cargarVehiculos();
   
   // Configurar eventos de filtros
   configurarEventosFiltros();
