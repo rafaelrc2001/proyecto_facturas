@@ -28,9 +28,28 @@ export async function actualizarProyecto(id, { cliente, nombre, descripción, ub
 }
 
 // Nueva función para actualizar solo el presupuesto
-export async function actualizarPresupuestoProyecto(id_proyecto, presupuesto) {
+export async function actualizarPresupuestoProyecto(id_proyecto, nuevoPresupuesto) {
+  // Primero obtener el presupuesto total actual
+  const { data: proyectoActual, error: errorGet } = await supabase
+    .from('proyecto')
+    .select('presupuesto, presupuesto_total')
+    .eq('id_proyecto', id_proyecto)
+    .single();
+
+  if (errorGet) {
+    return { error: errorGet };
+  }
+
+  // Calcular el nuevo total
+  const presupuestoTotalActual = parseFloat(proyectoActual.presupuesto_total || 0);
+  const nuevoTotal = presupuestoTotalActual + parseFloat(nuevoPresupuesto);
+
+  // Actualizar ambas columnas
   return await supabase
     .from('proyecto')
-    .update({ presupuesto })
+    .update({ 
+      presupuesto: nuevoPresupuesto,  // El último presupuesto asignado
+      presupuesto_total: nuevoTotal   // La suma acumulativa
+    })
     .eq('id_proyecto', id_proyecto);
 }

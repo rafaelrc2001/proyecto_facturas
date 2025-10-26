@@ -181,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
           document.getElementById('modal-asignar-presupuesto').style.display = 'none';
           document.getElementById('presupuesto-actual').value = '';
           // Opcional: recargar proyectos para ver el cambio
-          // cargarProyectos();
+           cargarProyectos();
         }
       } catch (ex) {
         console.error('Error inesperado:', ex);
@@ -579,6 +579,15 @@ function mostrarProyectosPaginados(proyectos) {
     const responsableProyecto = proyecto.asignacion?.trabajador?.nombre || 'Sin asignar';
     const responsableViaticos = proyecto.asignacion?.responsable_viaticos?.nombre || 'Sin asignar';
     
+
+    const presupuestoTotal = proyecto.presupuesto_total ? 
+  `$${parseFloat(proyecto.presupuesto_total).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : 
+  '$0.00';
+
+    const presupuesto = proyecto.presupuesto ? 
+  `$${parseFloat(proyecto.presupuesto).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}` : 
+  'Sin asignar';
+
     tbody.innerHTML += `
       <tr>
         <td>${proyecto.cliente}</td>
@@ -587,6 +596,8 @@ function mostrarProyectosPaginados(proyectos) {
         <td>${proyecto.ubicación || ''}</td>
         <td>${proyecto.fecha_inicio || ''}</td>
         <td>${proyecto.fecha_final || ''}</td>
+        <td style="font-weight: 600; color: #276080; text-align: center;">${presupuesto}</td>
+           <td style="font-weight: 700; color: #28a745; text-align: center; background: #f8fff9;">${presupuestoTotal}</td>
         <td>${responsableProyecto}</td>
         <td>${responsableViaticos}</td>
         <td>
@@ -600,6 +611,37 @@ function mostrarProyectosPaginados(proyectos) {
         </td>
       </tr>
     `;
+  });
+
+  // 🔥 AGREGAR ESTE BLOQUE COMPLETO AQUÍ:
+  
+  // Event listener para los botones de asignar presupuesto
+  document.querySelectorAll('.btn-asignar-presupuesto').forEach(btn => {
+    btn.onclick = function() {
+      console.log('Click en asignar presupuesto');
+      const index = this.getAttribute('data-index');
+      const proyecto = proyectosData[index];
+      
+      const modal = document.getElementById('modal-asignar-presupuesto');
+      if (modal) {
+        modal.style.display = 'flex';
+        
+        // Llenar información del proyecto
+        document.getElementById('presupuesto-proyecto-nombre').textContent = proyecto.nombre || 'Sin nombre';
+        document.getElementById('presupuesto-cliente').textContent = proyecto.cliente || 'Sin cliente';
+        
+        // Mostrar presupuesto total actual
+        const totalActual = proyecto.presupuesto_total || 0;
+        document.getElementById('presupuesto-total-actual').textContent = 
+          `$${parseFloat(totalActual).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        
+        // Limpiar el input
+        document.getElementById('presupuesto-actual').value = '';
+        
+        // Guardar el ID del proyecto
+        document.getElementById('form-asignar-presupuesto').dataset.proyectoId = proyecto.id_proyecto;
+      }
+    };
   });
 
   document.getElementById('contador-registros').textContent = `Registros Totales: ${proyectos.length}`;
@@ -661,7 +703,15 @@ function mostrarProyectosPaginados(proyectos) {
         document.getElementById('presupuesto-proyecto-nombre').textContent = proyecto.nombre || 'Sin nombre';
         document.getElementById('presupuesto-cliente').textContent = proyecto.cliente || 'Sin cliente';
         
-        // Guardar el ID del proyecto para cuando se envíe el formulario
+        // Mostrar presupuesto total actual
+        const totalActual = proyecto.presupuesto_total || 0;
+        document.getElementById('presupuesto-total-actual').textContent = 
+          `$${parseFloat(totalActual).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        
+        // Limpiar el input
+        document.getElementById('presupuesto-actual').value = '';
+        
+        // Guardar el ID del proyecto
         document.getElementById('form-asignar-presupuesto').dataset.proyectoId = proyecto.id_proyecto;
       } else {
         alert('Modal no encontrado. Verifica que el HTML esté agregado.');
