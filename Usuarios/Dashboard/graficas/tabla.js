@@ -51,6 +51,8 @@ export async function cargarTablaSupabase({ limit = 200, projectId = null } = {}
         .from('proyecto')
         .select('id_proyecto')
         .in('id_proyecto', ids)
+        .eq('visibilidad', true)
+        .eq('liberar', false);
 
       if (visErr) { console.error('Error cargando proyectos visibles:', visErr); cont.innerHTML = '<div class="table-empty">Error cargando registros.</div>'; return; }
       const visibleIds = (visibleProjs || []).map(p => Number(p.id_proyecto));
