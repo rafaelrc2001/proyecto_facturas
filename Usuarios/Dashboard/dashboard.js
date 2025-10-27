@@ -55,6 +55,9 @@ import { cargarTablaSupabase } from './graficas/tabla.js';
 let projectsMap = {};   // { 'proyecto x': 123, ... }
 let projectsList = [];  // ['Proyecto X', ...]
 
+// 🔥 AGREGAR ESTA VARIABLE AL INICIO (después de las otras variables)
+let registrosOriginales = []; // ← AÑADIR ESTA LÍNEA
+
 async function cargarDatosDashboard() {
   try {
     const idTrabajador = getIdTrabajador();

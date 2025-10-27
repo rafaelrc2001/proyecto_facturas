@@ -20,9 +20,7 @@ export async function cargarTablaSupabase({ limit = 200, projectId = null } = {}
         .select('id_registro, establecimiento, pago, importe, id_proyecto')
         .order('id_registro', { ascending: false })
         .limit(limit)
-        .eq('id_proyecto', projectId)
-        .eq('visibilidad', true)
-        .eq('liberar', false);
+        .eq('id_proyecto', projectId);
 
       const { data, error } = await query;
       if (error) { console.error('Error al leer registros para la tabla (projectId):', error); cont.innerHTML = '<div class="table-empty">Error cargando registros.</div>'; return; }
@@ -53,8 +51,7 @@ export async function cargarTablaSupabase({ limit = 200, projectId = null } = {}
         .from('proyecto')
         .select('id_proyecto')
         .in('id_proyecto', ids)
-        .eq('visibilidad', true)
-        .eq('liberar', false);
+
       if (visErr) { console.error('Error cargando proyectos visibles:', visErr); cont.innerHTML = '<div class="table-empty">Error cargando registros.</div>'; return; }
       const visibleIds = (visibleProjs || []).map(p => Number(p.id_proyecto));
       if (!visibleIds.length) { cont.innerHTML = '<div class="table-empty">No hay registros disponibles.</div>'; return; }
@@ -99,8 +96,3 @@ export async function cargarTablaSupabase({ limit = 200, projectId = null } = {}
   }
 }
 
-// Auto-inicializa cuando el DOM esté listo (opcional)
-document.addEventListener('DOMContentLoaded', () => {
-  // comentar si prefieres llamar cargarTablaSupabase() desde dashboard.js
-  cargarTablaSupabase();
-});
