@@ -358,6 +358,8 @@ if (projectidadmin) {
  * Carga KPIs desde Supabase y actualiza el DOM.
  * Acepta projectId opcional.
  */
+// ...existing code...
+
 async function cargarKPIsSupabase(projectId = null) {
   try {
     console.log('[KPIs] iniciar, projectId=', projectId);
@@ -421,34 +423,37 @@ async function cargarKPIsSupabase(projectId = null) {
       return;
     }
 
-    // Calcular totales de gastos
+    // 🔥 CAMBIAR ESTA LÓGICA PARA LOS TIPOS CORRECTOS
     let total = 0;
-    let totalFacturas = 0;
+    let totalCFDI = 0; // ← Cambiar nombre de variable
 
     data.forEach(r => {
       const importe = Number(String(r.importe).replace(',', '.')) || 0;
       total += importe;
-      const tipo = (r.tipo || '').toString().toLowerCase();
-      if (tipo.includes('factura')) {
-        totalFacturas += importe;
+      
+      // ✅ NUEVA LÓGICA: buscar tipos exactos de la BD
+      const tipo = (r.tipo || '').toString().trim(); // ← SIN toLowerCase()
+      
+      if (tipo === 'CFDI') {
+        totalCFDI += importe; // ← Suma todos los CFDI
       }
     });
 
-    const totalSinFacturar = total - totalFacturas;
+    const totalSinComprobante = total - totalCFDI; // ← Total Sin Comprobante
 
     // 🔥 CALCULAR VIÁTICOS RESTANTES: Total Viáticos - Total de Gastos
     const viaticosRestantes = totalPresupuestos - total;
 
-    // Actualizar todos los KPIs
+    // 🔥 ACTUALIZAR CON LOS NOMBRES CORRECTOS:
     setTextById('total-gastos', formatCurrency(total));
-    setTextById('facturas-gastos', formatCurrency(totalFacturas));
-    setTextById('tickets-gastos', formatCurrency(totalSinFacturar));
+    setTextById('facturas-gastos', formatCurrency(totalCFDI));           // ← Muestra Total CFDI
+    setTextById('tickets-gastos', formatCurrency(totalSinComprobante));   // ← Muestra Total Sin Comprobante
     setTextById('tickets-viaticos-restantes', formatCurrency(viaticosRestantes));
 
     console.log('[KPIs] actualizados:', { 
       total, 
-      totalFacturas, 
-      totalSinFacturar, 
+      totalCFDI,           // ← Cambiar nombre en log
+      totalSinComprobante, // ← Cambiar nombre en log
       totalPresupuestos, 
       viaticosRestantes 
     });
@@ -462,6 +467,8 @@ async function cargarKPIsSupabase(projectId = null) {
     setTextById('tickets-viaticos-restantes', 'Error');
   }
 }
+
+// ...existing code...
 
 // helper formato moneda (si no la tienes)
 function formatCurrency(n) {

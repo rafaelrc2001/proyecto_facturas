@@ -790,42 +790,48 @@ function calcularYSetearKPIs(data, totalPresupuestos = 0) {
   if (!data || data.length === 0) {
     // Si no hay gastos registrados
     setTextById('total-gastos', formatCurrency(0));
-    setTextById('facturas-gastos', formatCurrency(0));
-    setTextById('tickets-gastos', formatCurrency(0));
+    setTextById('facturas-gastos', formatCurrency(0)); // ← Total CFDI
+    setTextById('tickets-gastos', formatCurrency(0));   // ← Total Sin Comprobante
     
-    // 🔥 CALCULAR VIÁTICOS RESTANTES: Total Viáticos - Total de Gastos (0)
     const viaticosRestantes = totalPresupuestos - 0;
     setTextById('tickets-viaticos-restantes', formatCurrency(viaticosRestantes));
     
     return;
   }
 
-  let total = 0;
-  let totalFacturas = 0;
+  // 🔍 CORREGIR LAS SUMAS AQUÍ
+  let total = 0;           // ← Total de Gastos
+  let totalCFDI = 0;       // ← Total CFDI (antes era totalFacturas)
 
   data.forEach(r => {
     const importe = Number(String(r.importe).replace(',', '.')) || 0;
     total += importe;
-    const tipo = (r.tipo || '').toString().toLowerCase();
-    if (tipo.includes('factura')) totalFacturas += importe;
+
+    // 🔥 CAMBIAR ESTA LÓGICA:
+    const tipo = (r.tipo || '').toString().trim(); // ← SIN toLowerCase()
+    
+    // ✅ BUSCAR 'CFDI' EN VEZ DE 'factura'
+    if (tipo === 'CFDI') {
+      totalCFDI += importe; // ← Suma todos los CFDI
+    }
   });
 
-  const totalSinFacturar = total - totalFacturas;
+  const totalSinComprobante = total - totalCFDI; // ← Total Sin Comprobante
 
-  // 🔥 CALCULAR VIÁTICOS RESTANTES: Total Viáticos - Total de Gastos
   const viaticosRestantes = totalPresupuestos - total;
 
-  // Actualizar todos los KPIs
+  // 🔥 ACTUALIZAR CON LOS NOMBRES CORRECTOS:
   setTextById('total-gastos', formatCurrency(total));
-  setTextById('facturas-gastos', formatCurrency(totalFacturas));
-  setTextById('tickets-gastos', formatCurrency(totalSinFacturar));
+  setTextById('facturas-gastos', formatCurrency(totalCFDI));           // ← Muestra Total CFDI
+  setTextById('tickets-gastos', formatCurrency(totalSinComprobante));   // ← Muestra Total Sin Comprobante
   setTextById('tickets-viaticos-restantes', formatCurrency(viaticosRestantes));
 
-  console.log('[KPIs] actualizados:', { 
+  // 🔥 AGREGAR LOG PARA DEBUG
+  console.log('[KPIs] actualizados:', {
     total, 
-    totalFacturas, 
-    totalSinFacturar, 
+    totalCFDI, 
+    totalSinComprobante, 
     totalPresupuestos, 
-    viaticosRestantes 
+    viaticosRestantes
   });
 }
