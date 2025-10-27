@@ -48,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 let gastosOriginales = [];
+let filtroTipoActual = '';
 
 const GASTOS_POR_PAGINA = 7;
 let paginaActual = 1;
@@ -269,18 +270,29 @@ function renderizarPaginacionGastos(totalPaginas) {
 }
 
 // Filtro por folio y establecimiento
-document.querySelector('.input-buscar').addEventListener('input', function() {
-  const valor = this.value.trim().toLowerCase();
-  const filtrados = gastosOriginales.filter(g =>
-    (g.pago && g.pago.toLowerCase().includes(valor)) || // Tipo de pago
-    (g.establecimiento && g.establecimiento.toLowerCase().includes(valor)) || // Establecimiento
-    (g.folio && g.folio.toLowerCase().includes(valor)) || // Folio
-    (g.tipo && g.tipo.toLowerCase().includes(valor)) || // <-- Filtro por tipo actualizado
-    (proyectosInfo.find(p => p.id_proyecto === g.id_proyecto && p.nombre.toLowerCase().includes(valor))) // Proyecto
-  );
+
+// Función para aplicar todos los filtros
+function aplicarFiltros() {
+  const valorBusqueda = document.querySelector('.input-buscar').value.trim().toLowerCase();
+  
+  let filtrados = gastosOriginales.filter(gasto => {
+    // Filtro por búsqueda de texto
+    const coincideBusqueda = !valorBusqueda || 
+      (gasto.pago && gasto.pago.toLowerCase().includes(valorBusqueda)) ||
+      (gasto.establecimiento && gasto.establecimiento.toLowerCase().includes(valorBusqueda)) ||
+      (gasto.folio && gasto.folio.toLowerCase().includes(valorBusqueda)) ||
+      (gasto.tipo && gasto.tipo.toLowerCase().includes(valorBusqueda)) ||
+      (proyectosInfo.find(p => p.id_proyecto === gasto.id_proyecto && p.nombre.toLowerCase().includes(valorBusqueda)));
+    
+    // Filtro por tipo
+    const coincideTipo = !filtroTipoActual || gasto.tipo === filtroTipoActual;
+    
+    return coincideBusqueda && coincideTipo;
+  });
+  
   paginaActual = 1;
   mostrarGastosPaginados(filtrados);
-});
+}
 
 let proyectosInfo = []; // [{ id_proyecto, nombre }]
 let proyectoSeleccionadoId = null;
@@ -568,7 +580,24 @@ function obtenerNombreProyecto(id_proyecto) {
   return proyecto ? proyecto.nombre : '';
 }
 
-document.addEventListener('DOMContentLoaded', cargarGastos);
+document.addEventListener('DOMContentLoaded', () => {
+  cargarGastos();
+  
+  // Event listeners para filtros
+  const inputBuscar = document.querySelector('.input-buscar');
+  const filtroTipo = document.getElementById('filtro-tipo');
+  
+  if (inputBuscar) {
+    inputBuscar.addEventListener('input', aplicarFiltros);
+  }
+  
+  if (filtroTipo) {
+    filtroTipo.addEventListener('change', function() {
+      filtroTipoActual = this.value;
+      aplicarFiltros();
+    });
+  }
+});
 
 const idTrabajador = localStorage.getItem('id_trabajador');
 if (idTrabajador) {
