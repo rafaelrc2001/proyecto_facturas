@@ -1295,3 +1295,35 @@
   box-shadow: 0 0 0 2px rgba(255, 111, 0, 0.1) !important;
 }
 
+/*ESTILO PARA EL FILTRO */
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: white;
+  font-size: 14px;
+  color: #333;
+  min-width: 180px;
+  cursor: pointer;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #FF6F00;
+  box-shadow: 0 0 0 2px rgba(255, 111, 0, 0.1);
+}
+
+.gastos-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
